@@ -1,5 +1,5 @@
-# pygame
-Learning python game programming.
+# Jotsio Pygame programming
+Testing simple games with python and pygame.
 
-Project needs pygame:
+To run this you need pygame:
 https://www.pygame.org/
