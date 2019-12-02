@@ -1,6 +1,30 @@
 import sys, pygame
 pygame.init()
 
+#object class
+class Object:
+    def __init__(self):
+        print("Object is ready")
+        self.x = 300
+        self.y = 200
+        self.dx = 0
+        self.dy = 0
+    
+#player class
+class Player(Object):
+
+    def __init__(self):
+        super().__init__()
+        print("Player is ready")    
+
+    def whoisThis(self):
+        print("Player")
+
+
+playerShip = Player()
+playerShip.whoisThis()
+
+
 size = width, height = 800, 600
 speed = [0, 0]
 startPos = [400, 500]
