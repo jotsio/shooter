@@ -3,57 +3,65 @@ pygame.init()
 
 #object class
 class Object:
-    def __init__(self):
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
         print("Object is ready")
-        self.x = 300
-        self.y = 200
-        self.dx = 0
-        self.dy = 0
-    
+
+#particle class
+class Particle:
+    def __init__(self, x, y, dx, dy):
+        self.x = x
+        self.y = y
+        self.dx = dx
+        self.dy = dy  
+        print("Particle is ready")  
+
 #player class
-class Player(Object):
+class PlayerShip:
+    def __init__(self, x, y):
+        self.startPos = [x, y]
+        self.speed = [0, 0]  
+        self.img = pygame.image.load("assets/ship_default.png")
+        self.rect = self.img.get_rect()
+        self.rect = self.rect.move(x, y)
+        print("Player is ready")  
+    def moveX(self):
+        self.rect = self.rect.move(self.speed[0], 0 )
+    def setSpeed(self, amount):
+        self.speed[0] = amount
+    def bounceX(self):
+        self.speed[0] = -self.speed[0]
+    def bounceY(self):
+        self.speed[1] = -self.speed[1]
+    
 
-    def __init__(self):
-        super().__init__()
-        print("Player is ready")    
-
-    def whoisThis(self):
-        print("Player")
-
-
-playerShip = Player()
-playerShip.whoisThis()
-
+#pelaajan luonti
+player = PlayerShip(60,70)
+print (player.rect)
 
 size = width, height = 800, 600
-speed = [0, 0]
-startPos = [400, 500]
 black = 0, 0, 0
 
-
+#ruudun maarittely
 screen = pygame.display.set_mode(size)
-
-ship = pygame.image.load("assets/ship_default.png")
-shipRect = ship.get_rect()
-shipRect = shipRect.move(startPos)
 
 while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
-    
-        shipRect = shipRect.move(speed)
         # checks keypresses
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_LEFT]:
-            speed[0] = -2
+            player.setSpeed(-4)
         if pressed[pygame.K_RIGHT]:
-            speed[0] = 2
+            player.setSpeed(4)
         # bounces from the wall
-        if shipRect.left < 0 or shipRect.right > width:
-           speed[0] = -speed[0]
-        if shipRect.top < 0 or shipRect.bottom > height:
-           speed[1] = -speed[1]
+        if player.rect.left < 0 or player.rect.right > width:
+           player.bounceX()
+        if player.rect.top < 0 or player.rect.bottom > height:
+           player.bounceY()
+        player.moveX()
 
     screen.fill(black)
-    screen.blit(ship, shipRect)
+    screen.blit(player.img, player.rect)
     pygame.display.flip()
