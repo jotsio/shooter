@@ -25,18 +25,27 @@ class PlayerShip:
         self.img = pygame.image.load("assets/ship_default.png")
         self.rect = self.img.get_rect()
         self.rect = self.rect.move(x, y)
+        self.maxSpeed = 4
+        self.friction = 0.2
         print("Player is ready")  
-    def moveX(self):
-        self.rect = self.rect.move(self.speed[0], 0 )
-        if self.speed[0] > 0.000 :
-            self.speed[0] = self.speed[0] - 0.001
-        if self.speed[0] < 0.000 :
-            self.speed[0] = self.speed[0] + 0.001
+    def move(self):
+        if self.speed[0] > self.maxSpeed :
+            self.speed[0] = self.maxSpeed
+        if self.speed[0] < -self.maxSpeed :
+            self.speed[0] = -self.maxSpeed
+
+        self.rect = self.rect.move(self.speed)
+
+        if self.speed[0] > 0 :
+            self.speed[0] -= self.friction
+        if self.speed[0] < 0 :
+            self.speed[0] += self.friction
+
     def setThrustX(self, amount):
  #       if self.speed[0] <= 1 and self.speed[0] >= -1:
-            self.speed[0] = self.speed[0] + amount
-    def setSpeed(self, amount):
-        self.speed[0] = amount
+            self.speed[0] += amount
+    def setSpeedX(self, amount):
+        self.speed[0] += amount
     def bounceX(self):
         self.speed[0] = -self.speed[0]
     def bounceY(self):
@@ -53,16 +62,18 @@ screen = pygame.display.set_mode(size)
 player = PlayerShip(400,500)
 print (player.rect)
 
+clock = pygame.time.Clock()
 
-while 1:
+while clock.tick(120):
     # Keyevents listener
     for event in pygame.event.get():
-        if event.type == pygame.QUIT: sys.exit()
-        pressed = pygame.key.get_pressed()
-        player.setThrustX(pressed[pygame.K_RIGHT]-pressed[pygame.K_LEFT])
+       if event.type == pygame.QUIT: sys.exit()
+    
+    pressed = pygame.key.get_pressed()
+    player.setSpeedX(pressed[pygame.K_RIGHT]-pressed[pygame.K_LEFT])
     
     # Player movement
-    player.moveX()
+    player.move()
 
     # bounces from the wall
     if player.rect.left < 0 or player.rect.right > width:
