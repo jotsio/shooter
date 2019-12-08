@@ -47,8 +47,13 @@ class PlayerShip:
     def setSpeedX(self, amount):
         self.speed[0] += amount
     def bounceX(self):
+        if self.rect.left < 0:
+            self.rect.left = 0
+        if self.rect.right > width:
+            self.rect.right = width
         self.speed[0] = -self.speed[0]
     def bounceY(self):
+
         self.speed[1] = -self.speed[1]
 
 
