@@ -13,22 +13,31 @@ class Object:
 class StarField:
     def __init__(self, amount):
         self.n = amount
-        self.y = [0] * amount
-        self.x = [0] * amount
+        self.spd = 0.5
+        self.y = [0.0] * amount
+        self.x = [0.0] * amount
+        self.z = [0.0] * amount
+        self.color = [0,0,0] * amount
+        self.speed = [0.0] * amount
+
+        #Create star random positions and speed
         i = 0
         while i < self.n:
+            
             self.y[i] = random.randrange(0, height)
             self.x[i] = random.randrange(0, width)
+            self.z[i] = random.randrange(0, 255)
+            c = self.z[i]
+            self.color[i] = c, c, c
+            self.speed[i] = c / 255.0 * self.spd
             i += 1
-        print (self.x)
-        print (self.y)
 
     def draw(self): 
         i = 0
         while i < self.n:
-            self.y[i] += 1
+            self.y[i] += self.speed[i]
             if self.y[i] > height: self.y[i] = 0
-            pygame.gfxdraw.pixel(screen, self.x[i], self.y[i], white)
+            pygame.gfxdraw.pixel(screen, self.x[i], int(self.y[i]), self.color[i])
             i += 1
 
 #player class
@@ -39,8 +48,8 @@ class PlayerShip:
         self.img = pygame.image.load("assets/ship_default.png")
         self.rect = self.img.get_rect()
         self.rect = self.rect.move(x, y)
-        self.maxSpeedX = 4
-        self.maxSpeedY = 2
+        self.maxSpeedX = 4.0
+        self.maxSpeedY = 2.0
         self.frictionX = 0.1
         self.frictionY = 0.1
     
@@ -90,16 +99,16 @@ class PlayerShip:
 
 #define screen
 
-size = width, height = 800, 600
+size = width, height = 1280, 1080
 black = 0, 0, 0
 white = 255, 255, 255
 screen = pygame.display.set_mode(size)    
 
 # Create Stars
-stars= StarField(100)
+stars= StarField(400)
 
 # Create player
-player = PlayerShip(400,500)
+player = PlayerShip(width/2,height-100)
 print (player.rect)
 
 clock = pygame.time.Clock()
