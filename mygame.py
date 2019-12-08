@@ -18,8 +18,7 @@ class StarField:
         i = 0
         while i < self.n:
             self.y[i] = random.randrange(0, height)
-            self.x[i] = 300 + i * 10
-       #     self.star[i].y = random.randrange(0, height)
+            self.x[i] = random.randrange(0, width)
             i += 1
         print (self.x)
         print (self.y)
@@ -94,7 +93,7 @@ white = 255, 255, 255
 screen = pygame.display.set_mode(size)    
 
 # Create Stars
-stars= StarField(10)
+stars= StarField(100)
 
 # Create player
 player = PlayerShip(400,500)
