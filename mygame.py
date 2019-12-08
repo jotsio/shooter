@@ -25,27 +25,42 @@ class PlayerShip:
         self.img = pygame.image.load("assets/ship_default.png")
         self.rect = self.img.get_rect()
         self.rect = self.rect.move(x, y)
-        self.maxSpeed = 4
-        self.friction = 0.2
+        self.maxSpeedX = 4
+        self.maxSpeedY = 2
+        self.frictionX = 0.1
+        self.frictionY = 0.1
         print("Player is ready")  
+    
+    # Passive movement
     def move(self):
-        if self.speed[0] > self.maxSpeed :
-            self.speed[0] = self.maxSpeed
-        if self.speed[0] < -self.maxSpeed :
-            self.speed[0] = -self.maxSpeed
-
         self.rect = self.rect.move(self.speed)
-
+        # Horizontal friction
         if self.speed[0] > 0 :
-            self.speed[0] -= self.friction
+            self.speed[0] -= self.frictionX
         if self.speed[0] < 0 :
-            self.speed[0] += self.friction
-
-    def setThrustX(self, amount):
- #       if self.speed[0] <= 1 and self.speed[0] >= -1:
-            self.speed[0] += amount
+            self.speed[0] += self.frictionX
+        # Vertical friction
+        if self.speed[1] > 0 :
+            self.speed[1] -= self.frictionY
+        if self.speed[1] < 0 :
+            self.speed[1] += self.frictionY
+    
+    # Vertical acceleration
     def setSpeedX(self, amount):
         self.speed[0] += amount
+        if self.speed[0] > self.maxSpeedX :
+            self.speed[0] = self.maxSpeedX
+        if self.speed[0] < -self.maxSpeedX :
+            self.speed[0] = -self.maxSpeedX
+
+    # Horizontal acceleration
+    def setSpeedY(self, amount):
+        self.speed[1] += amount
+        if self.speed[1] > self.maxSpeedY :
+            self.speed[1] = self.maxSpeedY
+        if self.speed[1] < -self.maxSpeedY :
+            self.speed[1] = -self.maxSpeedY
+
     def bounceX(self):
         if self.rect.left < 0:
             self.rect.left = 0
@@ -76,6 +91,7 @@ while clock.tick(120):
     
     pressed = pygame.key.get_pressed()
     player.setSpeedX(pressed[pygame.K_RIGHT]-pressed[pygame.K_LEFT])
+    player.setSpeedY(pressed[pygame.K_DOWN]-pressed[pygame.K_UP])
     
     # Player movement
     player.move()
