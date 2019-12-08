@@ -1,4 +1,6 @@
 import sys, pygame
+import pygame.gfxdraw
+import random
 pygame.init()
 
 #object class
@@ -6,16 +8,29 @@ class Object:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        print("Object is ready")
 
-#particle class
-class Particle:
-    def __init__(self, x, y, dx, dy):
-        self.x = x
-        self.y = y
-        self.dx = dx
-        self.dy = dy  
-        print("Particle is ready")  
+#Stars class
+class StarField:
+    def __init__(self, amount):
+        self.n = amount
+        self.y = [0] * amount
+        self.x = [0] * amount
+        i = 0
+        while i < self.n:
+            self.y[i] = random.randrange(0, height)
+            self.x[i] = 300 + i * 10
+       #     self.star[i].y = random.randrange(0, height)
+            i += 1
+        print (self.x)
+        print (self.y)
+
+    def draw(self): 
+        i = 0
+        while i < self.n:
+            self.y[i] += 1
+            if self.y[i] > height: self.y[i] = 0
+            pygame.gfxdraw.pixel(screen, self.x[i], self.y[i], white)
+            i += 1
 
 #player class
 class PlayerShip:
@@ -29,7 +44,6 @@ class PlayerShip:
         self.maxSpeedY = 2
         self.frictionX = 0.1
         self.frictionY = 0.1
-        print("Player is ready")  
     
     # Passive movement
     def move(self):
@@ -76,7 +90,11 @@ class PlayerShip:
 
 size = width, height = 800, 600
 black = 0, 0, 0
+white = 255, 255, 255
 screen = pygame.display.set_mode(size)    
+
+# Create Stars
+stars= StarField(10)
 
 # Create player
 player = PlayerShip(400,500)
@@ -104,5 +122,6 @@ while clock.tick(120):
     
 
     screen.fill(black)
+    stars.draw()
     screen.blit(player.img, player.rect)
     pygame.display.flip()
