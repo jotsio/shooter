@@ -81,7 +81,10 @@ class PlayerShip:
             self.rect.right = width
         self.speed[0] = -self.speed[0]
     def bounceY(self):
-
+        if self.rect.top < 0:
+            self.rect.top = 0
+        if self.rect.bottom > height:
+            self.rect.bottom = height
         self.speed[1] = -self.speed[1]
 
 
