@@ -13,7 +13,7 @@ class Object:
 class StarField:
     def __init__(self, amount):
         self.n = amount
-        self.spd = 0.5
+        self.spd = 1.0
         self.y = [0.0] * amount
         self.x = [0.0] * amount
         self.z = [0.0] * amount
@@ -23,15 +23,15 @@ class StarField:
         #Create star random positions and speed
         i = 0
         while i < self.n:
-            
             self.y[i] = random.randrange(0, height)
             self.x[i] = random.randrange(0, width)
-            self.z[i] = random.randrange(0, 255)
+            rnd = random.random()
+            self.z[i] = rnd * rnd * 255
             c = self.z[i]
             self.color[i] = c, c, c
             self.speed[i] = c / 255.0 * self.spd
             i += 1
-
+        print(self.z)
     def draw(self): 
         i = 0
         while i < self.n:
@@ -105,7 +105,7 @@ white = 255, 255, 255
 screen = pygame.display.set_mode(size)    
 
 # Create Stars
-stars= StarField(400)
+stars= StarField(800)
 
 # Create player
 player = PlayerShip(width/2,height-100)
