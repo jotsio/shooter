@@ -6,8 +6,16 @@ pygame.init()
 #object class
 class Object:
     def __init__(self, x, y):
-        self.x = x
-        self.y = y
+        self.startPos = [x, y]
+        self.speed = [0.0, 2.0]  
+        self.img = pygame.image.load("assets/asteroid.png")
+        self.rect = self.img.get_rect()
+        self.rect = self.rect.move(x, y)
+    def move(self):
+        self.rect = self.rect.move(self.speed)
+        if self.rect.top > height:
+            self.rect.bottom = 0
+            self.rect.left = random.randrange(0, width-self.rect.width)
 
 #Stars class
 class StarField:
@@ -31,7 +39,7 @@ class StarField:
             self.color[i] = c, c, c
             self.speed[i] = c / 255.0 * self.spd
             i += 1
-        print(self.z)
+
     def draw(self): 
         i = 0
         while i < self.n:
@@ -109,7 +117,9 @@ stars= StarField(800)
 
 # Create player
 player = PlayerShip(width/2,height-100)
-print (player.rect)
+
+# Create meteor
+meteor = Object(width/2,height/2)
 
 clock = pygame.time.Clock()
 
@@ -124,6 +134,7 @@ while clock.tick(120):
     
     # Player movement
     player.move()
+    meteor.move()
 
     # bounces from the wall
     if player.rect.left < 0 or player.rect.right > width:
@@ -135,4 +146,6 @@ while clock.tick(120):
     screen.fill(black)
     stars.draw()
     screen.blit(player.img, player.rect)
+    screen.blit(meteor.img, meteor.rect)
+
     pygame.display.flip()
