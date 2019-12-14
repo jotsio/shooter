@@ -14,8 +14,7 @@ class Object:
     def move(self):
         self.rect = self.rect.move(self.speed)
         if self.rect.top > height:
-            self.rect.bottom = 0
-            self.rect.left = random.randrange(0, width-self.rect.width)
+            del self
 
 #Stars class
 class StarField:
@@ -28,7 +27,7 @@ class StarField:
         self.color = [0,0,0] * amount
         self.speed = [0.0] * amount
 
-        #Create star random positions and speed
+        #Create star a random position and speed
         i = 0
         while i < self.n:
             self.y[i] = random.randrange(0, height)
@@ -110,7 +109,9 @@ class PlayerShip:
 size = width, height = 1280, 1080
 black = 0, 0, 0
 white = 255, 255, 255
-screen = pygame.display.set_mode(size)    
+screen = pygame.display.set_mode(size)   
+meteorNumber = 8
+meteorList = []
 
 # Create Stars
 stars= StarField(800)
@@ -118,8 +119,13 @@ stars= StarField(800)
 # Create player
 player = PlayerShip(width/2,height-100)
 
-# Create meteor
-meteor = Object(width/2,height/2)
+# Create meteors
+i = 0
+while i < meteorNumber:
+    meteorList.append( Object(random.randrange(64, width-64), 0))
+    i += 1
+
+print(meteorList)
 
 clock = pygame.time.Clock()
 
@@ -132,9 +138,10 @@ while clock.tick(120):
     player.setSpeedX(pressed[pygame.K_RIGHT]-pressed[pygame.K_LEFT])
     player.setSpeedY(pressed[pygame.K_DOWN]-pressed[pygame.K_UP])
     
-    # Player movement
-    player.move()
-    meteor.move()
+
+
+
+ 
 
     # bounces from the wall
     if player.rect.left < 0 or player.rect.right > width:
@@ -142,10 +149,17 @@ while clock.tick(120):
     if player.rect.top < 0 or player.rect.bottom > height:
         player.bounceY()
     
-
+    #background update
     screen.fill(black)
     stars.draw()
+    
+    # player movement and draw
+    player.move()
     screen.blit(player.img, player.rect)
-    screen.blit(meteor.img, meteor.rect)
+
+    # enemy movement and draw
+    for obj in meteorList:
+        screen.blit(obj.img, obj.rect)
+        obj.move()
 
     pygame.display.flip()
