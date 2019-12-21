@@ -16,6 +16,25 @@ class Object:
         if self.rect.top > height:
             del self
 
+#Walls class
+class Walls:
+    def __init__(self, map):
+        self.map = map
+        self.position = [0, 0]
+        self.offset = 0
+        self.img = pygame.image.load("assets/wall.png")
+        print(self.map)
+
+    def draw(self):
+        i = 0
+        while i < 12:
+            screen.blit(self.img, self.position)
+            self.position[0] += gridsize
+            i += 1
+        self.position[0] = 0
+
+
+
 #Stars class
 class StarField:
     def __init__(self, amount):
@@ -107,25 +126,33 @@ class PlayerShip:
 #define screen
 
 size = width, height = 1280, 1080
+gridsize = 64
 black = 0, 0, 0
 white = 255, 255, 255
 screen = pygame.display.set_mode(size)   
-meteorNumber = 8
+meteorNumber = 0
 meteorList = []
 
 # Create Stars
-stars= StarField(800)
+stars = StarField(800)
 
 # Create player
 player = PlayerShip(width/2,height-100)
+
+# Define map
+level1_map =[
+"##..####..##",
+"##..####..##",
+]
+
+# Create level
+level1 = Walls(level1_map)
 
 # Create meteors
 i = 0
 while i < meteorNumber:
     meteorList.append( Object(random.randrange(64, width-64), 0))
     i += 1
-
-print(meteorList)
 
 clock = pygame.time.Clock()
 
@@ -152,6 +179,7 @@ while clock.tick(120):
     #background update
     screen.fill(black)
     stars.draw()
+    level1.draw()
     
     # player movement and draw
     player.move()
