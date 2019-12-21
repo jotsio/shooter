@@ -23,17 +23,23 @@ class Walls:
         self.position = [0, 0]
         self.offset = 0
         self.img = pygame.image.load("assets/wall.png")
-        print(self.map)
 
     def draw(self):
-        i = 0
-        while i < 12:
-            screen.blit(self.img, self.position)
-            self.position[0] += gridsize
-            i += 1
-        self.position[0] = 0
-
-
+        k = 0
+        #loop rows
+        while k < len(self.map):
+            #draw one row of walls
+            i = 0
+            while i < len(self.map[k]):
+                if self.map[k][i] == "#":
+                    screen.blit(self.img, self.position)
+                self.position[0] += gridsize
+                i += 1            
+            self.position[0] = 0
+            self.position[1] += gridsize
+            k += 1
+        self.position[1] = 0
+        
 
 #Stars class
 class StarField:
@@ -140,9 +146,24 @@ stars = StarField(800)
 player = PlayerShip(width/2,height-100)
 
 # Define map
-level1_map =[
-"##..####..##",
-"##..####..##",
+level1_map = [
+"####################",
+"###..............###",
+"#.....#...#.......##",
+"##....#...#..  ...##",
+"###..............###",
+"###..#.....#.....###",
+"#.....#####........#",
+"....................",
+"....................",
+"....................",
+"#..................#",
+"##................##",
+"###..............###",
+"##................##",
+"#..................#",
+"#..................#",
+"#..................#"
 ]
 
 # Create level
