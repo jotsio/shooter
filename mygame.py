@@ -8,7 +8,7 @@ class Object:
     def __init__(self, x, y):
         self.startPos = [x, y]
         self.speed = [0.0, 2.0]  
-        self.img = pygame.image.load("assets/asteroid.png")
+        self.img = pygame.image.load("assets/asteroid.png").convert()
         self.rect = self.img.get_rect()
         self.rect = self.rect.move(x, y)
     def move(self):
@@ -21,11 +21,12 @@ class Walls:
     def __init__(self, map):
         self.map = map
         self.position = [0, 0]
-        self.offset = 0
-        self.img = pygame.image.load("assets/wall.png")
+        self.offset = -len(self.map) * gridsize
+        self.img = pygame.image.load("assets/wall.png").convert()
 
     def draw(self):
         k = 0
+        self.position[1] = turns * scrollSpeed + self.offset
         #loop rows
         while k < len(self.map):
             #draw one row of walls
@@ -137,6 +138,8 @@ black = 0, 0, 0
 white = 255, 255, 255
 screen = pygame.display.set_mode(size)   
 meteorNumber = 0
+scrollSpeed = 2
+turns = 0
 meteorList = []
 
 # Create Stars
@@ -147,13 +150,50 @@ player = PlayerShip(width/2,height-100)
 
 # Define map
 level1_map = [
-"####################",
+"########...#########",
 "###..............###",
 "#.....#...#.......##",
 "##....#...#..  ...##",
 "###..............###",
 "###..#.....#.....###",
 "#.....#####........#",
+"....................",
+"....................",
+"....................",
+"#..................#",
+"##................##",
+"###..............###",
+"##................##",
+"#..................#",
+"#..................#",
+"#.........#........#",
+".........##.........",
+"........####.........",
+".........##..........",
+"#..................#",
+"##................##",
+"#####..........#####",
+"######........######",
+"########.....#######",
+"#########....#######",
+"#########....#######",
+"#########.....######",
+"###########....####",
+"#########.......####",
+"#########......#####",
+"#########.....######",
+"########.....#######",
+"#######....#########",
+"#######.....########",
+"########....#######",
+"#########....#######",
+"#########....#######",
+"########.....#######",
+"######.......#######",
+"#########....#######",
+"########.....#######",
+"########......######",
+"#####...........####",
 "....................",
 "....................",
 "....................",
@@ -185,11 +225,6 @@ while clock.tick(120):
     pressed = pygame.key.get_pressed()
     player.setSpeedX(pressed[pygame.K_RIGHT]-pressed[pygame.K_LEFT])
     player.setSpeedY(pressed[pygame.K_DOWN]-pressed[pygame.K_UP])
-    
-
-
-
- 
 
     # bounces from the wall
     if player.rect.left < 0 or player.rect.right > width:
@@ -212,3 +247,5 @@ while clock.tick(120):
         obj.move()
 
     pygame.display.flip()
+    turns += 1
+ 
