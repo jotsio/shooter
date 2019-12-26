@@ -44,7 +44,6 @@ class Walls:
     
     def checkCollision(self, rect):
         k = 0
-        global bgColor
         self.otherRect = rect
         self.rect[1] += turns * scrollSpeed
         #loop rows
@@ -52,10 +51,9 @@ class Walls:
             #check one row of blocks and mark collision if wall exists
             i = 0
             while i < len(self.map[k]):
-                if self.map[k][i] == "#":
-                    if self.rect.colliderect(self.otherRect):
-                        bgColor = WHITE
-                        
+                if self.map[k][i] == "#" and self.rect.colliderect(self.otherRect):
+                    self.rect[1] = self.yOffset
+                    return True
                 self.rect[0] += gridsize
                 i += 1            
             self.rect[0] = 0
@@ -100,7 +98,7 @@ class PlayerShip:
     def __init__(self, x, y):
         self.startPos = [x, y]
         self.speed = [0.000, 0.000]  
-        self.img = pygame.image.load("assets/ship_default.png").convert()
+        self.img = pygame.image.load("assets/ship_default.png")
         self.rect = self.img.get_rect()
         self.rect = self.rect.move(x, y)
         self.maxSpeedX = 4.0
@@ -152,13 +150,17 @@ class PlayerShip:
         self.speed[1] = -self.speed[1]
 
 
-#define screen
+#define game
 
+alive = True
 size = width, height = 1280, 1080
 gridsize = 64
 BLACK = 0, 0, 0
 WHITE = 255, 255, 255
+DARK_GREY = 64, 64, 64
+DARK_RED = 80, 0, 0
 bgColor = BLACK
+textColor = WHITE
 screen = pygame.display.set_mode(size)   
 meteorNumber = 0
 scrollSpeed = 2
@@ -171,8 +173,6 @@ stars = StarField(250)
 # Create player
 player = PlayerShip(width/2,height-100)
 
-
-
 # Create level
 level1 = Walls(level1_map)
 
@@ -182,9 +182,17 @@ while i < meteorNumber:
     meteorList.append( Object(random.randrange(64, width-64), 0))
     i += 1
 
+# Create text
+font = pygame.font.Font('freesansbold.ttf', 48) 
+text = font.render('Kuolit!', True, textColor)
+textRect = text.get_rect()  
+textRect.center = (width // 2, height // 2)  
+
+# Main loop
+
 clock = pygame.time.Clock()
 
-while clock.tick(120):
+while clock.tick(120) and alive == True:
     # Keyevents listener
     for event in pygame.event.get():
        if event.type == pygame.QUIT: sys.exit()
@@ -199,8 +207,10 @@ while clock.tick(120):
     if player.rect.top < 0 or player.rect.bottom > height:
         player.bounceY()
 
-    # Collision to walls
-    level1.checkCollision(player.rect)
+    # Player collision to walls
+    if level1.checkCollision(player.rect):
+        alive = False
+        bgColor = DARK_RED
 
     # Background update
     screen.fill(bgColor)
@@ -217,7 +227,10 @@ while clock.tick(120):
         screen.blit(obj.img, obj.rect)
         obj.move()
 
+    if alive == False:
+        screen.blit(text, textRect)
+
     pygame.display.flip()
     bgColor = BLACK
     turns += 1
- 
+
