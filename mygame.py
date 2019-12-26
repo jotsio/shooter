@@ -21,26 +21,47 @@ class Object:
 class Walls:
     def __init__(self, map):
         self.map = map
-        self.position = [0, 0]
-        self.offset = -len(self.map) * gridsize
+        self.yOffset = -len(self.map) * gridsize
+        self.rect = pygame.Rect(0, self.yOffset, gridsize, gridsize)    
         self.img = pygame.image.load("assets/wall.png").convert()
 
     def draw(self):
         k = 0
-        self.position[1] = turns * scrollSpeed + self.offset
+        self.rect[1] += turns * scrollSpeed
         #loop rows
         while k < len(self.map):
-            #draw one row of walls
+            #draw one row of blocks and draw graphics if wall exists
             i = 0
             while i < len(self.map[k]):
                 if self.map[k][i] == "#":
-                    screen.blit(self.img, self.position)
-                self.position[0] += gridsize
+                    screen.blit(self.img, self.rect)
+                self.rect[0] += gridsize
                 i += 1            
-            self.position[0] = 0
-            self.position[1] += gridsize
+            self.rect[0] = 0
+            self.rect[1] += gridsize
             k += 1
-        self.position[1] = 0
+        self.rect[1] = self.yOffset
+    
+    def checkCollision(self, rect):
+        k = 0
+        global bgColor
+        self.otherRect = rect
+        self.rect[1] += turns * scrollSpeed
+        #loop rows
+        while k < len(self.map):
+            #check one row of blocks and mark collision if wall exists
+            i = 0
+            while i < len(self.map[k]):
+                if self.map[k][i] == "#":
+                    if self.rect.colliderect(self.otherRect):
+                        bgColor = WHITE
+                        
+                self.rect[0] += gridsize
+                i += 1            
+            self.rect[0] = 0
+            self.rect[1] += gridsize
+            k += 1
+        self.rect[1] = self.yOffset
         
 
 #Stars class
@@ -54,7 +75,7 @@ class StarField:
         self.color = [0,0,0] * amount
         self.speed = [0.0] * amount
 
-        #Create star a random position and speed
+        #Create star a random.rect and speed
         i = 0
         while i < self.n:
             self.y[i] = random.randrange(0, height)
@@ -79,7 +100,7 @@ class PlayerShip:
     def __init__(self, x, y):
         self.startPos = [x, y]
         self.speed = [0.000, 0.000]  
-        self.img = pygame.image.load("assets/ship_default.png")
+        self.img = pygame.image.load("assets/ship_default.png").convert()
         self.rect = self.img.get_rect()
         self.rect = self.rect.move(x, y)
         self.maxSpeedX = 4.0
@@ -135,8 +156,9 @@ class PlayerShip:
 
 size = width, height = 1280, 1080
 gridsize = 64
-black = 0, 0, 0
-white = 255, 255, 255
+BLACK = 0, 0, 0
+WHITE = 255, 255, 255
+bgColor = BLACK
 screen = pygame.display.set_mode(size)   
 meteorNumber = 0
 scrollSpeed = 2
@@ -176,21 +198,26 @@ while clock.tick(120):
         player.bounceX()
     if player.rect.top < 0 or player.rect.bottom > height:
         player.bounceY()
-    
-    #background update
-    screen.fill(black)
+
+    # Collision to walls
+    level1.checkCollision(player.rect)
+
+    # Background update
+    screen.fill(bgColor)
     stars.draw()
     level1.draw()
+
     
-    # player movement and draw
+    # Player movement and draw
     player.move()
     screen.blit(player.img, player.rect)
 
-    # enemy movement and draw
+    # Enemy movement and draw
     for obj in meteorList:
         screen.blit(obj.img, obj.rect)
         obj.move()
 
     pygame.display.flip()
+    bgColor = BLACK
     turns += 1
  
