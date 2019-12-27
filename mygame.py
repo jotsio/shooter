@@ -2,11 +2,11 @@ import sys, pygame
 import pygame.gfxdraw
 import random
 import time
+from pygame.locals import *
 from levels import *
-pygame.init()
+
 
 # Global variables
-
 alive = True
 size = width, height = 1280, 1080
 gridsize = 64
@@ -16,10 +16,14 @@ DARK_GREY = 64, 64, 64
 DARK_RED = 80, 0, 0
 bgColor = BLACK
 textColor = WHITE
-screen = pygame.display.set_mode(size)   
-meteorNumber = 0
 
+meteorNumber = 0
 meteorList = []
+level = 1
+
+#pygame initials
+pygame.init()
+screen = pygame.display.set_mode(size)   
 
 #object class
 class Object:
@@ -178,7 +182,9 @@ def gameLoop(bgColor, level):
     while clock.tick(120):
         # Keyevents listener
         for event in pygame.event.get():
-            if event.type == pygame.QUIT: sys.exit()
+            if event.type == pygame.QUIT: 
+                pygame.quit()
+                sys.exit()
         pressed = pygame.key.get_pressed()
         player.setSpeedX(pressed[pygame.K_RIGHT]-pressed[pygame.K_LEFT])
         player.setSpeedY(pressed[pygame.K_DOWN]-pressed[pygame.K_UP])
@@ -195,7 +201,6 @@ def gameLoop(bgColor, level):
             break
         
         #Player win
-        print(-thisLevel.length, turns)
         if turns * scrollSpeed == thisLevel.length:
             break
         # Background update
@@ -224,33 +229,47 @@ def showText(message):
     textRect.center = (width // 2, height // 2)
     screen.blit(text, textRect)
     pygame.display.flip()
-    
+
+
 # Main program
+while True:
+    alive = True
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            pygame.quit()
+            sys.exit()
 
-# Create Stars
-stars = StarField(250)
+    # Create player
+    player = PlayerShip(width/2,height-100)
 
-# Create player
-player = PlayerShip(width/2,height-100)
+    # Create background
+    stars = StarField(250)
+    
+    # Create level
+    level1 = Walls(level1_map)
 
-# Create level
-level1 = Walls(level1_map)
+    # Create meteors
+    i = 2
+    while i < meteorNumber:
+        meteorList.append( Object(random.randrange(64, width-64), 0))
+        i += 1
 
-# Create meteors
-i = 0
-while i < meteorNumber:
-    meteorList.append( Object(random.randrange(64, width-64), 0))
-    i += 1
+    gameLoop(bgColor, level1)
+    # Show level ending text
+    if alive == False:
+        showText("Kuolit")
+    else:
+        showText("Voitto!")
+        level += 1
+    print(level)    
 
-
-gameLoop(bgColor, level1)
-# Show Dead text
-
- 
-if alive == False:
-    showText("Kuolit")
-else:
-    showText("Voitto!")
-time.sleep(5)
- 
+    while True:
+        event = pygame.event.wait()
+        if event.type == QUIT:
+            pygame.quit()
+            sys.exit()
+        elif event.type == KEYDOWN:
+            if event.key == K_RETURN:
+                print("klik")
+                break
 
