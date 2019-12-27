@@ -1,8 +1,25 @@
 import sys, pygame
 import pygame.gfxdraw
 import random
+import time
 from levels import *
 pygame.init()
+
+# Global variables
+
+alive = True
+size = width, height = 1280, 1080
+gridsize = 64
+BLACK = 0, 0, 0
+WHITE = 255, 255, 255
+DARK_GREY = 64, 64, 64
+DARK_RED = 80, 0, 0
+bgColor = BLACK
+textColor = WHITE
+screen = pygame.display.set_mode(size)   
+meteorNumber = 0
+
+meteorList = []
 
 #object class
 class Object:
@@ -22,12 +39,14 @@ class Walls:
     def __init__(self, map):
         self.map = map
         self.yOffset = -len(self.map) * gridsize
+        self.length = -self.yOffset + height
         self.rect = pygame.Rect(0, self.yOffset, gridsize, gridsize)    
         self.img = pygame.image.load("assets/wall.png").convert()
 
-    def draw(self):
+    def draw(self, offset):
+        self.offset = offset
         k = 0
-        self.rect[1] += turns * scrollSpeed
+        self.rect[1] += self.offset
         #loop rows
         while k < len(self.map):
             #draw one row of blocks and draw graphics if wall exists
@@ -42,10 +61,11 @@ class Walls:
             k += 1
         self.rect[1] = self.yOffset
     
-    def checkCollision(self, rect):
+    def checkCollision(self, rect, offset):
+        self.offset = offset
         k = 0
         self.otherRect = rect
-        self.rect[1] += turns * scrollSpeed
+        self.rect[1] += self.offset
         #loop rows
         while k < len(self.map):
             #check one row of blocks and mark collision if wall exists
@@ -99,7 +119,7 @@ class PlayerShip:
         self.startPos = [x, y]
         self.speed = [0.000, 0.000]  
         self.img = pygame.image.load("assets/ship_default.png")
-        self.rect = self.img.get_rect()
+        self.rect = self.img.get_rect() 
         self.rect = self.rect.move(x, y)
         self.maxSpeedX = 4.0
         self.maxSpeedY = 2.0
@@ -149,23 +169,63 @@ class PlayerShip:
             self.rect.bottom = height
         self.speed[1] = -self.speed[1]
 
+def gameLoop(bgColor, level):
+    global alive
+    thisLevel = level
+    turns = 0
+    scrollSpeed = 2
+    clock = pygame.time.Clock()
+    while clock.tick(120):
+        # Keyevents listener
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: sys.exit()
+        pressed = pygame.key.get_pressed()
+        player.setSpeedX(pressed[pygame.K_RIGHT]-pressed[pygame.K_LEFT])
+        player.setSpeedY(pressed[pygame.K_DOWN]-pressed[pygame.K_UP])
 
-#define game
+        # bounces from the wall
+        if player.rect.left < 0 or player.rect.right > width:
+            player.bounceX()
+        if player.rect.top < 0 or player.rect.bottom > height:
+            player.bounceY()
 
-alive = True
-size = width, height = 1280, 1080
-gridsize = 64
-BLACK = 0, 0, 0
-WHITE = 255, 255, 255
-DARK_GREY = 64, 64, 64
-DARK_RED = 80, 0, 0
-bgColor = BLACK
-textColor = WHITE
-screen = pygame.display.set_mode(size)   
-meteorNumber = 0
-scrollSpeed = 2
-turns = 0
-meteorList = []
+        # Player collision to walls
+        if thisLevel.checkCollision(player.rect, turns * scrollSpeed):
+            alive = False
+            break
+        
+        #Player win
+        print(-thisLevel.length, turns)
+        if turns * scrollSpeed == thisLevel.length:
+            break
+        # Background update
+        screen.fill(bgColor)
+        stars.draw()
+        thisLevel.draw(turns * scrollSpeed)
+
+        # Player movement and draw
+        player.move()
+        screen.blit(player.img, player.rect)
+
+        # Enemy movement and draw
+        for obj in meteorList:
+            screen.blit(obj.img, obj.rect)
+            obj.move()
+
+        pygame.display.flip()
+        bgColor = BLACK
+        turns += 1
+
+def showText(message):
+    message = message
+    font = pygame.font.Font('freesansbold.ttf', 48) 
+    text = font.render(message, True, textColor)
+    textRect = text.get_rect()  
+    textRect.center = (width // 2, height // 2)
+    screen.blit(text, textRect)
+    pygame.display.flip()
+    
+# Main program
 
 # Create Stars
 stars = StarField(250)
@@ -182,55 +242,15 @@ while i < meteorNumber:
     meteorList.append( Object(random.randrange(64, width-64), 0))
     i += 1
 
-# Create text
-font = pygame.font.Font('freesansbold.ttf', 48) 
-text = font.render('Kuolit!', True, textColor)
-textRect = text.get_rect()  
-textRect.center = (width // 2, height // 2)  
 
-# Main loop
+gameLoop(bgColor, level1)
+# Show Dead text
 
-clock = pygame.time.Clock()
-
-while clock.tick(120) and alive == True:
-    # Keyevents listener
-    for event in pygame.event.get():
-       if event.type == pygame.QUIT: sys.exit()
-    
-    pressed = pygame.key.get_pressed()
-    player.setSpeedX(pressed[pygame.K_RIGHT]-pressed[pygame.K_LEFT])
-    player.setSpeedY(pressed[pygame.K_DOWN]-pressed[pygame.K_UP])
-
-    # bounces from the wall
-    if player.rect.left < 0 or player.rect.right > width:
-        player.bounceX()
-    if player.rect.top < 0 or player.rect.bottom > height:
-        player.bounceY()
-
-    # Player collision to walls
-    if level1.checkCollision(player.rect):
-        alive = False
-        bgColor = DARK_RED
-
-    # Background update
-    screen.fill(bgColor)
-    stars.draw()
-    level1.draw()
-
-    
-    # Player movement and draw
-    player.move()
-    screen.blit(player.img, player.rect)
-
-    # Enemy movement and draw
-    for obj in meteorList:
-        screen.blit(obj.img, obj.rect)
-        obj.move()
-
-    if alive == False:
-        screen.blit(text, textRect)
-
-    pygame.display.flip()
-    bgColor = BLACK
-    turns += 1
+ 
+if alive == False:
+    showText("Kuolit")
+else:
+    showText("Voitto!")
+time.sleep(5)
+ 
 
