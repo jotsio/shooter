@@ -17,35 +17,32 @@ DARK_RED = 80, 0, 0
 bgColor = BLACK
 textColor = WHITE
 
-meteorNumber = 0
-meteorList = []
 level = 1
+
+#graphics
+GR_MYSHIP = "assets/ship_default.png"
+
 
 #pygame initials
 pygame.init()
 screen = pygame.display.set_mode(size)   
 
-#object class
-class Object:
-    def __init__(self, x, y):
-        self.startPos = [x, y]
-        self.speed = [0.0, 2.0]  
-        self.img = pygame.image.load("assets/asteroid.png").convert()
-        self.rect = self.img.get_rect()
-        self.rect = self.rect.move(x, y)
-    def move(self):
-        self.rect = self.rect.move(self.speed)
-        if self.rect.top > height:
-            del self
-
 #Walls class
 class Walls:
-    def __init__(self, map):
+    def __init__(self, map, tiles):
         self.map = map
+        self.tileset = tiles
+        print (self.tileset)
         self.yOffset = -len(self.map) * gridsize
         self.length = -self.yOffset + height
-        self.rect = pygame.Rect(0, self.yOffset, gridsize, gridsize)    
-        self.img = pygame.image.load("assets/wall.png").convert()
+        self.rect = pygame.Rect(0, self.yOffset, gridsize, gridsize) 
+        self.img = tiles
+        print (self.img)
+        i = 0
+        
+        while i < len(self.tileset):
+            self.img[i] = pygame.image.load(self.tileset[i]).convert()
+            i += 1
 
     def draw(self, offset):
         self.offset = offset
@@ -57,7 +54,7 @@ class Walls:
             i = 0
             while i < len(self.map[k]):
                 if self.map[k][i] == "#":
-                    screen.blit(self.img, self.rect)
+                    screen.blit(self.img[3], self.rect)
                 self.rect[0] += gridsize
                 i += 1            
             self.rect[0] = 0
@@ -122,7 +119,7 @@ class PlayerShip:
     def __init__(self, x, y):
         self.startPos = [x, y]
         self.speed = [0.000, 0.000]  
-        self.img = pygame.image.load("assets/ship_default.png")
+        self.img = pygame.image.load(GR_MYSHIP)
         self.rect = self.img.get_rect() 
         self.rect = self.rect.move(x, y)
         self.maxSpeedX = 4.0
@@ -212,11 +209,6 @@ def gameLoop(bgColor, level):
         player.move()
         screen.blit(player.img, player.rect)
 
-        # Enemy movement and draw
-        for obj in meteorList:
-            screen.blit(obj.img, obj.rect)
-            obj.move()
-
         pygame.display.flip()
         bgColor = BLACK
         turns += 1
@@ -246,13 +238,7 @@ while True:
     stars = StarField(250)
     
     # Create level
-    level1 = Walls(level1_map)
-
-    # Create meteors
-    i = 2
-    while i < meteorNumber:
-        meteorList.append( Object(random.randrange(64, width-64), 0))
-        i += 1
+    level1 = Walls(level1_map, wallset_stone)
 
     gameLoop(bgColor, level1)
     # Show level ending text
