@@ -32,12 +32,10 @@ class Walls:
     def __init__(self, map, tiles):
         self.map = map
         self.tileset = tiles
-        print (self.tileset)
+        self.img = tiles
         self.yOffset = -len(self.map) * gridsize
         self.length = -self.yOffset + height
         self.rect = pygame.Rect(0, self.yOffset, gridsize, gridsize) 
-        self.img = tiles
-        print (self.img)
         i = 0
         
         while i < len(self.tileset):
@@ -49,12 +47,63 @@ class Walls:
         k = 0
         self.rect[1] += self.offset
         #loop rows
+        
         while k < len(self.map):
             #draw one row of blocks and draw graphics if wall exists
             i = 0
+            
             while i < len(self.map[k]):
-                if self.map[k][i] == "#":
-                    screen.blit(self.img[3], self.rect)
+                this = self.map[k][i]
+                up = "#"
+                if k > 0:
+                    up = self.map[k-1][i]
+                down = "#" 
+                if k < len(self.map)-1:
+                    down = self.map[k+1][i]
+                left = "#"
+                if i > 0:
+                    left = self.map[k][i-1]
+                right = "#"
+                if i < len(self.map[k])-1:
+                    right = self.map[k][i+1]
+
+                # select which wall asset to use
+                if this == "#":
+                    if up == "#" and  down == "#" and left == "#" and  right == "#":
+                        screen.blit(self.img[0], self.rect)
+                    elif up == "." and  down == "." and left == "." and  right == ".":
+                        screen.blit(self.img[1], self.rect)
+                    elif up == "." and  down == "." and left == "#" and  right == "#":
+                        screen.blit(self.img[2], self.rect)
+                    elif up == "#" and  down == "#" and left == "." and  right == ".":
+                        screen.blit(self.img[3], self.rect)
+                    elif up == "." and  down == "#" and left == "." and  right == ".":
+                        screen.blit(self.img[4], self.rect)
+                    elif up == "#" and  down == "." and left == "." and  right == ".":
+                        screen.blit(self.img[5], self.rect)
+                    elif up == "." and  down == "." and left == "." and  right == "#":
+                        screen.blit(self.img[6], self.rect)
+                    elif up == "." and  down == "." and left == "#" and  right == ".":
+                        screen.blit(self.img[7], self.rect)
+                    elif up == "." and  down == "#" and left == "#" and  right == "#":
+                        screen.blit(self.img[8], self.rect)
+                    elif up == "#" and  down == "." and left == "#" and  right == "#":
+                        screen.blit(self.img[9], self.rect)
+                    elif up == "#" and  down == "#" and left == "." and  right == "#":
+                       screen.blit(self.img[10], self.rect)
+                    elif up == "#" and  down == "#" and left == "#" and  right == ".":
+                        screen.blit(self.img[11], self.rect)
+                    elif up == "." and  down == "#" and left == "." and  right == "#":
+                        screen.blit(self.img[12], self.rect)
+                    elif up == "." and  down == "#" and left == "#" and  right == ".":
+                        screen.blit(self.img[13], self.rect)
+                    elif up == "#" and  down == "." and left == "#" and  right == ".":
+                        screen.blit(self.img[14], self.rect)
+                    elif up == "#" and  down == "." and left == "." and  right == "#":
+                        screen.blit(self.img[15], self.rect)
+                    else:
+                        screen.blit(self.img[0], self.rect)
+
                 self.rect[0] += gridsize
                 i += 1            
             self.rect[0] = 0
@@ -246,8 +295,7 @@ while True:
         showText("Kuolit")
     else:
         showText("Voitto!")
-        level += 1
-    print(level)    
+        level += 1  
 
     while True:
         event = pygame.event.wait()
