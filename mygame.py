@@ -39,7 +39,7 @@ class Walls:
         i = 0
         
         while i < len(self.tileset):
-            self.img[i] = pygame.image.load(self.tileset[i]).convert()
+            self.img[i] = pygame.image.load(self.tileset[i]).convert_alpha()
             i += 1
 
     def draw(self, offset):
@@ -168,7 +168,7 @@ class PlayerShip:
     def __init__(self, x, y):
         self.startPos = [x, y]
         self.speed = [0.000, 0.000]  
-        self.img = pygame.image.load(GR_MYSHIP)
+        self.img = pygame.image.load(GR_MYSHIP).convert_alpha()
         self.rect = self.img.get_rect() 
         self.rect = self.rect.move(x, y)
         self.maxSpeedX = 4.0
@@ -287,7 +287,7 @@ while True:
     stars = StarField(250)
     
     # Create level
-    level1 = Walls(level1_map, wallset_stone)
+    level1 = Walls(level3_map, wallset_tech)
 
     gameLoop(bgColor, level1)
     # Show level ending text
