@@ -17,15 +17,12 @@ DARK_RED = 80, 0, 0
 bgColor = BLACK
 textColor = WHITE
 
-level = 1
-
 #graphics
 GR_MYSHIP = "assets/ship_default.png"
 
 
-#pygame initials
-pygame.init()
-screen = pygame.display.set_mode(size)   
+
+
 
 #Walls class
 class Walls:
@@ -273,23 +270,27 @@ def showText(message):
 
 
 # Main program
-while True:
-    alive = True
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
+# Pygame initials
+pygame.init()
+screen = pygame.display.set_mode(size)  
+level = 1
 
+# Create background
+stars = StarField(250)
+
+# Create level
+level1 = Walls(level3_map, wallset_tech)
+
+# Level loop
+while True: 
+    
     # Create player
     player = PlayerShip(width/2,height-100)
+    alive = True
 
-    # Create background
-    stars = StarField(250)
-    
-    # Create level
-    level1 = Walls(level3_map, wallset_tech)
-
+    # Play the level
     gameLoop(bgColor, level1)
+    
     # Show level ending text
     if alive == False:
         showText("Kuolit")
@@ -297,13 +298,15 @@ while True:
         showText("Voitto!")
         level += 1  
 
+    pygame.event.clear()
     while True:
         event = pygame.event.wait()
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
-        elif event.type == KEYDOWN:
-            if event.key == K_RETURN:
-                print("klik")
-                break
+        if event.type == KEYDOWN and event.key == K_RETURN:
+            break
+
+
+
 
