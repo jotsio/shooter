@@ -1,5 +1,5 @@
 # Add Graphics
-wallset_stone = [
+images_stone = [
 "assets/wall_middle.png",
 "assets/wall_single.png",
 "assets/bar_vertical.png",
@@ -17,7 +17,7 @@ wallset_stone = [
 "assets/corner_bottom_right.png",
 "assets/corner_bottom_left.png"
 ]
-wallset_tech = [
+images_tech = [
 "assets/tech_wall_middle.png",
 "assets/tech_wall_single.png",
 "assets/tech_bar_vertical.png",
@@ -93,7 +93,7 @@ level1_map = [
 "#..................#",
 "#..................#"
 ]
-level2_map = [
+level3_map = [
 "##########.....#####",
 "#########.....######",
 "#######.....########",
@@ -148,7 +148,7 @@ level2_map = [
 "....................",
 "...................."
 ]
-level3_map = [
+level2_map = [
 "..##################",
 "..##################",
 "...#################",

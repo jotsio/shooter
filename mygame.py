@@ -28,16 +28,10 @@ GR_MYSHIP = "assets/ship_default.png"
 class Walls:
     def __init__(self, map, tiles):
         self.map = map
-        self.tileset = tiles
         self.img = tiles
         self.yOffset = -len(self.map) * gridsize
         self.length = -self.yOffset + height
         self.rect = pygame.Rect(0, self.yOffset, gridsize, gridsize) 
-        i = 0
-        
-        while i < len(self.tileset):
-            self.img[i] = pygame.image.load(self.tileset[i]).convert_alpha()
-            i += 1
 
     def draw(self, offset):
         self.offset = offset
@@ -273,13 +267,32 @@ def showText(message):
 # Pygame initials
 pygame.init()
 screen = pygame.display.set_mode(size)  
-level = 1
+currentLevel = 0
 
 # Create background
 stars = StarField(250)
 
-# Create level
-level1 = Walls(level3_map, wallset_tech)
+i = 0
+wallset_tech = images_tech
+while i < len(wallset_tech):
+    wallset_tech[i] = pygame.image.load(wallset_tech[i]).convert_alpha()
+    i += 1
+print(wallset_tech)
+
+i = 0
+wallset_stone = images_stone
+while i < len(wallset_stone):
+    wallset_stone[i] = pygame.image.load(wallset_stone[i]).convert_alpha()
+    i += 1
+print(wallset_stone)
+
+# Create levels
+level1 = Walls(level1_map, wallset_tech)
+level2 = Walls(level2_map, wallset_stone)
+level3 = Walls(level3_map, wallset_tech)
+
+levels = [level1, level2, level3]
+
 
 # Level loop
 while True: 
@@ -289,14 +302,14 @@ while True:
     alive = True
 
     # Play the level
-    gameLoop(bgColor, level1)
-    
+    gameLoop(bgColor, levels[currentLevel])
+   
     # Show level ending text
     if alive == False:
         showText("Kuolit")
     else:
         showText("Voitto!")
-        level += 1  
+        currentLevel += 1  
 
     pygame.event.clear()
     while True:
