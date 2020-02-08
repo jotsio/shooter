@@ -272,19 +272,17 @@ currentLevel = 0
 # Create background
 stars = StarField(250)
 
-i = 0
-wallset_tech = images_tech
-while i < len(wallset_tech):
-    wallset_tech[i] = pygame.image.load(wallset_tech[i]).convert_alpha()
-    i += 1
-print(wallset_tech)
 
-i = 0
-wallset_stone = images_stone
-while i < len(wallset_stone):
-    wallset_stone[i] = pygame.image.load(wallset_stone[i]).convert_alpha()
-    i += 1
-print(wallset_stone)
+def loadWalls(tileset):
+    i = 0
+    images = tileset
+    while i < len(images):
+        images[i] = pygame.image.load(images[i]).convert_alpha()
+        i += 1
+    return images
+
+wallset_stone = loadWalls(images_stone)
+wallset_tech = loadWalls(images_tech)
 
 # Create levels
 level1 = Walls(level1_map, wallset_tech)
@@ -306,11 +304,12 @@ while True:
    
     # Show level ending text
     if alive == False:
-        showText("Kuolit")
-    elif currentLevel >= len(levels)+1:
-        showText("Kaikki kentat kayty lapi!")
+        showText("Kuolit!")
+    elif currentLevel == (len(levels)-1):
+        showText("HIENOA PELI LAPAISTY!")
+        currentLevel = 0
     else:
-        showText("Voitto!")
+        showText("Kentta lapaisty!")
         currentLevel += 1  
 
     pygame.event.clear()
