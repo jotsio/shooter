@@ -307,6 +307,8 @@ while True:
     # Show level ending text
     if alive == False:
         showText("Kuolit")
+    elif currentLevel >= len(levels)+1:
+        showText("Kaikki kentat kayty lapi!")
     else:
         showText("Voitto!")
         currentLevel += 1  
