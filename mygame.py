@@ -20,9 +20,14 @@ textColor = WHITE
 #graphics
 GR_MYSHIP = "assets/ship_default.png"
 
-
-
-
+#Load wall images
+def loadWalls(tileset):
+    i = 0
+    images = tileset
+    while i < len(images):
+        images[i] = pygame.image.load(images[i]).convert_alpha()
+        i += 1
+    return images
 
 #Walls class
 class Walls:
@@ -122,7 +127,6 @@ class Walls:
             k += 1
         self.rect[1] = self.yOffset
         
-
 #Stars class
 class StarField:
     def __init__(self, amount):
@@ -210,7 +214,7 @@ class PlayerShip:
             self.rect.bottom = height
         self.speed[1] = -self.speed[1]
 
-def gameLoop(bgColor, level):
+def levelLoop(bgColor, level):
     global alive
     thisLevel = level
     turns = 0
@@ -243,6 +247,7 @@ def gameLoop(bgColor, level):
         # Background update
         screen.fill(bgColor)
         stars.draw()
+
         thisLevel.draw(turns * scrollSpeed)
 
         # Player movement and draw
@@ -264,35 +269,36 @@ def showText(message):
 
 
 # Main program
+#-------------
 # Pygame initials
 pygame.init()
+# Title
+pygame.display.set_caption("Luolalentely")
+icon = pygame.image.load(GR_MYSHIP)
+pygame.display.set_icon(icon)
+
+# Screen size
 screen = pygame.display.set_mode(size)  
-currentLevel = 0
 
 # Create background
 stars = StarField(250)
 
-
-def loadWalls(tileset):
-    i = 0
-    images = tileset
-    while i < len(images):
-        images[i] = pygame.image.load(images[i]).convert_alpha()
-        i += 1
-    return images
-
+# Load level image sets
 wallset_stone = loadWalls(images_stone)
 wallset_tech = loadWalls(images_tech)
 
 # Create levels
-level1 = Walls(level1_map, wallset_tech)
-level2 = Walls(level2_map, wallset_stone)
-level3 = Walls(level3_map, wallset_tech)
+levels = [
+    Walls(level1_map, wallset_tech), 
+    Walls(level2_map, wallset_stone),  
+    Walls(level3_map, wallset_tech)
+    ]
 
-levels = [level1, level2, level3]
+currentLevel = 0
 
+#level = SpriteWalls()
 
-# Level loop
+# Main loop
 while True: 
     
     # Create player
@@ -300,7 +306,7 @@ while True:
     alive = True
 
     # Play the level
-    gameLoop(bgColor, levels[currentLevel])
+    levelLoop(bgColor, levels[currentLevel])
    
     # Show level ending text
     if alive == False:
