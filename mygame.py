@@ -8,7 +8,7 @@ from levels import *
 
 # Global variables
 alive = True
-size = width, height = 1280, 1080
+size = width, height = 1366, 768
 gridsize = 64
 BLACK = 0, 0, 0
 WHITE = 255, 255, 255
@@ -278,10 +278,11 @@ pygame.display.set_caption("Luolalentely")
 icon = pygame.image.load(GR_MYSHIP)
 pygame.display.set_icon(icon)
 
-# Screen size
-screen = pygame.display.set_mode(size)  
+# Define displays
+pygame.FULLSCREEN
+screen = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
 
-# Create background
+# Create stars on background
 stars = StarField(250)
 
 # Load level image sets
@@ -324,7 +325,7 @@ while True:
     pygame.event.clear()
     while True:
         event = pygame.event.wait()
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
             pygame.quit()
             sys.exit()
         if event.type == KEYDOWN and event.key == K_RETURN:
