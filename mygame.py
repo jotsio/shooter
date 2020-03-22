@@ -28,6 +28,7 @@ def loadWalls(tileset):
         images[i] = pygame.image.load(images[i]).convert_alpha()
         i += 1
     return images
+        
 
 #Walls class
 class Walls:
@@ -159,12 +160,13 @@ class StarField:
             i += 1
 
 #player class
-class PlayerShip:
+class PlayerShip(pygame.sprite.Sprite):
     def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
         self.startPos = [x, y]
         self.speed = [0.000, 0.000]  
-        self.img = pygame.image.load(GR_MYSHIP).convert_alpha()
-        self.rect = self.img.get_rect() 
+        self.image = pygame.image.load(GR_MYSHIP).convert_alpha()
+        self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
         self.maxSpeedX = 4.0
         self.maxSpeedY = 2.0
@@ -214,9 +216,8 @@ class PlayerShip:
             self.rect.bottom = height
         self.speed[1] = -self.speed[1]
 
-def levelLoop(bgColor, level):
+def levelLoop(bgColor, this_level):
     global alive
-    thisLevel = level
     turns = 0
     scrollSpeed = 2
     clock = pygame.time.Clock()
@@ -237,23 +238,23 @@ def levelLoop(bgColor, level):
             player.bounceY()
 
         # Player collision to walls
-        if thisLevel.checkCollision(player.rect, turns * scrollSpeed):
+        if this_level.checkCollision(player.rect, turns * scrollSpeed):
             alive = False
             break
         
         #Player win
-        if turns * scrollSpeed == thisLevel.length:
+        if turns * scrollSpeed == this_level.length:
             break
         # Background update
         screen.fill(bgColor)
         stars.draw()
-
-        thisLevel.draw(turns * scrollSpeed)
+        this_level.draw(turns * scrollSpeed)
 
         # Player movement and draw
+        player_group.draw(screen)
         player.move()
-        screen.blit(player.img, player.rect)
 
+ 
         pygame.display.flip()
         bgColor = BLACK
         turns += 1
@@ -303,6 +304,8 @@ while True:
     
     # Create player
     player = PlayerShip(width/2,height-100)
+    player_group = pygame.sprite.Group()
+    player_group.add(player)
     alive = True
 
     # Play the level
@@ -321,7 +324,7 @@ while True:
     pygame.event.clear()
     while True:
         event = pygame.event.wait()
-        if event.type == QUIT:
+        if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
         if event.type == KEYDOWN and event.key == K_RETURN:
