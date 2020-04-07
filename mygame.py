@@ -10,6 +10,7 @@ from levels import *
 alive = True
 size = width, height = 1366, 768
 gridsize = 64
+player_safearea = 16
 BLACK = 0, 0, 0
 WHITE = 255, 255, 255
 DARK_GREY = 64, 64, 64
@@ -108,17 +109,16 @@ class Walls:
             k += 1
         self.rect[1] = self.yOffset
     
-    def checkCollision(self, rect, offset):
+    def checkCollision(self, obj_rect, offset):
         self.offset = offset
         k = 0
-        self.otherRect = rect
         self.rect[1] += self.offset
         #loop rows
         while k < len(self.map):
             #check one row of blocks and mark collision if wall exists
             i = 0
             while i < len(self.map[k]):
-                if self.map[k][i] == "#" and self.rect.colliderect(self.otherRect):
+                if self.map[k][i] == "#" and self.rect.colliderect(obj_rect):
                     self.rect[1] = self.yOffset
                     return True
                 self.rect[0] += gridsize
@@ -195,6 +195,10 @@ class PlayerShip(pygame.sprite.Sprite):
         if self.speed[0] < -self.maxSpeedX :
             self.speed[0] = -self.maxSpeedX
 
+    def getHitbox(self):
+        hitbox = (self.rect[0] + player_safearea, self.rect[1] + player_safearea, self.rect[2] - player_safearea * 2, self.rect[3] - player_safearea * 2)
+        return hitbox
+
     # Horizontal acceleration
     def setSpeedY(self, amount):
         self.speed[1] += amount
@@ -238,7 +242,7 @@ def levelLoop(bgColor, this_level):
             player.bounceY()
 
         # Player collision to walls
-        if this_level.checkCollision(player.rect, turns * scrollSpeed):
+        if this_level.checkCollision(player.getHitbox(), turns * scrollSpeed):
             alive = False
             break
         
@@ -280,7 +284,7 @@ pygame.display.set_icon(icon)
 
 # Define displays
 pygame.FULLSCREEN
-screen = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
+screen = pygame.display.set_mode(size)  
 
 # Create stars on background
 stars = StarField(250)
