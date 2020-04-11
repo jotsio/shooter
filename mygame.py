@@ -9,7 +9,6 @@ from levels import *
 # Global variables
 size = width, height = 1366, 768
 gridsize = 64
-player_safearea = 16
 BLACK = 0, 0, 0
 WHITE = 255, 255, 255
 DARK_GREY = 64, 64, 64
@@ -169,13 +168,23 @@ class newShot(pygame.sprite.Sprite):
         self.image = pygame.image.load(GR_AMMO).convert_alpha()
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
+        self.ver_margin = 5
+        self.hor_margin = 2
         self.speed = [0.000, -10.000]  
 
     # Passive movement
     def update(self, level):
         self.rect = self.rect.move(self.speed)
+        # Check if outside area
         if self.rect.y < 0:
             self.kill()
+        # Check collision
+        if level.checkCollision(self.getHitbox(), turns * scrollSpeed):
+            self.kill()
+
+    def getHitbox(self):
+        hitbox = (self.rect[0] + self.hor_margin, self.rect[1] + self.ver_margin, self.rect[2] - self.ver_margin * 2, self.rect[3] - self.hor_margin * 2)
+        return hitbox
 
 #player class
 class PlayerShip(pygame.sprite.Sprite):
@@ -187,6 +196,8 @@ class PlayerShip(pygame.sprite.Sprite):
         self.image = pygame.image.load(GR_MYSHIP).convert_alpha()
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
+        self.ver_margin = 16
+        self.hor_margin = 16
         self.maxSpeedX = 4.0
         self.maxSpeedY = 2.0
         self.frictionX = 0.1
@@ -225,7 +236,7 @@ class PlayerShip(pygame.sprite.Sprite):
             self.speed[0] = -self.maxSpeedX
 
     def getHitbox(self):
-        hitbox = (self.rect[0] + player_safearea, self.rect[1] + player_safearea, self.rect[2] - player_safearea * 2, self.rect[3] - player_safearea * 2)
+        hitbox = (self.rect[0] + self.hor_margin, self.rect[1] + self.ver_margin, self.rect[2] - self.ver_margin * 2, self.rect[3] - self.hor_margin * 2)
         return hitbox
 
     # Horizontal acceleration
@@ -242,6 +253,7 @@ class PlayerShip(pygame.sprite.Sprite):
         if self.rect.right > width:
             self.rect.right = width
         self.speed[0] = -self.speed[0]
+
     def bounceY(self):
         if self.rect.top < 0:
             self.rect.top = 0
