@@ -20,6 +20,7 @@ textColor = WHITE
 
 #graphics
 GR_MYSHIP = "assets/ship_default.png"
+GR_AMMO = "assets/laserbeam.png"
 
 #Load wall images
 def loadWalls(tileset):
@@ -159,6 +160,22 @@ class StarField:
             pygame.gfxdraw.pixel(screen, self.x[i], int(self.y[i]), self.color[i])
             i += 1
 
+#Ammunition
+
+class newShot(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load(GR_AMMO).convert_alpha()
+        self.rect = self.image.get_rect() 
+        self.rect = self.rect.move(x, y)
+        self.speed = [0.000, -10.000]  
+
+    # Passive movement
+    def update(self):
+        self.rect = self.rect.move(self.speed)
+        if self.rect.y < 0:
+            self.kill()
+
 #player class
 class PlayerShip(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -172,9 +189,13 @@ class PlayerShip(pygame.sprite.Sprite):
         self.maxSpeedY = 2.0
         self.frictionX = 0.1
         self.frictionY = 0.1
+        self.shoot_delay = 8
+        self.shoot_timer = 0
     
     # Passive movement
-    def move(self):
+    def update(self):
+        if self.shoot_timer < self.shoot_delay:
+            self.shoot_timer += 1
         self.rect = self.rect.move(self.speed)
         # Horizontal friction
         if self.speed[0] > 0 :
@@ -220,6 +241,13 @@ class PlayerShip(pygame.sprite.Sprite):
             self.rect.bottom = height
         self.speed[1] = -self.speed[1]
 
+    def shoot(self):
+        if self.shoot_timer >= self.shoot_delay:
+            shot = newShot(self.rect.x + 24, self.rect.y)
+            player_group.add(shot)
+            self.shoot_timer = 0
+
+
 def levelLoop(bgColor, this_level):
     global alive
     turns = 0
@@ -234,6 +262,9 @@ def levelLoop(bgColor, this_level):
         pressed = pygame.key.get_pressed()
         player.setSpeedX(pressed[pygame.K_RIGHT]-pressed[pygame.K_LEFT])
         player.setSpeedY(pressed[pygame.K_DOWN]-pressed[pygame.K_UP])
+        if pressed[pygame.K_SPACE]:
+            player.shoot()
+
 
         # bounces from the wall
         if player.rect.left < 0 or player.rect.right > width:
@@ -256,7 +287,7 @@ def levelLoop(bgColor, this_level):
 
         # Player movement and draw
         player_group.draw(screen)
-        player.move()
+        player_group.update()
 
  
         pygame.display.flip()
