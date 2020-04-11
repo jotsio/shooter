@@ -7,7 +7,6 @@ from levels import *
 
 
 # Global variables
-alive = True
 size = width, height = 1366, 768
 gridsize = 64
 player_safearea = 16
@@ -17,6 +16,8 @@ DARK_GREY = 64, 64, 64
 DARK_RED = 80, 0, 0
 bgColor = BLACK
 textColor = WHITE
+turns = 0
+scrollSpeed = 0
 
 #graphics
 GR_MYSHIP = "assets/ship_default.png"
@@ -171,7 +172,7 @@ class newShot(pygame.sprite.Sprite):
         self.speed = [0.000, -10.000]  
 
     # Passive movement
-    def update(self):
+    def update(self, level):
         self.rect = self.rect.move(self.speed)
         if self.rect.y < 0:
             self.kill()
@@ -180,6 +181,7 @@ class newShot(pygame.sprite.Sprite):
 class PlayerShip(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
+        self.alive = True
         self.startPos = [x, y]
         self.speed = [0.000, 0.000]  
         self.image = pygame.image.load(GR_MYSHIP).convert_alpha()
@@ -192,8 +194,11 @@ class PlayerShip(pygame.sprite.Sprite):
         self.shoot_delay = 8
         self.shoot_timer = 0
     
-    # Passive movement
-    def update(self):
+    # Passive movement & collision detection
+    def update(self, level):
+        global turns
+        global scrollSpeed
+        # Check shooting delay
         if self.shoot_timer < self.shoot_delay:
             self.shoot_timer += 1
         self.rect = self.rect.move(self.speed)
@@ -207,7 +212,10 @@ class PlayerShip(pygame.sprite.Sprite):
             self.speed[1] -= self.frictionY
         if self.speed[1] < 0 :
             self.speed[1] += self.frictionY
-    
+        # Check collision
+        if level.checkCollision(self.getHitbox(), turns * scrollSpeed):
+            self.alive = False
+
     # Vertical acceleration
     def setSpeedX(self, amount):
         self.speed[0] += amount
@@ -249,7 +257,8 @@ class PlayerShip(pygame.sprite.Sprite):
 
 
 def levelLoop(bgColor, this_level):
-    global alive
+    global turns
+    global scrollSpeed
     turns = 0
     scrollSpeed = 2
     clock = pygame.time.Clock()
@@ -272,11 +281,6 @@ def levelLoop(bgColor, this_level):
         if player.rect.top < 0 or player.rect.bottom > height:
             player.bounceY()
 
-        # Player collision to walls
-        if this_level.checkCollision(player.getHitbox(), turns * scrollSpeed):
-            alive = False
-            break
-        
         #Player win
         if turns * scrollSpeed == this_level.length:
             break
@@ -287,9 +291,12 @@ def levelLoop(bgColor, this_level):
 
         # Player movement and draw
         player_group.draw(screen)
-        player_group.update()
+        player_group.update(this_level)
 
- 
+        # Is player alive?
+        if player.alive == False:
+            break
+
         pygame.display.flip()
         bgColor = BLACK
         turns += 1
@@ -342,13 +349,12 @@ while True:
     player = PlayerShip(width/2,height-100)
     player_group = pygame.sprite.Group()
     player_group.add(player)
-    alive = True
 
     # Play the level
     levelLoop(bgColor, levels[currentLevel])
    
     # Show level ending text
-    if alive == False:
+    if player.alive == False:
         showText("Kuolit!")
     elif currentLevel == (len(levels)-1):
         showText("HIENOA PELI LAPAISTY!")
