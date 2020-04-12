@@ -36,12 +36,20 @@ def loadImageSet(tileset):
         images[i] = pygame.image.load(images[i]).convert_alpha()
         i += 1
     return images
-        
+
+# Convert levels to lists
+def levelToList(map):
+    i = 0
+    while i < len(map):
+        map[i] = list(map[i])
+        i += 1
+    return map
 
 #Walls class
 class Walls:
     def __init__(self, map, tiles):
-        self.map = map
+        self.map = levelToList(map)  
+        print(self.map)
         self.img = tiles
         self.yOffset = -len(self.map) * gridsize
         self.length = -self.yOffset + height
@@ -116,6 +124,7 @@ class Walls:
             k += 1
         self.rect[1] = self.yOffset
     
+    # Checks collision to walls for certain rectangle
     def checkCollision(self, obj_rect, offset):
         self.offset = offset
         k = 0
@@ -127,14 +136,20 @@ class Walls:
             while i < len(self.map[k]):
                 if self.map[k][i] == "#" and self.rect.colliderect(obj_rect):
                     self.rect[1] = self.yOffset
-                    return True
+                    return (i, k)
                 self.rect[0] += gridsize
                 i += 1            
             self.rect[0] = 0
             self.rect[1] += gridsize
             k += 1
         self.rect[1] = self.yOffset
-        
+    
+    # Removes defined wallblock from level
+    def removeBlock(self, (col, row)):
+        self.map[row][col] = "."
+
+
+
 #Stars class
 class StarField:
     def __init__(self, amount):
@@ -212,8 +227,10 @@ class newShot(pygame.sprite.Sprite):
         if self.rect.y < 0:
             self.kill()
         # Check collision, kill itself and create explosion
-        if level.checkCollision(self.getHitbox(), turns * scrollSpeed):
+        hitted_block = level.checkCollision(self.getHitbox(), turns * scrollSpeed)
+        if hitted_block:
             self.kill()
+            level.removeBlock(hitted_block)
             explosion = newEffect(self.rect.centerx, self.rect.centery, ANIM_AMMO)
             effects_group.add(explosion)
 
@@ -231,8 +248,8 @@ class PlayerShip(pygame.sprite.Sprite):
         self.image = pygame.image.load(GR_MYSHIP).convert_alpha()
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
-        self.hor_margin = 6
-        self.ver_margin = 14
+        self.hor_margin = 8
+        self.ver_margin = 15
         self.maxSpeedX = 4.0
         self.maxSpeedY = 2.0
         self.frictionX = 0.1
@@ -307,6 +324,9 @@ def levelLoop(bgColor, this_level):
     turns = 0
     scrollSpeed = 2
     clock = pygame.time.Clock()
+
+    this_level.removeBlock((1, 53))
+
     while clock.tick(framerate):
         # Keyevents listener
         for event in pygame.event.get():
@@ -331,7 +351,7 @@ def levelLoop(bgColor, this_level):
             break
         # Background update
         screen.fill(bgColor)
-     #   stars.draw()
+        stars.draw()
         this_level.draw(turns * scrollSpeed)
 
         # Player movement and draw
@@ -368,8 +388,8 @@ icon = pygame.image.load(GR_MYSHIP)
 pygame.display.set_icon(icon)
 
 # Define displays
-pygame.FULLSCREEN
-#screen = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
+# pygame.FULLSCREEN
+# screen = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
 screen = pygame.display.set_mode(size)  
 
 # Create stars on background
