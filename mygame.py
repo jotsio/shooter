@@ -7,6 +7,7 @@ from levels import *
 
 
 # Global variables
+framerate = 120
 size = width, height = 1366, 768
 gridsize = 64
 BLACK = 0, 0, 0
@@ -15,15 +16,20 @@ DARK_GREY = 64, 64, 64
 DARK_RED = 80, 0, 0
 bgColor = BLACK
 textColor = WHITE
-turns = 0
-scrollSpeed = 0
+
 
 #graphics
 GR_MYSHIP = "assets/ship_default.png"
 GR_AMMO = "assets/laserbeam.png"
+ANIM_AMMO = [
+"assets/laserexp1.png",
+"assets/laserexp2.png",
+"assets/laserexp3.png",
+"assets/laserexp4.png"       
+]
 
 #Load wall images
-def loadWalls(tileset):
+def loadImageSet(tileset):
     i = 0
     images = tileset
     while i < len(images):
@@ -160,14 +166,41 @@ class StarField:
             pygame.gfxdraw.pixel(screen, self.x[i], int(self.y[i]), self.color[i])
             i += 1
 
-#Ammunition
+class newEffect(pygame.sprite.Sprite):
+    def __init__(self, x, y, image_list):
+        pygame.sprite.Sprite.__init__(self)
+        self.animation = [
+        pygame.image.load(image_list[0]).convert_alpha(),
+        pygame.image.load(image_list[1]).convert_alpha(),
+        pygame.image.load(image_list[2]).convert_alpha(),
+        pygame.image.load(image_list[3]).convert_alpha()
+        ]
+        self.image = self.animation[0]
+        self.rect = self.image.get_rect() 
+        self.rect = self.rect.move(x - self.rect.w / 2, y - self.rect.h / 2)
+        self.delay_multiplier = 4
+        self.lifetime = len(image_list) * self.delay_multiplier
+        self.counter = 0
+    
+    def update(self):
+        # Check if dead
+        if self.counter > self.lifetime:
+            self.counter = 0
+            self.kill()
+        # Scoll down
+        self.rect = self.rect.move(0, scrollSpeed)
+        # Change image
+        self.image = self.animation[self.counter / self.delay_multiplier - 1]
+        self.counter += 1
 
+
+# Ammunition
 class newShot(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(GR_AMMO).convert_alpha()
         self.rect = self.image.get_rect() 
-        self.rect = self.rect.move(x, y)
+        self.rect = self.rect.move(x - self.rect.w / 2, y - self.rect.h / 2)
         self.ver_margin = 5
         self.hor_margin = 2
         self.speed = [0.000, -10.000]  
@@ -178,9 +211,11 @@ class newShot(pygame.sprite.Sprite):
         # Check if outside area
         if self.rect.y < 0:
             self.kill()
-        # Check collision
+        # Check collision, kill itself and create explosion
         if level.checkCollision(self.getHitbox(), turns * scrollSpeed):
             self.kill()
+            explosion = newEffect(self.rect.centerx, self.rect.centery, ANIM_AMMO)
+            effects_group.add(explosion)
 
     def getHitbox(self):
         hitbox = (self.rect[0] + self.hor_margin, self.rect[1] + self.ver_margin, self.rect[2] - self.ver_margin * 2, self.rect[3] - self.hor_margin * 2)
@@ -196,8 +231,8 @@ class PlayerShip(pygame.sprite.Sprite):
         self.image = pygame.image.load(GR_MYSHIP).convert_alpha()
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
-        self.ver_margin = 16
-        self.hor_margin = 16
+        self.hor_margin = 6
+        self.ver_margin = 14
         self.maxSpeedX = 4.0
         self.maxSpeedY = 2.0
         self.frictionX = 0.1
@@ -207,8 +242,6 @@ class PlayerShip(pygame.sprite.Sprite):
     
     # Passive movement & collision detection
     def update(self, level):
-        global turns
-        global scrollSpeed
         # Check shooting delay
         if self.shoot_timer < self.shoot_delay:
             self.shoot_timer += 1
@@ -263,7 +296,7 @@ class PlayerShip(pygame.sprite.Sprite):
 
     def shoot(self):
         if self.shoot_timer >= self.shoot_delay:
-            shot = newShot(self.rect.x + 24, self.rect.y)
+            shot = newShot(self.rect.centerx, self.rect.y)
             player_group.add(shot)
             self.shoot_timer = 0
 
@@ -274,7 +307,7 @@ def levelLoop(bgColor, this_level):
     turns = 0
     scrollSpeed = 2
     clock = pygame.time.Clock()
-    while clock.tick(120):
+    while clock.tick(framerate):
         # Keyevents listener
         for event in pygame.event.get():
             if event.type == pygame.QUIT: 
@@ -298,12 +331,14 @@ def levelLoop(bgColor, this_level):
             break
         # Background update
         screen.fill(bgColor)
-        stars.draw()
+     #   stars.draw()
         this_level.draw(turns * scrollSpeed)
 
         # Player movement and draw
         player_group.draw(screen)
         player_group.update(this_level)
+        effects_group.draw(screen)
+        effects_group.update()
 
         # Is player alive?
         if player.alive == False:
@@ -334,14 +369,17 @@ pygame.display.set_icon(icon)
 
 # Define displays
 pygame.FULLSCREEN
+#screen = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
 screen = pygame.display.set_mode(size)  
 
 # Create stars on background
 stars = StarField(250)
 
+# Load animations
+
 # Load level image sets
-wallset_stone = loadWalls(images_stone)
-wallset_tech = loadWalls(images_tech)
+wallset_stone = loadImageSet(images_stone)
+wallset_tech = loadImageSet(images_tech)
 
 # Create levels
 levels = [
@@ -352,8 +390,6 @@ levels = [
 
 currentLevel = 0
 
-#level = SpriteWalls()
-
 # Main loop
 while True: 
     
@@ -361,6 +397,9 @@ while True:
     player = PlayerShip(width/2,height-100)
     player_group = pygame.sprite.Group()
     player_group.add(player)
+
+    # Create effects group
+    effects_group = pygame.sprite.Group()
 
     # Play the level
     levelLoop(bgColor, levels[currentLevel])
