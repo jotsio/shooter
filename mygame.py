@@ -49,7 +49,6 @@ def levelToList(map):
 class Walls:
     def __init__(self, map, tiles):
         self.map = levelToList(map)  
-        print(self.map)
         self.img = tiles
         self.yOffset = -len(self.map) * gridsize
         self.length = -self.yOffset + height
@@ -325,8 +324,6 @@ def levelLoop(bgColor, this_level):
     scrollSpeed = 2
     clock = pygame.time.Clock()
 
-    this_level.removeBlock((1, 53))
-
     while clock.tick(framerate):
         # Keyevents listener
         for event in pygame.event.get():
@@ -389,8 +386,8 @@ pygame.display.set_icon(icon)
 
 # Define displays
 # pygame.FULLSCREEN
-# screen = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
-screen = pygame.display.set_mode(size)  
+screen = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
+# screen = pygame.display.set_mode(size)  
 
 # Create stars on background
 stars = StarField(250)
