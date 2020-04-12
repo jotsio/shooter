@@ -21,21 +21,15 @@ textColor = WHITE
 #graphics
 GR_MYSHIP = "assets/ship_default.png"
 GR_AMMO = "assets/laserbeam.png"
-ANIM_AMMO = [
-"assets/laserexp1.png",
-"assets/laserexp2.png",
-"assets/laserexp3.png",
-"assets/laserexp4.png"       
-]
+ANIM_AMMO = ["assets/laserexp1.png", "assets/laserexp2.png", "assets/laserexp3.png", "assets/laserexp4.png"]
 
 #Load wall images
-def loadImageSet(tileset):
+def loadImageSet(image_list):
     i = 0
-    images = tileset
-    while i < len(images):
-        images[i] = pygame.image.load(images[i]).convert_alpha()
+    while i < len(image_list):
+        image_list[i] = pygame.image.load(image_list[i]).convert_alpha()
         i += 1
-    return images
+    return image_list
 
 # Convert levels to lists
 def levelToList(map):
@@ -183,17 +177,12 @@ class StarField:
 class newEffect(pygame.sprite.Sprite):
     def __init__(self, x, y, image_list):
         pygame.sprite.Sprite.__init__(self)
-        self.animation = [
-        pygame.image.load(image_list[0]).convert_alpha(),
-        pygame.image.load(image_list[1]).convert_alpha(),
-        pygame.image.load(image_list[2]).convert_alpha(),
-        pygame.image.load(image_list[3]).convert_alpha()
-        ]
+        self.animation = image_list
         self.image = self.animation[0]
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x - self.rect.w / 2, y - self.rect.h / 2)
         self.delay_multiplier = 4
-        self.lifetime = len(image_list) * self.delay_multiplier
+        self.lifetime = len(self.animation) * self.delay_multiplier
         self.counter = 0
     
     def update(self):
@@ -217,7 +206,7 @@ class newShot(pygame.sprite.Sprite):
         self.rect = self.rect.move(x - self.rect.w / 2, y - self.rect.h / 2)
         self.ver_margin = 5
         self.hor_margin = 2
-        self.speed = [0.000, -10.000]  
+        self.speed = [0.000, -10.000] 
 
     # Passive movement
     def update(self, level):
@@ -230,7 +219,7 @@ class newShot(pygame.sprite.Sprite):
         if hitted_block:
             self.kill()
             level.removeBlock(hitted_block)
-            explosion = newEffect(self.rect.centerx, self.rect.centery, ANIM_AMMO)
+            explosion = newEffect(self.rect.centerx, self.rect.centery, laser_explosion)
             effects_group.add(explosion)
 
     def getHitbox(self):
@@ -242,15 +231,15 @@ class PlayerShip(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.alive = True
-        self.startPos = [x, y]
-        self.speed = [0.000, 0.000]  
         self.image = pygame.image.load(GR_MYSHIP).convert_alpha()
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
+        self.speedx = 0.000
+        self.speedy = 0.000  
         self.hor_margin = 8
         self.ver_margin = 15
-        self.maxSpeedX = 4.0
-        self.maxSpeedY = 2.0
+        self.max_speedx = 4.0
+        self.max_speedy = 2.0
         self.frictionX = 0.1
         self.frictionY = 0.1
         self.shoot_delay = 8
@@ -261,55 +250,58 @@ class PlayerShip(pygame.sprite.Sprite):
         # Check shooting delay
         if self.shoot_timer < self.shoot_delay:
             self.shoot_timer += 1
-        self.rect = self.rect.move(self.speed)
-        # Horizontal friction
-        if self.speed[0] > 0 :
-            self.speed[0] -= self.frictionX
-        if self.speed[0] < 0 :
-            self.speed[0] += self.frictionX
-        # Vertical friction
-        if self.speed[1] > 0 :
-            self.speed[1] -= self.frictionY
-        if self.speed[1] < 0 :
-            self.speed[1] += self.frictionY
-        # Check collision
+        self.rect = self.rect.move(self.speedx, self.speedy)
+
+        # bounces from outside the area
+        if self.rect.left < 0:
+            self.rect.left = 0
+            self.speedx = -self.speedx
+        if self.rect.right > width:
+            self.rect.right = width
+            self.speedx = -self.speedx
+        if self.rect.top < 0:
+            self.rect.top = 0
+            self.speedy = -self.speedy
+        if self.rect.bottom > height:
+            self.rect.bottom = height
+            self.speedy = -self.speedy
+
+        # Check collision to walls
         if level.checkCollision(self.getHitbox(), turns * scrollSpeed):
             self.alive = False
 
-    # Vertical acceleration
-    def setSpeedX(self, amount):
-        self.speed[0] += amount
-        if self.speed[0] > self.maxSpeedX :
-            self.speed[0] = self.maxSpeedX
-        if self.speed[0] < -self.maxSpeedX :
-            self.speed[0] = -self.maxSpeedX
+        # Horizontal friction
+        if self.speedx > 0 :
+            self.speedx -= self.frictionX
+        if self.speedx < 0 :
+            self.speedx += self.frictionX
+        # Vertical friction
+        if self.speedy > 0 :
+            self.speedy -= self.frictionY
+        if self.speedy < 0 :
+            self.speedy += self.frictionY
 
     def getHitbox(self):
         hitbox = (self.rect[0] + self.hor_margin, self.rect[1] + self.ver_margin, self.rect[2] - self.ver_margin * 2, self.rect[3] - self.hor_margin * 2)
         return hitbox
 
+    # Vertical acceleration
+    def setSpeedX(self, amount):
+        self.speedx += amount
+        if self.speedx > self.max_speedx :
+            self.speedx = self.max_speedx
+        if self.speedx < -self.max_speedx :
+            self.speedx = -self.max_speedx
+
     # Horizontal acceleration
     def setSpeedY(self, amount):
-        self.speed[1] += amount
-        if self.speed[1] > self.maxSpeedY :
-            self.speed[1] = self.maxSpeedY
-        if self.speed[1] < -self.maxSpeedY :
-            self.speed[1] = -self.maxSpeedY
+        self.speedy += amount
+        if self.speedy > self.max_speedy :
+            self.speedy = self.max_speedy
+        if self.speedy < -self.max_speedy :
+            self.speedy = -self.max_speedy
 
-    def bounceX(self):
-        if self.rect.left < 0:
-            self.rect.left = 0
-        if self.rect.right > width:
-            self.rect.right = width
-        self.speed[0] = -self.speed[0]
-
-    def bounceY(self):
-        if self.rect.top < 0:
-            self.rect.top = 0
-        if self.rect.bottom > height:
-            self.rect.bottom = height
-        self.speed[1] = -self.speed[1]
-
+    # Shooting
     def shoot(self):
         if self.shoot_timer >= self.shoot_delay:
             shot = newShot(self.rect.centerx, self.rect.y)
@@ -335,13 +327,6 @@ def levelLoop(bgColor, this_level):
         player.setSpeedY(pressed[pygame.K_DOWN]-pressed[pygame.K_UP])
         if pressed[pygame.K_SPACE]:
             player.shoot()
-
-
-        # bounces from the wall
-        if player.rect.left < 0 or player.rect.right > width:
-            player.bounceX()
-        if player.rect.top < 0 or player.rect.bottom > height:
-            player.bounceY()
 
         #Player win
         if turns * scrollSpeed == this_level.length:
@@ -386,13 +371,14 @@ pygame.display.set_icon(icon)
 
 # Define displays
 # pygame.FULLSCREEN
-screen = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
-# screen = pygame.display.set_mode(size)  
+# screen = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
+screen = pygame.display.set_mode(size)  
 
 # Create stars on background
 stars = StarField(250)
 
 # Load animations
+laser_explosion = loadImageSet(ANIM_AMMO)
 
 # Load level image sets
 wallset_stone = loadImageSet(images_stone)
