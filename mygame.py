@@ -138,10 +138,8 @@ class Walls:
         self.rect[1] = self.yOffset
     
     # Removes defined wallblock from level
-    def removeBlock(self, (col, row)):
+    def removeBlock(self, col, row):
         self.map[row][col] = "."
-
-
 
 #Stars class
 class StarField:
@@ -180,7 +178,7 @@ class newEffect(pygame.sprite.Sprite):
         self.animation = image_list
         self.image = self.animation[0]
         self.rect = self.image.get_rect() 
-        self.rect = self.rect.move(x - self.rect.w / 2, y - self.rect.h / 2)
+        self.rect = self.rect.move(round(x - self.rect.w / 2), y - round(self.rect.h / 2))
         self.delay_multiplier = 4
         self.lifetime = len(self.animation) * self.delay_multiplier
         self.counter = 0
@@ -194,7 +192,7 @@ class newEffect(pygame.sprite.Sprite):
         # Scoll down
         self.rect = self.rect.move(0, scrollSpeed)
         # Change image
-        self.image = self.animation[self.counter / self.delay_multiplier - 1]
+        self.image = self.animation[round(self.counter / self.delay_multiplier) - 1]
         self.counter += 1
 
 
@@ -208,6 +206,7 @@ class newShot(pygame.sprite.Sprite):
         self.ver_margin = 5
         self.hor_margin = 2
         self.speed = [0.000, -10.000] 
+        snd_laser.play()
 
     # Passive movement
     def update(self, level):
@@ -219,7 +218,7 @@ class newShot(pygame.sprite.Sprite):
         hitted_block = level.checkCollision(self.getHitbox(), turns * scrollSpeed)
         if hitted_block:
             self.kill()
-            level.removeBlock(hitted_block)
+            level.removeBlock(hitted_block[0], hitted_block[1])
             explosion = newEffect(self.rect.centerx, self.rect.centery, laser_explosion)
             effects_group.add(explosion)
 
@@ -231,6 +230,7 @@ class newShot(pygame.sprite.Sprite):
 class PlayerShip(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
+        global player_group
         self.alive = True
         self.image = pygame.image.load(GR_MYSHIP).convert_alpha()
         self.rect = self.image.get_rect() 
@@ -268,9 +268,8 @@ class PlayerShip(pygame.sprite.Sprite):
             self.speedy = -self.speedy
 
         # Check collision to walls
-        if level.checkCollision(self.getHitbox(), turns * scrollSpeed):
-            snd_death.play()
-            self.alive = False
+        if self.alive == True and level.checkCollision(self.getHitbox(), turns * scrollSpeed):
+            self.die()
 
         # Horizontal friction
         if self.speedx > 0 :
@@ -308,16 +307,22 @@ class PlayerShip(pygame.sprite.Sprite):
         if self.shoot_timer >= self.shoot_delay:
             shot = newShot(self.rect.centerx, self.rect.y)
             player_group.add(shot)
-            snd_laser.play()
             self.shoot_timer = 0 
 
+    def die(self):
+        self.alive = False
+        snd_death.play()
+        player_group.remove(player)
+        explosion = newEffect(self.rect.centerx, self.rect.centery, laser_explosion)
+        effects_group.add(explosion)
 
 def levelLoop(bgColor, this_level):
     global turns
     global scrollSpeed
     turns = 0
-    scrollSpeed = 2
+    scrollSpeed = 2.0
     clock = pygame.time.Clock()
+    end_counter = 0
 
     while clock.tick(framerate):
         # Keyevents listener
@@ -347,7 +352,12 @@ def levelLoop(bgColor, this_level):
 
         # Is player alive?
         if player.alive == False:
-            break
+            player.speedx = 0.0
+            player.speedy = 0.0
+            if end_counter > framerate:
+                break
+            end_counter += 1
+            
 
         pygame.display.flip()
         bgColor = BLACK
@@ -357,17 +367,16 @@ def showText(message):
     message = message
     font = pygame.font.Font('freesansbold.ttf', 48) 
     text = font.render(message, True, textColor)
-    textRect = text.get_rect()  
+    textRect = text.get_rect()
     textRect.center = (width // 2, height // 2)
     screen.blit(text, textRect)
     pygame.display.flip()
-
 
 # Main program
 #-------------
 # Pygame initials
 pygame.init()
-pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=4096, allowedchanges=AUDIO_ALLOW_FREQUENCY_CHANGE | AUDIO_ALLOW_CHANNELS_CHANGE) 
+pygame.mixer.init(frequency=22050, size=-16, channels=1, buffer=4096, allowedchanges=AUDIO_ALLOW_FREQUENCY_CHANGE | AUDIO_ALLOW_CHANNELS_CHANGE) 
 # Title
 pygame.display.set_caption("Luolalentely")
 icon = pygame.image.load(GR_MYSHIP)
@@ -375,8 +384,8 @@ pygame.display.set_icon(icon)
 
 # Define displays
 # pygame.FULLSCREEN
-# screen = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
-screen = pygame.display.set_mode(size)  
+screen = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
+#screen = pygame.display.set_mode(size)  
 
 # Create stars on background
 stars = StarField(250)
@@ -409,7 +418,7 @@ currentLevel = 0
 while True: 
     
     # Create player
-    player = PlayerShip(width/2,height-100)
+    player = PlayerShip(round(width/2),round(height-100))
     player_group = pygame.sprite.Group()
     player_group.add(player)
 
@@ -433,7 +442,7 @@ while True:
     while True:
         event = pygame.event.wait()
         if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-            pygame.quit()
+            pygame.QUIT()
             sys.exit()
         if event.type == KEYDOWN and event.key == K_RETURN:
             break
