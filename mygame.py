@@ -184,6 +184,7 @@ class newEffect(pygame.sprite.Sprite):
         self.delay_multiplier = 4
         self.lifetime = len(self.animation) * self.delay_multiplier
         self.counter = 0
+        snd_small_explo.play()
     
     def update(self):
         # Check if dead
@@ -268,6 +269,7 @@ class PlayerShip(pygame.sprite.Sprite):
 
         # Check collision to walls
         if level.checkCollision(self.getHitbox(), turns * scrollSpeed):
+            snd_death.play()
             self.alive = False
 
         # Horizontal friction
@@ -306,7 +308,8 @@ class PlayerShip(pygame.sprite.Sprite):
         if self.shoot_timer >= self.shoot_delay:
             shot = newShot(self.rect.centerx, self.rect.y)
             player_group.add(shot)
-            self.shoot_timer = 0
+            snd_laser.play()
+            self.shoot_timer = 0 
 
 
 def levelLoop(bgColor, this_level):
@@ -364,6 +367,7 @@ def showText(message):
 #-------------
 # Pygame initials
 pygame.init()
+pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=4096, allowedchanges=AUDIO_ALLOW_FREQUENCY_CHANGE | AUDIO_ALLOW_CHANNELS_CHANGE) 
 # Title
 pygame.display.set_caption("Luolalentely")
 icon = pygame.image.load(GR_MYSHIP)
@@ -379,6 +383,14 @@ stars = StarField(250)
 
 # Load animations
 laser_explosion = loadImageSet(ANIM_AMMO)
+
+# Load sounds
+snd_laser = pygame.mixer.Sound("sounds/laser1.ogg")
+snd_laser.set_volume(0.15)
+snd_death = pygame.mixer.Sound("sounds/player_destroyed.ogg")
+snd_death.set_volume(0.8)
+snd_small_explo = pygame.mixer.Sound("sounds/hit1.ogg")
+snd_small_explo.set_volume(0.3)
 
 # Load level image sets
 wallset_stone = loadImageSet(images_stone)
