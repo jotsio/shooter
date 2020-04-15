@@ -1,8 +1,8 @@
 import sys, pygame
 import pygame.gfxdraw
+from pygame.locals import *
 import random
 import time
-from pygame.locals import *
 from levels import *
 
 
@@ -51,7 +51,7 @@ class Walls:
     def draw(self, offset):
         self.offset = offset
         k = 0
-        self.rect[1] += self.offset
+        self.rect[1] += round(self.offset)
         #loop rows
         
         while k < len(self.map):
@@ -121,7 +121,7 @@ class Walls:
     def checkCollision(self, obj_rect, offset):
         self.offset = offset
         k = 0
-        self.rect[1] += self.offset
+        self.rect[1] += round(self.offset)
         #loop rows
         while k < len(self.map):
             #check one row of blocks and mark collision if wall exists
@@ -190,7 +190,7 @@ class newEffect(pygame.sprite.Sprite):
             self.counter = 0
             self.kill()
         # Scoll down
-        self.rect = self.rect.move(0, scrollSpeed)
+        self.rect = self.rect.move(0, round(scrollSpeed))
         # Change image
         self.image = self.animation[round(self.counter / self.delay_multiplier) - 1]
         self.counter += 1
@@ -235,8 +235,8 @@ class PlayerShip(pygame.sprite.Sprite):
         self.image = pygame.image.load(GR_MYSHIP).convert_alpha()
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
-        self.speedx = 0.000
-        self.speedy = 0.000  
+        self.speedx = 0.0
+        self.speedy = 0.0
         self.hor_margin = 8
         self.ver_margin = 15
         self.max_speedx = 4.0
@@ -251,7 +251,7 @@ class PlayerShip(pygame.sprite.Sprite):
         # Check shooting delay
         if self.shoot_timer < self.shoot_delay:
             self.shoot_timer += 1
-        self.rect = self.rect.move(self.speedx, self.speedy)
+        self.rect = self.rect.move(round(self.speedx), round(self.speedy))
 
         # bounces from outside the area
         if self.rect.left < 0:
@@ -304,7 +304,7 @@ class PlayerShip(pygame.sprite.Sprite):
 
     # Shooting
     def shoot(self):
-        if self.shoot_timer >= self.shoot_delay:
+        if player.alive == True and self.shoot_timer >= self.shoot_delay:
             shot = newShot(self.rect.centerx, self.rect.y)
             player_group.add(shot)
             self.shoot_timer = 0 
@@ -384,8 +384,8 @@ pygame.display.set_icon(icon)
 
 # Define displays
 # pygame.FULLSCREEN
-screen = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
-#screen = pygame.display.set_mode(size)  
+#screen = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
+screen = pygame.display.set_mode(size)  
 
 # Create stars on background
 stars = StarField(250)
