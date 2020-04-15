@@ -20,6 +20,7 @@ textColor = WHITE
 
 #graphics
 GR_MYSHIP = "assets/ship_default.png"
+GR_ENEMYSHIP = "assets/enemy1.png"
 GR_AMMO = "assets/laserbeam.png"
 ANIM_AMMO = ["assets/laserexp1.png", "assets/laserexp2.png", "assets/laserexp3.png", "assets/laserexp4.png"]
 
@@ -226,7 +227,28 @@ class newShot(pygame.sprite.Sprite):
         hitbox = (self.rect[0] + self.hor_margin, self.rect[1] + self.ver_margin, self.rect[2] - self.ver_margin * 2, self.rect[3] - self.hor_margin * 2)
         return hitbox
 
-#player class
+# Enemy class
+class EnemyShip(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        global enemy_group
+        self.alive = True
+        self.image = pygame.image.load(GR_ENEMYSHIP).convert_alpha()
+        self.rect = self.image.get_rect() 
+        self.rect = self.rect.move(x, y)
+    
+    # Passive movement & collision detection
+    def update(self, level):
+        # Keep on scrolling
+        self.rect = self.rect.move(0, round(scrollSpeed))
+
+    def die(self):
+        self.kill()
+        snd_death.play()
+        explosion = newEffect(self.rect.centerx, self.rect.centery, laser_explosion)
+        effects_group.add(explosion)
+
+# Player class
 class PlayerShip(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
@@ -323,6 +345,8 @@ def levelLoop(bgColor, this_level):
     scrollSpeed = 2.0
     clock = pygame.time.Clock()
     end_counter = 0
+    enemy = EnemyShip(100, 100)
+    enemy_group.add(enemy)
 
     while clock.tick(framerate):
         # Keyevents listener
@@ -335,29 +359,33 @@ def levelLoop(bgColor, this_level):
         player.setSpeedY(pressed[pygame.K_DOWN]-pressed[pygame.K_UP])
         if pressed[pygame.K_SPACE]:
             player.shoot()
-
-        #Player win
-        if turns * scrollSpeed == this_level.length:
-            break
-        # Background update
-        screen.fill(bgColor)
-        stars.draw()
-        this_level.draw(turns * scrollSpeed)
-
-        # Player movement and draw
-        player_group.draw(screen)
-        player_group.update(this_level)
-        effects_group.draw(screen)
-        effects_group.update()
-
-        # Is player alive?
+         
+       # Is player alive?
         if player.alive == False:
             player.speedx = 0.0
             player.speedy = 0.0
             if end_counter > framerate:
                 break
             end_counter += 1
-            
+
+        # Is player reached the end of level?
+        if turns * scrollSpeed == this_level.length:
+            break
+
+        # Background update
+        screen.fill(bgColor)
+        stars.draw()
+        this_level.draw(turns * scrollSpeed)
+
+        # Objects update
+        player_group.update(this_level)
+        enemy_group.update(this_level)
+        effects_group.update()
+
+        # Draw all the objects
+        player_group.draw(screen)
+        enemy_group.draw(screen)
+        effects_group.draw(screen)
 
         pygame.display.flip()
         bgColor = BLACK
@@ -417,13 +445,14 @@ currentLevel = 0
 # Main loop
 while True: 
     
+    # Create sprite groups
+    player_group = pygame.sprite.Group()
+    enemy_group = pygame.sprite.Group()
+    effects_group = pygame.sprite.Group()
+
     # Create player
     player = PlayerShip(round(width/2),round(height-100))
-    player_group = pygame.sprite.Group()
     player_group.add(player)
-
-    # Create effects group
-    effects_group = pygame.sprite.Group()
 
     # Play the level
     levelLoop(bgColor, levels[currentLevel])
