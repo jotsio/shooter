@@ -74,6 +74,11 @@ class Walls:
                 if i < len(self.map[k])-1:
                     right = self.map[k][i+1]
 
+                # create enemy on screen
+                if this == "X" and self.rect.y == -gridsize:
+                    enemy = EnemyShip(self.rect.x, self.rect.y)
+                    enemy_group.add(enemy)
+
                 # select which wall asset to use
                 if this == "#":
                     if up == "#" and  down == "#" and left == "#" and  right == "#":
@@ -137,7 +142,7 @@ class Walls:
             self.rect[1] += gridsize
             k += 1
         self.rect[1] = self.yOffset
-    
+
     # Removes defined wallblock from level
     def removeBlock(self, col, row):
         self.map[row][col] = "."
@@ -236,6 +241,7 @@ class EnemyShip(pygame.sprite.Sprite):
         self.image = pygame.image.load(GR_ENEMYSHIP).convert_alpha()
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
+        print("I'm alive! ", self.rect.x, self.rect.y)
     
     # Passive movement & collision detection
     def update(self, level):
@@ -345,8 +351,6 @@ def levelLoop(bgColor, this_level):
     scrollSpeed = 2.0
     clock = pygame.time.Clock()
     end_counter = 0
-    enemy = EnemyShip(100, 100)
-    enemy_group.add(enemy)
 
     while clock.tick(framerate):
         # Keyevents listener
