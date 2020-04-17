@@ -25,6 +25,7 @@ textColor = WHITE
 GR_MYSHIP = "assets/ship_default.png"
 GR_ENEMYSHIP = "assets/enemy1.png"
 GR_AMMO = "assets/laserbeam.png"
+GR_AMMO_ENEMY = "assets/laserbeam_enemy.png"
 ANIM_AMMO = ["assets/laserexp1.png", "assets/laserexp2.png", "assets/laserexp3.png", "assets/laserexp4.png"]
 
 #Load wall images
@@ -209,9 +210,9 @@ class newEffect(pygame.sprite.Sprite):
 
 # Ammunition
 class newShot(pygame.sprite.Sprite):
-    def __init__(self, x, y, speedy):
+    def __init__(self, x, y, speedy, graphics):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(GR_AMMO).convert_alpha()
+        self.image = pygame.image.load(graphics).convert_alpha()
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x - self.rect.w / 2, y - self.rect.h / 2)
         self.ver_margin = 5
@@ -225,7 +226,6 @@ class newShot(pygame.sprite.Sprite):
         # Check if outside area
         if self.rect.y < 0 or self.rect.y > height:
             self.kill()
-            print("ouh!")
         # Check collision, kill itself and create explosion
         hitted_block = level.checkCollision(self.getHitbox(), offset)
         if hitted_block:
@@ -254,6 +254,11 @@ class EnemyShip(pygame.sprite.Sprite):
     def update(self, level):
         # Keep on scrolling
         self.rect = self.rect.move(0, round(scrollSpeed))
+        
+        # Check collision to enemy or enemy ammo
+        if self.alive == True and pygame.sprite.spritecollideany(self, player_group):
+            self.die()
+
         # Check shooting delay
         if self.shoot_timer < self.shoot_delay:
             self.shoot_timer += 1
@@ -268,7 +273,7 @@ class EnemyShip(pygame.sprite.Sprite):
     # Shooting
     def shoot(self):
         if self.alive == True and self.shoot_timer >= self.shoot_delay:
-            shot = newShot(self.rect.centerx, self.rect.y + self.rect[3], 6.0)
+            shot = newShot(self.rect.centerx, self.rect.y + self.rect[3], 6.0, GR_AMMO_ENEMY)
             enemy_group.add(shot)
             self.shoot_timer = 0 
 
@@ -318,6 +323,10 @@ class PlayerShip(pygame.sprite.Sprite):
         if self.alive == True and level.checkCollision(self.getHitbox(), offset):
             self.die()
 
+        # Check collision to enemy or enemy ammo
+        if self.alive == True and pygame.sprite.spritecollideany(self, enemy_group):
+            self.die()
+
         # Horizontal friction
         if self.speedx > 0 :
             self.speedx -= self.frictionX
@@ -352,7 +361,7 @@ class PlayerShip(pygame.sprite.Sprite):
     # Shooting
     def shoot(self):
         if self.alive == True and self.shoot_timer >= self.shoot_delay:
-            shot = newShot(self.rect.centerx, self.rect.y, -10.0)
+            shot = newShot(self.rect.centerx, self.rect.y, -10.0, GR_AMMO)
             player_group.add(shot)
             self.shoot_timer = 0 
 
@@ -434,8 +443,8 @@ pygame.display.set_icon(icon)
 
 # Define displays
 # pygame.FULLSCREEN
-#screen = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
-SCREEN = pygame.display.set_mode(size)  
+SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
+#SCREEN = pygame.display.set_mode(size)  
 
 # Create stars on background
 stars = StarField(250)
@@ -476,6 +485,7 @@ while True:
     player_group.add(player)
 
     # Play the level
+    offset = 0
     levelLoop(bgColor, levels[currentLevel])
    
     # Show level ending text
