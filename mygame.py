@@ -8,6 +8,9 @@ from levels import *
 
 # Global variables
 framerate = 120
+scrollSpeed = 2
+offset = 0
+currentLevel = 0
 size = width, height = 1366, 768
 gridsize = 64
 BLACK = 0, 0, 0
@@ -52,7 +55,7 @@ class Walls:
     def draw(self, offset):
         self.offset = offset
         k = 0
-        self.rect[1] += round(self.offset)
+        self.rect.y += round(self.offset)
         #loop rows
         
         while k < len(self.map):
@@ -82,66 +85,66 @@ class Walls:
                 # select which wall asset to use
                 if this == "#":
                     if up == "#" and  down == "#" and left == "#" and  right == "#":
-                        screen.blit(self.img[0], self.rect)
+                        SCREEN.blit(self.img[0], self.rect)
                     elif up == "." and  down == "." and left == "." and  right == ".":
-                        screen.blit(self.img[1], self.rect)
+                        SCREEN.blit(self.img[1], self.rect)
                     elif up == "." and  down == "." and left == "#" and  right == "#":
-                        screen.blit(self.img[2], self.rect)
+                        SCREEN.blit(self.img[2], self.rect)
                     elif up == "#" and  down == "#" and left == "." and  right == ".":
-                        screen.blit(self.img[3], self.rect)
+                        SCREEN.blit(self.img[3], self.rect)
                     elif up == "." and  down == "#" and left == "." and  right == ".":
-                        screen.blit(self.img[4], self.rect)
+                        SCREEN.blit(self.img[4], self.rect)
                     elif up == "#" and  down == "." and left == "." and  right == ".":
-                        screen.blit(self.img[5], self.rect)
+                        SCREEN.blit(self.img[5], self.rect)
                     elif up == "." and  down == "." and left == "." and  right == "#":
-                        screen.blit(self.img[6], self.rect)
+                        SCREEN.blit(self.img[6], self.rect)
                     elif up == "." and  down == "." and left == "#" and  right == ".":
-                        screen.blit(self.img[7], self.rect)
+                        SCREEN.blit(self.img[7], self.rect)
                     elif up == "." and  down == "#" and left == "#" and  right == "#":
-                        screen.blit(self.img[8], self.rect)
+                        SCREEN.blit(self.img[8], self.rect)
                     elif up == "#" and  down == "." and left == "#" and  right == "#":
-                        screen.blit(self.img[9], self.rect)
+                        SCREEN.blit(self.img[9], self.rect)
                     elif up == "#" and  down == "#" and left == "." and  right == "#":
-                       screen.blit(self.img[10], self.rect)
+                        SCREEN.blit(self.img[10], self.rect)
                     elif up == "#" and  down == "#" and left == "#" and  right == ".":
-                        screen.blit(self.img[11], self.rect)
+                        SCREEN.blit(self.img[11], self.rect)
                     elif up == "." and  down == "#" and left == "." and  right == "#":
-                        screen.blit(self.img[12], self.rect)
+                        SCREEN.blit(self.img[12], self.rect)
                     elif up == "." and  down == "#" and left == "#" and  right == ".":
-                        screen.blit(self.img[13], self.rect)
+                        SCREEN.blit(self.img[13], self.rect)
                     elif up == "#" and  down == "." and left == "#" and  right == ".":
-                        screen.blit(self.img[14], self.rect)
+                        SCREEN.blit(self.img[14], self.rect)
                     elif up == "#" and  down == "." and left == "." and  right == "#":
-                        screen.blit(self.img[15], self.rect)
+                        SCREEN.blit(self.img[15], self.rect)
                     else:
-                        screen.blit(self.img[0], self.rect)
+                        SCREEN.blit(self.img[0], self.rect)
 
-                self.rect[0] += gridsize
+                self.rect.x += gridsize
                 i += 1            
-            self.rect[0] = 0
-            self.rect[1] += gridsize
+            self.rect.x = 0
+            self.rect.y += gridsize
             k += 1
-        self.rect[1] = self.yOffset
+        self.rect.y = self.yOffset
     
     # Checks collision to walls for certain rectangle
     def checkCollision(self, obj_rect, offset):
         self.offset = offset
         k = 0
-        self.rect[1] += round(self.offset)
+        self.rect.y += round(self.offset)
         #loop rows
         while k < len(self.map):
             #check one row of blocks and mark collision if wall exists
             i = 0
             while i < len(self.map[k]):
                 if self.map[k][i] == "#" and self.rect.colliderect(obj_rect):
-                    self.rect[1] = self.yOffset
+                    self.rect.y = self.yOffset
                     return (i, k)
-                self.rect[0] += gridsize
+                self.rect.x += gridsize
                 i += 1            
-            self.rect[0] = 0
-            self.rect[1] += gridsize
+            self.rect.x = 0
+            self.rect.y += gridsize
             k += 1
-        self.rect[1] = self.yOffset
+        self.rect.y = self.yOffset
 
     # Removes defined wallblock from level
     def removeBlock(self, col, row):
@@ -175,7 +178,7 @@ class StarField:
         while i < self.n:
             self.y[i] += self.speed[i]
             if self.y[i] > height: self.y[i] = 0
-            pygame.gfxdraw.pixel(screen, self.x[i], int(self.y[i]), self.color[i])
+            pygame.gfxdraw.pixel(SCREEN, self.x[i], int(self.y[i]), self.color[i])
             i += 1
 
 class newEffect(pygame.sprite.Sprite):
@@ -221,7 +224,7 @@ class newShot(pygame.sprite.Sprite):
         if self.rect.y < 0:
             self.kill()
         # Check collision, kill itself and create explosion
-        hitted_block = level.checkCollision(self.getHitbox(), turns * scrollSpeed)
+        hitted_block = level.checkCollision(self.getHitbox(), offset)
         if hitted_block:
             self.kill()
             level.removeBlock(hitted_block[0], hitted_block[1])
@@ -229,7 +232,7 @@ class newShot(pygame.sprite.Sprite):
             effects_group.add(explosion)
 
     def getHitbox(self):
-        hitbox = (self.rect[0] + self.hor_margin, self.rect[1] + self.ver_margin, self.rect[2] - self.ver_margin * 2, self.rect[3] - self.hor_margin * 2)
+        hitbox = (self.rect.x + self.hor_margin, self.rect.y + self.ver_margin, self.rect[2] - self.ver_margin * 2, self.rect[3] - self.hor_margin * 2)
         return hitbox
 
 # Enemy class
@@ -296,7 +299,7 @@ class PlayerShip(pygame.sprite.Sprite):
             self.speedy = -self.speedy
 
         # Check collision to walls
-        if self.alive == True and level.checkCollision(self.getHitbox(), turns * scrollSpeed):
+        if self.alive == True and level.checkCollision(self.getHitbox(), offset):
             self.die()
 
         # Horizontal friction
@@ -311,7 +314,7 @@ class PlayerShip(pygame.sprite.Sprite):
             self.speedy += self.frictionY
 
     def getHitbox(self):
-        hitbox = (self.rect[0] + self.hor_margin, self.rect[1] + self.ver_margin, self.rect[2] - self.ver_margin * 2, self.rect[3] - self.hor_margin * 2)
+        hitbox = (self.rect.x + self.hor_margin, self.rect.y + self.ver_margin, self.rect[2] - self.ver_margin * 2, self.rect[3] - self.hor_margin * 2)
         return hitbox
 
     # Vertical acceleration
@@ -345,10 +348,7 @@ class PlayerShip(pygame.sprite.Sprite):
         effects_group.add(explosion)
 
 def levelLoop(bgColor, this_level):
-    global turns
-    global scrollSpeed
-    turns = 0
-    scrollSpeed = 2.0
+    global offset
     clock = pygame.time.Clock()
     end_counter = 0
 
@@ -373,13 +373,13 @@ def levelLoop(bgColor, this_level):
             end_counter += 1
 
         # Is player reached the end of level?
-        if turns * scrollSpeed == this_level.length:
+        if offset == this_level.length:
             break
 
         # Background update
-        screen.fill(bgColor)
+        SCREEN.fill(bgColor)
         stars.draw()
-        this_level.draw(turns * scrollSpeed)
+        this_level.draw(offset)
 
         # Objects update
         player_group.update(this_level)
@@ -387,13 +387,15 @@ def levelLoop(bgColor, this_level):
         effects_group.update()
 
         # Draw all the objects
-        player_group.draw(screen)
-        enemy_group.draw(screen)
-        effects_group.draw(screen)
+        player_group.draw(SCREEN)
+        enemy_group.draw(SCREEN)
+        effects_group.draw(SCREEN)
 
         pygame.display.flip()
         bgColor = BLACK
-        turns += 1
+        
+        # Move the whole screen up one step
+        offset += scrollSpeed
 
 def showText(message):
     message = message
@@ -401,7 +403,7 @@ def showText(message):
     text = font.render(message, True, textColor)
     textRect = text.get_rect()
     textRect.center = (width // 2, height // 2)
-    screen.blit(text, textRect)
+    SCREEN.blit(text, textRect)
     pygame.display.flip()
 
 # Main program
@@ -417,7 +419,7 @@ pygame.display.set_icon(icon)
 # Define displays
 # pygame.FULLSCREEN
 #screen = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
-screen = pygame.display.set_mode(size)  
+SCREEN = pygame.display.set_mode(size)  
 
 # Create stars on background
 stars = StarField(250)
@@ -444,7 +446,6 @@ levels = [
     Walls(level3_map, wallset_tech)
     ]
 
-currentLevel = 0
 
 # Main loop
 while True: 
