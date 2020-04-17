@@ -43,6 +43,38 @@ def levelToList(map):
         i += 1
     return map
 
+
+#Stars class
+class StarField:
+    def __init__(self, amount):
+        self.n = amount
+        self.spd = 0.5
+        self.y = [0.0] * amount
+        self.x = [0.0] * amount
+        self.z = [0.0] * amount
+        self.color = [0,0,0] * amount
+        self.speed = [0.0] * amount
+
+        #Create star a random.rect and speed
+        i = 0
+        while i < self.n:
+            self.y[i] = random.randrange(0, height)
+            self.x[i] = random.randrange(0, width)
+            rnd = random.random()
+            self.z[i] = rnd * rnd * 255
+            c = self.z[i]
+            self.color[i] = c, c, c
+            self.speed[i] = c / 255.0 * self.spd
+            i += 1
+
+    def draw(self): 
+        i = 0
+        while i < self.n:
+            self.y[i] += self.speed[i]
+            if self.y[i] > height: self.y[i] = 0
+            pygame.gfxdraw.pixel(SCREEN, self.x[i], int(self.y[i]), self.color[i])
+            i += 1
+
 #Walls class
 class Walls:
     def __init__(self, map, tiles):
@@ -150,36 +182,6 @@ class Walls:
     def removeBlock(self, col, row):
         self.map[row][col] = "."
 
-#Stars class
-class StarField:
-    def __init__(self, amount):
-        self.n = amount
-        self.spd = 0.5
-        self.y = [0.0] * amount
-        self.x = [0.0] * amount
-        self.z = [0.0] * amount
-        self.color = [0,0,0] * amount
-        self.speed = [0.0] * amount
-
-        #Create star a random.rect and speed
-        i = 0
-        while i < self.n:
-            self.y[i] = random.randrange(0, height)
-            self.x[i] = random.randrange(0, width)
-            rnd = random.random()
-            self.z[i] = rnd * rnd * 255
-            c = self.z[i]
-            self.color[i] = c, c, c
-            self.speed[i] = c / 255.0 * self.spd
-            i += 1
-
-    def draw(self): 
-        i = 0
-        while i < self.n:
-            self.y[i] += self.speed[i]
-            if self.y[i] > height: self.y[i] = 0
-            pygame.gfxdraw.pixel(SCREEN, self.x[i], int(self.y[i]), self.color[i])
-            i += 1
 
 class newEffect(pygame.sprite.Sprite):
     def __init__(self, x, y, image_list):
@@ -207,22 +209,23 @@ class newEffect(pygame.sprite.Sprite):
 
 # Ammunition
 class newShot(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, speedy):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(GR_AMMO).convert_alpha()
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x - self.rect.w / 2, y - self.rect.h / 2)
         self.ver_margin = 5
         self.hor_margin = 2
-        self.speed = [0.000, -10.000] 
+        self.speed = [0.000, speedy] 
         snd_laser.play()
 
     # Passive movement
     def update(self, level):
         self.rect = self.rect.move(self.speed)
         # Check if outside area
-        if self.rect.y < 0:
+        if self.rect.y < 0 or self.rect.y > height:
             self.kill()
+            print("ouh!")
         # Check collision, kill itself and create explosion
         hitted_block = level.checkCollision(self.getHitbox(), offset)
         if hitted_block:
@@ -244,18 +247,31 @@ class EnemyShip(pygame.sprite.Sprite):
         self.image = pygame.image.load(GR_ENEMYSHIP).convert_alpha()
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
-        print("I'm alive! ", self.rect.x, self.rect.y)
+        self.shoot_timer = 0
+        self.shoot_delay = 80
     
     # Passive movement & collision detection
     def update(self, level):
         # Keep on scrolling
         self.rect = self.rect.move(0, round(scrollSpeed))
+        # Check shooting delay
+        if self.shoot_timer < self.shoot_delay:
+            self.shoot_timer += 1
+        self.shoot()
 
     def die(self):
         self.kill()
         snd_death.play()
         explosion = newEffect(self.rect.centerx, self.rect.centery, laser_explosion)
         effects_group.add(explosion)
+
+    # Shooting
+    def shoot(self):
+        if self.alive == True and self.shoot_timer >= self.shoot_delay:
+            shot = newShot(self.rect.centerx, self.rect.y + self.rect[3], 6.0)
+            enemy_group.add(shot)
+            self.shoot_timer = 0 
+
 
 # Player class
 class PlayerShip(pygame.sprite.Sprite):
@@ -335,8 +351,8 @@ class PlayerShip(pygame.sprite.Sprite):
 
     # Shooting
     def shoot(self):
-        if player.alive == True and self.shoot_timer >= self.shoot_delay:
-            shot = newShot(self.rect.centerx, self.rect.y)
+        if self.alive == True and self.shoot_timer >= self.shoot_delay:
+            shot = newShot(self.rect.centerx, self.rect.y, -10.0)
             player_group.add(shot)
             self.shoot_timer = 0 
 
