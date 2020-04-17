@@ -194,7 +194,6 @@ class newEffect(pygame.sprite.Sprite):
         self.delay_multiplier = 4
         self.lifetime = len(self.animation) * self.delay_multiplier
         self.counter = 0
-        snd_small_explo.play()
     
     def update(self):
         # Check if dead
@@ -218,7 +217,6 @@ class newShot(pygame.sprite.Sprite):
         self.ver_margin = 5
         self.hor_margin = 2
         self.speed = [0.000, speedy] 
-        snd_laser.play()
 
     # Passive movement
     def update(self, level):
@@ -233,6 +231,7 @@ class newShot(pygame.sprite.Sprite):
             level.removeBlock(hitted_block[0], hitted_block[1])
             explosion = newEffect(self.rect.centerx, self.rect.centery, laser_explosion)
             effects_group.add(explosion)
+            snd_small_explo.play()
 
     def getHitbox(self):
         hitbox = (self.rect.x + self.hor_margin, self.rect.y + self.ver_margin, self.rect[2] - self.ver_margin * 2, self.rect[3] - self.hor_margin * 2)
@@ -249,12 +248,19 @@ class EnemyShip(pygame.sprite.Sprite):
         self.rect = self.rect.move(x, y)
         self.shoot_timer = 0
         self.shoot_delay = 100
+        self.visible = True
     
     # Passive movement & collision detection
     def update(self, level):
         # Keep on scrolling
         self.rect = self.rect.move(0, round(scrollSpeed))
         
+        # Check visiblity
+        if self.rect.y < 0 or self.rect.y > height:
+            visible = False
+        else: 
+            visible = True
+
         # Check collision to enemy or enemy ammo
         if self.alive == True and pygame.sprite.spritecollideany(self, player_group):
             self.die()
@@ -265,16 +271,17 @@ class EnemyShip(pygame.sprite.Sprite):
         self.shoot()
 
     def die(self):
-        self.kill()
-        snd_death.play()
+        snd_enemy_death.play()
         explosion = newEffect(self.rect.centerx, self.rect.centery, laser_explosion)
         effects_group.add(explosion)
+        self.kill()
 
     # Shooting
     def shoot(self):
-        if self.alive == True and self.shoot_timer >= self.shoot_delay:
+        if self.alive == True and self.shoot_timer >= self.shoot_delay and self.visible == True:
             shot = newShot(self.rect.centerx, self.rect.y + self.rect[3], 6.0, GR_AMMO_ENEMY)
             enemy_group.add(shot)
+            snd_laser_enemy.play()
             self.shoot_timer = 0 
 
 
@@ -363,11 +370,12 @@ class PlayerShip(pygame.sprite.Sprite):
         if self.alive == True and self.shoot_timer >= self.shoot_delay and key == True:
             shot = newShot(self.rect.centerx, self.rect.y, -10.0, GR_AMMO)
             player_group.add(shot)
+            snd_laser.play()
             self.shoot_timer = 0 
 
     def die(self):
         self.alive = False
-        snd_death.play()
+        snd_player_death.play()
         player_group.remove(player)
         explosion = newEffect(self.rect.centerx, self.rect.centery, laser_explosion)
         effects_group.add(explosion)
@@ -454,9 +462,13 @@ laser_explosion = loadImageSet(ANIM_AMMO)
 # Load sounds
 snd_laser = pygame.mixer.Sound("sounds/laser1.ogg")
 snd_laser.set_volume(0.15)
-snd_death = pygame.mixer.Sound("sounds/player_destroyed.ogg")
-snd_death.set_volume(0.8)
-snd_small_explo = pygame.mixer.Sound("sounds/hit1.ogg")
+snd_laser_enemy = pygame.mixer.Sound("sounds/laser2.ogg")
+snd_laser_enemy.set_volume(0.3)
+snd_player_death = pygame.mixer.Sound("sounds/defeated.ogg")
+snd_player_death.set_volume(0.8)
+snd_enemy_death = pygame.mixer.Sound("sounds/hit1.ogg")
+snd_enemy_death.set_volume(0.8)
+snd_small_explo = pygame.mixer.Sound("sounds/hit3.ogg")
 snd_small_explo.set_volume(0.3)
 
 # Load level image sets
