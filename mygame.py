@@ -119,35 +119,35 @@ class Walls:
                 if this == "#":
                     if up == "#" and  down == "#" and left == "#" and  right == "#":
                         SCREEN.blit(self.img[0], self.rect)
-                    elif up == "." and  down == "." and left == "." and  right == ".":
+                    elif up != "#" and  down != "#" and left != "#" and  right != "#":
                         SCREEN.blit(self.img[1], self.rect)
-                    elif up == "." and  down == "." and left == "#" and  right == "#":
+                    elif up != "#" and  down != "#" and left == "#" and  right == "#":
                         SCREEN.blit(self.img[2], self.rect)
-                    elif up == "#" and  down == "#" and left == "." and  right == ".":
+                    elif up == "#" and  down == "#" and left != "#" and  right != "#":
                         SCREEN.blit(self.img[3], self.rect)
-                    elif up == "." and  down == "#" and left == "." and  right == ".":
+                    elif up != "#" and  down == "#" and left != "#" and  right != "#":
                         SCREEN.blit(self.img[4], self.rect)
-                    elif up == "#" and  down == "." and left == "." and  right == ".":
+                    elif up == "#" and  down != "#" and left != "#" and  right != "#":
                         SCREEN.blit(self.img[5], self.rect)
-                    elif up == "." and  down == "." and left == "." and  right == "#":
+                    elif up != "#" and  down != "#" and left != "#" and  right == "#":
                         SCREEN.blit(self.img[6], self.rect)
-                    elif up == "." and  down == "." and left == "#" and  right == ".":
+                    elif up != "#" and  down != "#" and left == "#" and  right != "#":
                         SCREEN.blit(self.img[7], self.rect)
-                    elif up == "." and  down == "#" and left == "#" and  right == "#":
+                    elif up != "#" and  down == "#" and left == "#" and  right == "#":
                         SCREEN.blit(self.img[8], self.rect)
-                    elif up == "#" and  down == "." and left == "#" and  right == "#":
+                    elif up == "#" and  down != "#" and left == "#" and  right == "#":
                         SCREEN.blit(self.img[9], self.rect)
-                    elif up == "#" and  down == "#" and left == "." and  right == "#":
+                    elif up == "#" and  down == "#" and left != "#" and  right == "#":
                         SCREEN.blit(self.img[10], self.rect)
-                    elif up == "#" and  down == "#" and left == "#" and  right == ".":
+                    elif up == "#" and  down == "#" and left == "#" and  right != "#":
                         SCREEN.blit(self.img[11], self.rect)
-                    elif up == "." and  down == "#" and left == "." and  right == "#":
+                    elif up != "#" and  down == "#" and left != "#" and  right == "#":
                         SCREEN.blit(self.img[12], self.rect)
-                    elif up == "." and  down == "#" and left == "#" and  right == ".":
+                    elif up != "#" and  down == "#" and left == "#" and  right != "#":
                         SCREEN.blit(self.img[13], self.rect)
-                    elif up == "#" and  down == "." and left == "#" and  right == ".":
+                    elif up == "#" and  down != "#" and left == "#" and  right != "#":
                         SCREEN.blit(self.img[14], self.rect)
-                    elif up == "#" and  down == "." and left == "." and  right == "#":
+                    elif up == "#" and  down != "#" and left != "#" and  right == "#":
                         SCREEN.blit(self.img[15], self.rect)
                     else:
                         SCREEN.blit(self.img[0], self.rect)
@@ -248,7 +248,7 @@ class EnemyShip(pygame.sprite.Sprite):
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
         self.shoot_timer = 0
-        self.shoot_delay = 80
+        self.shoot_delay = 100
     
     # Passive movement & collision detection
     def update(self, level):
@@ -359,8 +359,8 @@ class PlayerShip(pygame.sprite.Sprite):
             self.speedy = -self.max_speedy
 
     # Shooting
-    def shoot(self):
-        if self.alive == True and self.shoot_timer >= self.shoot_delay:
+    def shoot(self, key):
+        if self.alive == True and self.shoot_timer >= self.shoot_delay and key == True:
             shot = newShot(self.rect.centerx, self.rect.y, -10.0, GR_AMMO)
             player_group.add(shot)
             self.shoot_timer = 0 
@@ -386,8 +386,7 @@ def levelLoop(bgColor, this_level):
         pressed = pygame.key.get_pressed()
         player.setSpeedX(pressed[pygame.K_RIGHT]-pressed[pygame.K_LEFT])
         player.setSpeedY(pressed[pygame.K_DOWN]-pressed[pygame.K_UP])
-        if pressed[pygame.K_SPACE]:
-            player.shoot()
+        player.shoot(pressed[pygame.K_SPACE])
          
        # Is player alive?
         if player.alive == False:
