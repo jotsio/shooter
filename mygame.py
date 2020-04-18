@@ -24,9 +24,10 @@ textColor = WHITE
 #graphics
 GR_MYSHIP = "assets/ship_default.png"
 GR_ENEMYSHIP = "assets/enemy1.png"
-GR_AMMO = "assets/laserbeam.png"
-GR_AMMO_ENEMY = "assets/laserbeam_enemy.png"
-ANIM_AMMO = ["assets/laserexp1.png", "assets/laserexp2.png", "assets/laserexp3.png", "assets/laserexp4.png"]
+GR_AMMO = "assets/ammo_blue.png"
+GR_AMMO_ENEMY = "assets/ammo_pink.png"
+ANIM_BLUEEXP = ["assets/exp_blue1.png", "assets/exp_blue2.png", "assets/exp_blue3.png", "assets/exp_blue4.png"]
+ANIM_PINKEXP = ["assets/exp_pink1.png", "assets/exp_pink2.png", "assets/exp_pink3.png", "assets/exp_pink4.png"]
 
 #Load wall images
 def loadImageSet(image_list):
@@ -135,7 +136,7 @@ class Walls:
                 block = 15
             else:
                 block = 0
-        return int(block)
+        return block
 
     def draw(self, offset):
         self.offset = offset
@@ -212,13 +213,14 @@ class newEffect(pygame.sprite.Sprite):
 
 # Ammunition
 class newShot(pygame.sprite.Sprite):
-    def __init__(self, x, y, speedy, graphics):
+    def __init__(self, x, y, speedy, graphics, animation):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(graphics).convert_alpha()
+        self.animation = animation
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x - self.rect.w / 2, y - self.rect.h / 2)
-        self.ver_margin = 5
-        self.hor_margin = 2
+        self.ver_margin = 0
+        self.hor_margin = 0
         self.speed = [0.000, speedy] 
 
     # Passive movement
@@ -232,7 +234,7 @@ class newShot(pygame.sprite.Sprite):
         if hitted_block:
             self.kill()
             level.removeBlock(hitted_block[0], hitted_block[1])
-            explosion = newEffect(self.rect.centerx, self.rect.centery, laser_explosion)
+            explosion = newEffect(self.rect.centerx, self.rect.centery, self.animation)
             effects_group.add(explosion)
             snd_small_explo.play()
 
@@ -250,7 +252,7 @@ class EnemyShip(pygame.sprite.Sprite):
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
         self.shoot_timer = 0
-        self.shoot_delay = 100
+        self.shoot_delay = 20
         self.visible = True
     
     # Passive movement & collision detection
@@ -282,7 +284,7 @@ class EnemyShip(pygame.sprite.Sprite):
     # Shooting
     def shoot(self):
         if self.alive == True and self.shoot_timer >= self.shoot_delay and self.visible == True:
-            shot = newShot(self.rect.centerx, self.rect.y + self.rect[3], 6.0, GR_AMMO_ENEMY)
+            shot = newShot(self.rect.centerx, self.rect.y + self.rect[3], 6.0, GR_AMMO_ENEMY, ANIM_PINKEXP)
             enemy_group.add(shot)
             snd_laser_enemy.play()
             self.shoot_timer = 0 
@@ -303,7 +305,7 @@ class PlayerShip(pygame.sprite.Sprite):
         self.ver_margin = 15
         self.max_speedx = 4.0
         self.max_speedy = 2.0
-        self.frictionX = 0.1
+        self.frictionX = 0.1 
         self.frictionY = 0.1
         self.shoot_delay = 8
         self.shoot_timer = 0
@@ -371,7 +373,7 @@ class PlayerShip(pygame.sprite.Sprite):
     # Shooting
     def shoot(self, key):
         if self.alive == True and self.shoot_timer >= self.shoot_delay and key == True:
-            shot = newShot(self.rect.centerx, self.rect.y, -10.0, GR_AMMO)
+            shot = newShot(self.rect.centerx, self.rect.y, -10.0, GR_AMMO, ANIM_BLUEEXP)
             player_group.add(shot)
             snd_laser.play()
             self.shoot_timer = 0 
@@ -453,14 +455,15 @@ pygame.display.set_icon(icon)
 
 # Define displays
 # pygame.FULLSCREEN
-#SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
-SCREEN = pygame.display.set_mode(size)  
+SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
+# SCREEN = pygame.display.set_mode(size)  
 
 # Create stars on background
 stars = StarField(250)
 
 # Load animations
-laser_explosion = loadImageSet(ANIM_AMMO)
+laser_explosion = loadImageSet(ANIM_BLUEEXP)
+laser2_explosion = loadImageSet(ANIM_PINKEXP)
 
 # Load sounds
 snd_laser = pygame.mixer.Sound("sounds/laser1.ogg")
