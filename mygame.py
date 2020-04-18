@@ -85,6 +85,58 @@ class Walls:
         self.length = -self.yOffset + height
         self.rect = pygame.Rect(0, self.yOffset, gridsize, gridsize) 
 
+    def defineBlock(self, row, col):
+        block = 0
+        this = self.map[row][col]
+        up = "#"
+        down = "#"
+        left = "#" 
+        right = "#"
+        if row > 0:
+            up = self.map[row-1][col]
+        if row < len(self.map)-1:
+            down = self.map[row+1][col]
+        if col > 0:
+            left = self.map[row][col-1]
+        if col < len(self.map[row])-1:
+            right = self.map[row][col+1]
+        if this == "#":
+            if up == "#" and  down == "#" and left == "#" and  right == "#":
+                block = 0
+            elif up != "#" and  down != "#" and left != "#" and  right != "#":
+                block = 1
+            elif up != "#" and  down != "#" and left == "#" and  right == "#":
+                block = 2
+            elif up == "#" and  down == "#" and left != "#" and  right != "#":
+                block = 3
+            elif up != "#" and  down == "#" and left != "#" and  right != "#":
+                block = 4
+            elif up == "#" and  down != "#" and left != "#" and  right != "#":
+                block = 5
+            elif up != "#" and  down != "#" and left != "#" and  right == "#":
+                block = 6
+            elif up != "#" and  down != "#" and left == "#" and  right != "#":
+                block = 7
+            elif up != "#" and  down == "#" and left == "#" and  right == "#":
+                block = 8
+            elif up == "#" and  down != "#" and left == "#" and  right == "#":
+                block = 9
+            elif up == "#" and  down == "#" and left != "#" and  right == "#":
+                block = 10
+            elif up == "#" and  down == "#" and left == "#" and  right != "#":
+                block = 11
+            elif up != "#" and  down == "#" and left != "#" and  right == "#":
+                block = 12
+            elif up != "#" and  down == "#" and left == "#" and  right != "#":
+                block = 13
+            elif up == "#" and  down != "#" and left == "#" and  right != "#":
+                block = 14
+            elif up == "#" and  down != "#" and left != "#" and  right == "#":
+                block = 15
+            else:
+                block = 0
+        return int(block)
+
     def draw(self, offset):
         self.offset = offset
         k = 0
@@ -93,65 +145,16 @@ class Walls:
         
         while k < len(self.map):
             #draw one row of blocks and draw graphics if wall exists
-            i = 0
-            
+            i = 0 
             while i < len(self.map[k]):
-                this = self.map[k][i]
-                up = "#"
-                if k > 0:
-                    up = self.map[k-1][i]
-                down = "#" 
-                if k < len(self.map)-1:
-                    down = self.map[k+1][i]
-                left = "#"
-                if i > 0:
-                    left = self.map[k][i-1]
-                right = "#"
-                if i < len(self.map[k])-1:
-                    right = self.map[k][i+1]
-
+                # Draw right block on screen
+                if self.map[k][i] == "#":
+                    SCREEN.blit(self.img[self.defineBlock(k,i)], self.rect)
                 # create enemy on screen
-                if this == "X" and self.rect.y == -gridsize:
+                if self.map[k][i] == "X" and self.rect.y == -gridsize:
                     enemy = EnemyShip(self.rect.x, self.rect.y)
                     enemy_group.add(enemy)
-
                 # select which wall asset to use
-                if this == "#":
-                    if up == "#" and  down == "#" and left == "#" and  right == "#":
-                        SCREEN.blit(self.img[0], self.rect)
-                    elif up != "#" and  down != "#" and left != "#" and  right != "#":
-                        SCREEN.blit(self.img[1], self.rect)
-                    elif up != "#" and  down != "#" and left == "#" and  right == "#":
-                        SCREEN.blit(self.img[2], self.rect)
-                    elif up == "#" and  down == "#" and left != "#" and  right != "#":
-                        SCREEN.blit(self.img[3], self.rect)
-                    elif up != "#" and  down == "#" and left != "#" and  right != "#":
-                        SCREEN.blit(self.img[4], self.rect)
-                    elif up == "#" and  down != "#" and left != "#" and  right != "#":
-                        SCREEN.blit(self.img[5], self.rect)
-                    elif up != "#" and  down != "#" and left != "#" and  right == "#":
-                        SCREEN.blit(self.img[6], self.rect)
-                    elif up != "#" and  down != "#" and left == "#" and  right != "#":
-                        SCREEN.blit(self.img[7], self.rect)
-                    elif up != "#" and  down == "#" and left == "#" and  right == "#":
-                        SCREEN.blit(self.img[8], self.rect)
-                    elif up == "#" and  down != "#" and left == "#" and  right == "#":
-                        SCREEN.blit(self.img[9], self.rect)
-                    elif up == "#" and  down == "#" and left != "#" and  right == "#":
-                        SCREEN.blit(self.img[10], self.rect)
-                    elif up == "#" and  down == "#" and left == "#" and  right != "#":
-                        SCREEN.blit(self.img[11], self.rect)
-                    elif up != "#" and  down == "#" and left != "#" and  right == "#":
-                        SCREEN.blit(self.img[12], self.rect)
-                    elif up != "#" and  down == "#" and left == "#" and  right != "#":
-                        SCREEN.blit(self.img[13], self.rect)
-                    elif up == "#" and  down != "#" and left == "#" and  right != "#":
-                        SCREEN.blit(self.img[14], self.rect)
-                    elif up == "#" and  down != "#" and left != "#" and  right == "#":
-                        SCREEN.blit(self.img[15], self.rect)
-                    else:
-                        SCREEN.blit(self.img[0], self.rect)
-
                 self.rect.x += gridsize
                 i += 1            
             self.rect.x = 0
@@ -450,8 +453,8 @@ pygame.display.set_icon(icon)
 
 # Define displays
 # pygame.FULLSCREEN
-SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
-#SCREEN = pygame.display.set_mode(size)  
+#SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
+SCREEN = pygame.display.set_mode(size)  
 
 # Create stars on background
 stars = StarField(250)
