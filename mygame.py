@@ -6,28 +6,8 @@ import time
 from levels import *
 
 
-# Global variables
-framerate = 120
-scrollSpeed = 2
-offset = 0
-currentLevel = 0
-size = width, height = 1366, 768
-gridsize = 64
-BLACK = 0, 0, 0
-WHITE = 255, 255, 255
-DARK_GREY = 64, 64, 64
-DARK_RED = 80, 0, 0
-bgColor = BLACK
-textColor = WHITE
-
-
-#graphics
-GR_MYSHIP = "assets/ship_default.png"
-GR_ENEMYSHIP = "assets/enemy1.png"
-GR_AMMO = "assets/ammo_blue.png"
-GR_AMMO_ENEMY = "assets/ammo_pink.png"
-ANIM_BLUEEXP = ["assets/exp_blue1.png", "assets/exp_blue2.png", "assets/exp_blue3.png", "assets/exp_blue4.png"]
-ANIM_PINKEXP = ["assets/exp_pink1.png", "assets/exp_pink2.png", "assets/exp_pink3.png", "assets/exp_pink4.png"]
+# HELPER FUNCTIONS
+# ----------------
 
 #Load wall images
 def loadImageSet(image_list):
@@ -45,8 +25,20 @@ def levelToList(map):
         i += 1
     return map
 
+# Show game titles
+def showText(message):
+    message = message
+    font = pygame.font.Font('freesansbold.ttf', 48) 
+    text = font.render(message, True, textColor)
+    textRect = text.get_rect()
+    textRect.center = (width // 2, height // 2)
+    SCREEN.blit(text, textRect)
+    pygame.display.flip()
 
-#Stars class
+# CLASSES
+# -------
+# Stars class
+
 class StarField:
     def __init__(self, amount):
         self.n = amount
@@ -80,6 +72,7 @@ class StarField:
 #Walls class
 class Walls:
     def __init__(self, map, tiles):
+        global offset
         self.map = levelToList(map)  
         self.img = tiles
         self.yOffset = -len(self.map) * gridsize
@@ -188,7 +181,7 @@ class Walls:
         self.map[row][col] = "."
 
 
-class newEffect(pygame.sprite.Sprite):
+class NewEffect(pygame.sprite.Sprite):
     def __init__(self, x, y, image_list):
         pygame.sprite.Sprite.__init__(self)
         self.animation = image_list
@@ -210,9 +203,8 @@ class newEffect(pygame.sprite.Sprite):
         self.image = self.animation[round(self.counter / self.delay_multiplier) - 1]
         self.counter += 1
 
-
 # Ammunition
-class newShot(pygame.sprite.Sprite):
+class NewShot(pygame.sprite.Sprite):
     def __init__(self, x, y, speedy, graphics, animation):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(graphics).convert_alpha()
@@ -234,7 +226,7 @@ class newShot(pygame.sprite.Sprite):
         if hitted_block:
             self.kill()
             level.removeBlock(hitted_block[0], hitted_block[1])
-            explosion = newEffect(self.rect.centerx, self.rect.centery, self.animation)
+            explosion = NewEffect(self.rect.centerx, self.rect.centery, self.animation)
             effects_group.add(explosion)
             snd_small_explo.play()
 
@@ -277,14 +269,14 @@ class EnemyShip(pygame.sprite.Sprite):
 
     def die(self):
         snd_enemy_death.play()
-        explosion = newEffect(self.rect.centerx, self.rect.centery, laser_explosion)
+        explosion = NewEffect(self.rect.centerx, self.rect.centery, laser_explosion)
         effects_group.add(explosion)
         self.kill()
 
     # Shooting
     def shoot(self):
         if self.alive == True and self.shoot_timer >= self.shoot_delay and self.visible == True:
-            shot = newShot(self.rect.centerx, self.rect.y + self.rect[3], 6.0, GR_AMMO_ENEMY, ANIM_PINKEXP)
+            shot = NewShot(self.rect.centerx, self.rect.y + self.rect[3], 6.0, GR_AMMO_ENEMY, ANIM_PINKEXP)
             enemy_group.add(shot)
             snd_laser_enemy.play()
             self.shoot_timer = 0 
@@ -373,7 +365,7 @@ class PlayerShip(pygame.sprite.Sprite):
     # Shooting
     def shoot(self, key):
         if self.alive == True and self.shoot_timer >= self.shoot_delay and key == True:
-            shot = newShot(self.rect.centerx, self.rect.y, -10.0, GR_AMMO, ANIM_BLUEEXP)
+            shot = NewShot(self.rect.centerx, self.rect.y, -10.0, GR_AMMO, ANIM_BLUEEXP)
             player_group.add(shot)
             snd_laser.play()
             self.shoot_timer = 0 
@@ -382,11 +374,95 @@ class PlayerShip(pygame.sprite.Sprite):
         self.alive = False
         snd_player_death.play()
         player_group.remove(player)
-        explosion = newEffect(self.rect.centerx, self.rect.centery, laser_explosion)
+        explosion = NewEffect(self.rect.centerx, self.rect.centery, laser_explosion)
         effects_group.add(explosion)
 
-def levelLoop(bgColor, this_level):
-    global offset
+# Main program
+#-------------
+# Pygame initials
+pygame.init()
+pygame.mixer.init(frequency=22050, size=-16, channels=1, buffer=4096, allowedchanges=AUDIO_ALLOW_FREQUENCY_CHANGE | AUDIO_ALLOW_CHANNELS_CHANGE) 
+
+# Global variables
+framerate = 120
+scrollSpeed = 2
+offset = 0
+currentLevel = 0
+size = width, height = 1366, 768
+gridsize = 64
+
+# Colors
+BLACK = 0, 0, 0
+WHITE = 255, 255, 255
+DARK_GREY = 64, 64, 64
+DARK_RED = 80, 0, 0
+color_bg_default = BLACK
+textColor = WHITE
+
+# Define displays
+# pygame.FULLSCREEN
+# SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
+SCREEN = pygame.display.set_mode(size)  
+
+#graphics
+GR_MYSHIP = "assets/ship_default.png"
+GR_ENEMYSHIP = "assets/enemy1.png"
+GR_AMMO = "assets/ammo_blue.png"
+GR_AMMO_ENEMY = "assets/ammo_pink.png"
+ANIM_BLUEEXP = ["assets/exp_blue1.png", "assets/exp_blue2.png", "assets/exp_blue3.png", "assets/exp_blue4.png"]
+ANIM_PINKEXP = ["assets/exp_pink1.png", "assets/exp_pink2.png", "assets/exp_pink3.png", "assets/exp_pink4.png"]
+
+# Load animations
+laser_explosion = loadImageSet(ANIM_BLUEEXP)
+laser2_explosion = loadImageSet(ANIM_PINKEXP)
+
+# Load level image sets
+wallset_stone = loadImageSet(images_stone)
+wallset_tech = loadImageSet(images_tech)
+
+# Load sounds
+snd_laser = pygame.mixer.Sound("sounds/laser1.ogg")
+snd_laser.set_volume(0.15)
+snd_laser_enemy = pygame.mixer.Sound("sounds/laser2.ogg")
+snd_laser_enemy.set_volume(0.3)
+snd_player_death = pygame.mixer.Sound("sounds/defeated.ogg")
+snd_player_death.set_volume(0.8)
+snd_enemy_death = pygame.mixer.Sound("sounds/hit1.ogg")
+snd_enemy_death.set_volume(0.8)
+snd_small_explo = pygame.mixer.Sound("sounds/hit3.ogg")
+snd_small_explo.set_volume(0.3)
+
+# Create levels
+levels = [
+    Walls(level1_map, wallset_tech), 
+    Walls(level2_map, wallset_stone),  
+    Walls(level3_map, wallset_tech)
+    ]
+
+# Title
+pygame.display.set_caption("Luolalentely")
+icon = pygame.image.load(GR_MYSHIP)
+pygame.display.set_icon(icon)
+
+# Main loop
+while True: 
+    # Create stars on background
+    stars = StarField(250)
+
+    # Create sprite groups
+    player_group = pygame.sprite.Group()
+    enemy_group = pygame.sprite.Group()
+    effects_group = pygame.sprite.Group()
+
+    # Create player
+    player = PlayerShip(round(width/2),round(height-100))
+    player_group.add(player)
+
+    # Play the level
+    offset = 0
+#    levelLoop(color_bg_default, levels[currentLevel])
+   
+    this_level = levels[currentLevel]
     clock = pygame.time.Clock()
     end_counter = 0
 
@@ -414,7 +490,7 @@ def levelLoop(bgColor, this_level):
             break
 
         # Background update
-        SCREEN.fill(bgColor)
+        SCREEN.fill(color_bg_default)
         stars.draw()
         this_level.draw(offset)
 
@@ -429,82 +505,11 @@ def levelLoop(bgColor, this_level):
         effects_group.draw(SCREEN)
 
         pygame.display.flip()
-        bgColor = BLACK
+        color_bg_default = BLACK
         
         # Move the whole screen up one step
         offset += scrollSpeed
 
-def showText(message):
-    message = message
-    font = pygame.font.Font('freesansbold.ttf', 48) 
-    text = font.render(message, True, textColor)
-    textRect = text.get_rect()
-    textRect.center = (width // 2, height // 2)
-    SCREEN.blit(text, textRect)
-    pygame.display.flip()
-
-# Main program
-#-------------
-# Pygame initials
-pygame.init()
-pygame.mixer.init(frequency=22050, size=-16, channels=1, buffer=4096, allowedchanges=AUDIO_ALLOW_FREQUENCY_CHANGE | AUDIO_ALLOW_CHANNELS_CHANGE) 
-# Title
-pygame.display.set_caption("Luolalentely")
-icon = pygame.image.load(GR_MYSHIP)
-pygame.display.set_icon(icon)
-
-# Define displays
-# pygame.FULLSCREEN
-SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
-# SCREEN = pygame.display.set_mode(size)  
-
-# Create stars on background
-stars = StarField(250)
-
-# Load animations
-laser_explosion = loadImageSet(ANIM_BLUEEXP)
-laser2_explosion = loadImageSet(ANIM_PINKEXP)
-
-# Load sounds
-snd_laser = pygame.mixer.Sound("sounds/laser1.ogg")
-snd_laser.set_volume(0.15)
-snd_laser_enemy = pygame.mixer.Sound("sounds/laser2.ogg")
-snd_laser_enemy.set_volume(0.3)
-snd_player_death = pygame.mixer.Sound("sounds/defeated.ogg")
-snd_player_death.set_volume(0.8)
-snd_enemy_death = pygame.mixer.Sound("sounds/hit1.ogg")
-snd_enemy_death.set_volume(0.8)
-snd_small_explo = pygame.mixer.Sound("sounds/hit3.ogg")
-snd_small_explo.set_volume(0.3)
-
-# Load level image sets
-wallset_stone = loadImageSet(images_stone)
-wallset_tech = loadImageSet(images_tech)
-
-# Create levels
-levels = [
-    Walls(level1_map, wallset_tech), 
-    Walls(level2_map, wallset_stone),  
-    Walls(level3_map, wallset_tech)
-    ]
-
-
-# Main loop
-while True: 
-    
-    # Create sprite groups
-    player_group = pygame.sprite.Group()
-    enemy_group = pygame.sprite.Group()
-    effects_group = pygame.sprite.Group()
-
-    # Create player
-    player = PlayerShip(round(width/2),round(height-100))
-    player_group.add(player)
-
-    # Play the level
-    offset = 0
-    levelLoop(bgColor, levels[currentLevel])
-   
     # Show level ending text
     if player.alive == False:
         showText("Kuolit!")
