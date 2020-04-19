@@ -7,9 +7,8 @@ from levels import *
 
 # HELPER FUNCTIONS
 # ----------------
-#Load wall images
 def loadImageSet(image_list):
-    folder = "assets/"
+    folder = IMG_FOLDER
     i = 0
     while i < len(image_list):
         image_list[i] = pygame.image.load(folder + image_list[i]).convert_alpha()
@@ -17,10 +16,17 @@ def loadImageSet(image_list):
     return image_list
 
 def loadImage(filename):
-    folder = "assets/"
+    folder = IMG_FOLDER
     filename = folder + filename
     image = pygame.image.load(filename).convert_alpha()
     return image
+
+def loadSound(filename, volume):
+    folder = SND_FOLDER
+    filename = folder + filename
+    sound = pygame.mixer.Sound(filename)
+    sound.set_volume(volume)
+    return sound
 
 # Convert levels to lists
 def levelToList(map):
@@ -30,10 +36,8 @@ def levelToList(map):
         i += 1
     return map
 
-
 # Show game titles
 def showText(message):
-    message = message
     font = pygame.font.Font('freesansbold.ttf', 48) 
     text = font.render(message, True, textColor)
     textRect = text.get_rect()
@@ -399,33 +403,32 @@ textColor = WHITE
 #SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
 SCREEN = pygame.display.set_mode(size)  
 
+# Asset folders for images and sounds
+IMG_FOLDER = "assets/"
+SND_FOLDER = "sounds/"
+
 #graphics
 GR_MYSHIP = loadImage("ship_default.png")
 GR_ENEMYSHIP = loadImage("enemy_default.png")
 GR_AMMO = loadImage("ammo_blue.png")
 GR_AMMO_ENEMY = loadImage("ammo_pink.png")
+
+# Load animations
 ANIM_MYSHIP_BLINK = loadImageSet(["ship_default.png", "ship_hilight.png"])
 ANIM_ENEMYSHIP_BLINK = loadImageSet(["enemy_default.png", "enemy_hilight.png"])
 ANIM_BLUEEXP = loadImageSet(["exp_blue1.png", "exp_blue2.png", "exp_blue3.png", "exp_blue4.png"])
 ANIM_PINKEXP = loadImageSet(["exp_pink1.png", "exp_pink2.png", "exp_pink3.png", "exp_pink4.png"])
-
-# Load animations
 
 # Load level image sets
 wallset_stone = loadImageSet(images_stone)
 wallset_tech = loadImageSet(images_tech)
 
 # Load sounds
-snd_laser = pygame.mixer.Sound("sounds/laser1.ogg")
-snd_laser.set_volume(0.15)
-snd_laser_enemy = pygame.mixer.Sound("sounds/laser2.ogg")
-snd_laser_enemy.set_volume(0.3)
-snd_player_death = pygame.mixer.Sound("sounds/defeated.ogg")
-snd_player_death.set_volume(0.8)
-snd_enemy_death = pygame.mixer.Sound("sounds/hit1.ogg")
-snd_enemy_death.set_volume(0.8)
-snd_small_explo = pygame.mixer.Sound("sounds/hit3.ogg")
-snd_small_explo.set_volume(0.3)
+snd_laser = loadSound("laser1.ogg", 0.15)
+snd_laser_enemy = loadSound("laser2.ogg", 0.3)
+snd_player_death = loadSound("defeated.ogg", 0.8)
+snd_enemy_death = loadSound("hit1.ogg", 0.8)
+snd_small_explo = loadSound("hit3.ogg", 0.3)
 
 # Create levels
 levels = [
@@ -509,10 +512,10 @@ while True:
     if player.alive == False:
         showText("Kuolit!")
     elif currentLevel == (len(levels)-1):
-        showText("HIENOA PELI LAPAISTY!")
+        showText("HIENOA PELI LÄPÄISTY!")
         currentLevel = 0
     else:
-        showText("Kentta lapaisty!")
+        showText("Kenttä läpäisty!")
         currentLevel += 1  
 
     pygame.event.clear()
