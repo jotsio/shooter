@@ -23,6 +23,7 @@ def levelToList(map):
         i += 1
     return map
 
+
 # Show game titles
 def showText(message):
     message = message
@@ -127,47 +128,50 @@ class Walls:
                 block = 0
         return block
 
-    def draw(self, offset):
+    def draw(self):
         k = 0
-        self.rect.y += round(offset)
+        self.rect.y += offset
         #loop rows
         
         while k < len(self.map):
             #draw one row of blocks and draw graphics if wall exists
-            i = 0 
-            while i < len(self.map[k]):
-                # Draw right block on screen
-                if self.map[k][i] == "#":
-                    SCREEN.blit(self.img[self.defineBlock(k,i)], self.rect)
-                # create enemy on screen
-                if self.map[k][i] == "X" and self.rect.y == -gridsize:
-                    enemy = EnemyShip(self.rect.x, self.rect.y)
-                    enemy_group.add(enemy)
-                # select which wall asset to use
-                self.rect.x += gridsize
-                i += 1            
-            self.rect.x = 0
-            self.rect.y += gridsize
+            if self.rect.y >= -gridsize and self.rect.y <= height:
+                i = 0 
+                while i < len(self.map[k]):
+                    # Draw right block on screen
+                    if self.map[k][i] == "#":
+                        SCREEN.blit(self.img[self.defineBlock(k,i)], self.rect)
+                    # create enemy on screen
+                    if self.map[k][i] == "X" and self.rect.y == -gridsize:
+                        enemy = EnemyShip(self.rect.x, self.rect.y)
+                        enemy_group.add(enemy)
+                    # select which wall asset to use
+                    self.rect.x += gridsize
+                    i += 1
+                self.rect.x = 0
             k += 1
+            self.rect.y += gridsize
         self.rect.y = self.start_point
     
     # Checks collision to walls for certain rectangle
-    def checkCollision(self, obj_rect, offset):
+    def checkCollision(self, obj_rect):
         k = 0
-        self.rect.y += round(offset)
+        self.rect.y += offset
         #loop rows
         while k < len(self.map):
             #check one row of blocks and mark collision if wall exists
-            i = 0
-            while i < len(self.map[k]):
-                if self.map[k][i] == "#" and self.rect.colliderect(obj_rect):
-                    self.rect.y = self.start_point
-                    return (i, k)
-                self.rect.x += gridsize
-                i += 1            
-            self.rect.x = 0
-            self.rect.y += gridsize
+            if self.rect.y >= -gridsize and self.rect.y <= height:
+                i = 0
+                while i < len(self.map[k]):
+                    if self.map[k][i] == "#":
+                        if self.rect.colliderect(obj_rect):
+                            self.rect.y = self.start_point
+                            return (i, k)
+                    self.rect.x += gridsize
+                    i += 1            
+                self.rect.x = 0
             k += 1
+            self.rect.y += gridsize
         self.rect.y = self.start_point
 
     # Removes defined wallblock from level
@@ -205,8 +209,6 @@ class NewShot(pygame.sprite.Sprite):
         self.animation = animation
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
-        self.ver_margin = 0
-        self.hor_margin = 0
         self.speed = [0.0, speedy] 
 
     # Passive movement
@@ -216,7 +218,7 @@ class NewShot(pygame.sprite.Sprite):
         if self.rect.y < 0 or self.rect.y > height:
             self.kill()
         # Check collision, kill itself and create explosion
-        hitted_block = level.checkCollision(self.getHitbox(), offset)
+        hitted_block = level.checkCollision(self.rect)
         if hitted_block:
             self.kill()
             level.removeBlock(hitted_block[0], hitted_block[1])
@@ -224,36 +226,28 @@ class NewShot(pygame.sprite.Sprite):
             effects_group.add(explosion)
             snd_small_explo.play()
 
-    def getHitbox(self):
-        hitbox = (self.rect.x + self.hor_margin, self.rect.y + self.ver_margin, self.rect[2] - self.ver_margin * 2, self.rect[3] - self.hor_margin * 2)
-        return hitbox
-
 # Enemy class
 class EnemyShip(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         global enemy_group
-        self.alive = True
         self.image = pygame.image.load(GR_ENEMYSHIP).convert_alpha()
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
         self.shoot_timer = 0
         self.shoot_delay = 100
-        self.visible = True
     
     # Passive movement & collision detection
     def update(self, level):
         # Keep on scrolling
         self.rect = self.rect.move(0, round(scrollSpeed))
         
-        # Check visiblity
-        if self.rect.y < 0 or self.rect.y > height:
-            visible = False
-        else: 
-            visible = True
+        # Check if outside area
+        if self.rect.y < -gridsize * 2 or self.rect.y > height:
+            self.kill()
 
         # Check collision to enemy or enemy ammo
-        if self.alive == True and pygame.sprite.spritecollideany(self, player_group):
+        if pygame.sprite.spritecollideany(self, player_group):
             self.die()
 
         # Check shooting delay
@@ -269,7 +263,7 @@ class EnemyShip(pygame.sprite.Sprite):
 
     # Shooting
     def shoot(self):
-        if self.alive == True and self.shoot_timer >= self.shoot_delay and self.visible == True:
+        if self.shoot_timer >= self.shoot_delay:
             shot = NewShot(self.rect.centerx, self.rect.y + self.rect[3], 6.0, GR_AMMO_ENEMY, ANIM_PINKEXP)
             enemy_group.add(shot)
             snd_laser_enemy.play()
@@ -318,7 +312,7 @@ class PlayerShip(pygame.sprite.Sprite):
             self.speedy = -self.speedy
 
         # Check collision to walls
-        if self.alive == True and level.checkCollision(self.getHitbox(), offset):
+        if self.alive == True and level.checkCollision(self.getHitbox()):
             self.die()
 
         # Check collision to enemy or enemy ammo
@@ -378,7 +372,7 @@ pygame.init()
 pygame.mixer.init(frequency=22050, size=-16, channels=1, buffer=4096, allowedchanges=AUDIO_ALLOW_FREQUENCY_CHANGE | AUDIO_ALLOW_CHANNELS_CHANGE) 
 
 # Global variables
-framerate = 120
+framerate = 100
 scrollSpeed = 2
 offset = 0
 currentLevel = 0
@@ -394,8 +388,8 @@ color_bg_default = BLACK
 textColor = WHITE
 
 # Define displays
-# pygame.FULLSCREEN
-# SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
+#pygame.FULLSCREEN
+#SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
 SCREEN = pygame.display.set_mode(size)  
 
 #graphics
@@ -430,7 +424,8 @@ snd_small_explo.set_volume(0.3)
 levels = [
     Walls(level1_map, wallset_tech), 
     Walls(level2_map, wallset_stone),  
-    Walls(level3_map, wallset_tech)
+    Walls(level3_map, wallset_tech),
+    Walls(level4_map, wallset_tech)
     ]
 
 # Title
@@ -464,6 +459,7 @@ while True:
             if event.type == pygame.QUIT: 
                 pygame.quit()
                 sys.exit()
+
         pressed = pygame.key.get_pressed()
         player.setSpeedX(pressed[pygame.K_RIGHT]-pressed[pygame.K_LEFT])
         player.setSpeedY(pressed[pygame.K_DOWN]-pressed[pygame.K_UP])
@@ -484,7 +480,7 @@ while True:
         # Background update
         SCREEN.fill(color_bg_default)
         stars.draw()
-        this_level.draw(offset)
+        this_level.draw()
 
         # Objects update
         player_group.update(this_level)
