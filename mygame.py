@@ -5,10 +5,8 @@ import random
 import time
 from levels import *
 
-
 # HELPER FUNCTIONS
 # ----------------
-
 #Load wall images
 def loadImageSet(image_list):
     i = 0
@@ -38,7 +36,6 @@ def showText(message):
 # CLASSES
 # -------
 # Stars class
-
 class StarField:
     def __init__(self, amount):
         self.n = amount
@@ -75,9 +72,8 @@ class Walls:
         global offset
         self.map = levelToList(map)  
         self.img = tiles
-        self.yOffset = -len(self.map) * gridsize
-        self.length = -self.yOffset + height
-        self.rect = pygame.Rect(0, self.yOffset, gridsize, gridsize) 
+        self.start_point = -len(self.map) * gridsize
+        self.rect = pygame.Rect(0, self.start_point, gridsize, gridsize) 
 
     def defineBlock(self, row, col):
         block = 0
@@ -132,9 +128,8 @@ class Walls:
         return block
 
     def draw(self, offset):
-        self.offset = offset
         k = 0
-        self.rect.y += round(self.offset)
+        self.rect.y += round(offset)
         #loop rows
         
         while k < len(self.map):
@@ -154,27 +149,26 @@ class Walls:
             self.rect.x = 0
             self.rect.y += gridsize
             k += 1
-        self.rect.y = self.yOffset
+        self.rect.y = self.start_point
     
     # Checks collision to walls for certain rectangle
     def checkCollision(self, obj_rect, offset):
-        self.offset = offset
         k = 0
-        self.rect.y += round(self.offset)
+        self.rect.y += round(offset)
         #loop rows
         while k < len(self.map):
             #check one row of blocks and mark collision if wall exists
             i = 0
             while i < len(self.map[k]):
                 if self.map[k][i] == "#" and self.rect.colliderect(obj_rect):
-                    self.rect.y = self.yOffset
+                    self.rect.y = self.start_point
                     return (i, k)
                 self.rect.x += gridsize
                 i += 1            
             self.rect.x = 0
             self.rect.y += gridsize
             k += 1
-        self.rect.y = self.yOffset
+        self.rect.y = self.start_point
 
     # Removes defined wallblock from level
     def removeBlock(self, col, row):
@@ -210,10 +204,10 @@ class NewShot(pygame.sprite.Sprite):
         self.image = pygame.image.load(graphics).convert_alpha()
         self.animation = animation
         self.rect = self.image.get_rect() 
-        self.rect = self.rect.move(x - self.rect.w / 2, y - self.rect.h / 2)
+        self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
         self.ver_margin = 0
         self.hor_margin = 0
-        self.speed = [0.000, speedy] 
+        self.speed = [0.0, speedy] 
 
     # Passive movement
     def update(self, level):
@@ -244,7 +238,7 @@ class EnemyShip(pygame.sprite.Sprite):
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
         self.shoot_timer = 0
-        self.shoot_delay = 20
+        self.shoot_delay = 100
         self.visible = True
     
     # Passive movement & collision detection
@@ -459,13 +453,11 @@ while True:
     player_group.add(player)
 
     # Play the level
+    end_counter = 0
     offset = 0
-#    levelLoop(color_bg_default, levels[currentLevel])
-   
     this_level = levels[currentLevel]
     clock = pygame.time.Clock()
-    end_counter = 0
-
+    
     while clock.tick(framerate):
         # Keyevents listener
         for event in pygame.event.get():
@@ -486,7 +478,7 @@ while True:
             end_counter += 1
 
         # Is player reached the end of level?
-        if offset == this_level.length:
+        if offset == -this_level.start_point:
             break
 
         # Background update
