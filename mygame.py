@@ -9,11 +9,18 @@ from levels import *
 # ----------------
 #Load wall images
 def loadImageSet(image_list):
+    folder = "assets/"
     i = 0
     while i < len(image_list):
-        image_list[i] = pygame.image.load(image_list[i]).convert_alpha()
+        image_list[i] = pygame.image.load(folder + image_list[i]).convert_alpha()
         i += 1
     return image_list
+
+def loadImage(filename):
+    folder = "assets/"
+    filename = folder + filename
+    image = pygame.image.load(filename).convert_alpha()
+    return image
 
 # Convert levels to lists
 def levelToList(map):
@@ -205,7 +212,7 @@ class NewEffect(pygame.sprite.Sprite):
 class NewShot(pygame.sprite.Sprite):
     def __init__(self, x, y, speedy, graphics, animation):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(graphics).convert_alpha()
+        self.image = graphics
         self.animation = animation
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
@@ -231,7 +238,7 @@ class EnemyShip(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         global enemy_group
-        self.image = pygame.image.load(GR_ENEMYSHIP).convert_alpha()
+        self.image = GR_ENEMYSHIP
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
         self.shoot_timer = 0
@@ -257,7 +264,7 @@ class EnemyShip(pygame.sprite.Sprite):
 
     def die(self):
         snd_enemy_death.play()
-        explosion = NewEffect(self.rect.centerx, self.rect.centery, laser_explosion)
+        explosion = NewEffect(self.rect.centerx, self.rect.centery, ANIM_BLUEEXP)
         effects_group.add(explosion)
         self.kill()
 
@@ -276,7 +283,7 @@ class PlayerShip(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         global player_group
         self.alive = True
-        self.image = pygame.image.load(GR_MYSHIP).convert_alpha()
+        self.image = GR_MYSHIP
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
         self.speedx = 0.0
@@ -362,7 +369,7 @@ class PlayerShip(pygame.sprite.Sprite):
         self.alive = False
         snd_player_death.play()
         player_group.remove(player)
-        explosion = NewEffect(self.rect.centerx, self.rect.centery, laser_explosion)
+        explosion = NewEffect(self.rect.centerx, self.rect.centery, ANIM_BLUEEXP)
         effects_group.add(explosion)
 
 # Main program
@@ -393,16 +400,16 @@ textColor = WHITE
 SCREEN = pygame.display.set_mode(size)  
 
 #graphics
-GR_MYSHIP = "assets/ship_default.png"
-GR_ENEMYSHIP = "assets/enemy1.png"
-GR_AMMO = "assets/ammo_blue.png"
-GR_AMMO_ENEMY = "assets/ammo_pink.png"
-ANIM_BLUEEXP = ["assets/exp_blue1.png", "assets/exp_blue2.png", "assets/exp_blue3.png", "assets/exp_blue4.png"]
-ANIM_PINKEXP = ["assets/exp_pink1.png", "assets/exp_pink2.png", "assets/exp_pink3.png", "assets/exp_pink4.png"]
+GR_MYSHIP = loadImage("ship_default.png")
+GR_ENEMYSHIP = loadImage("enemy_default.png")
+GR_AMMO = loadImage("ammo_blue.png")
+GR_AMMO_ENEMY = loadImage("ammo_pink.png")
+ANIM_MYSHIP_BLINK = loadImageSet(["ship_default.png", "ship_hilight.png"])
+ANIM_ENEMYSHIP_BLINK = loadImageSet(["enemy_default.png", "enemy_hilight.png"])
+ANIM_BLUEEXP = loadImageSet(["exp_blue1.png", "exp_blue2.png", "exp_blue3.png", "exp_blue4.png"])
+ANIM_PINKEXP = loadImageSet(["exp_pink1.png", "exp_pink2.png", "exp_pink3.png", "exp_pink4.png"])
 
 # Load animations
-laser_explosion = loadImageSet(ANIM_BLUEEXP)
-laser2_explosion = loadImageSet(ANIM_PINKEXP)
 
 # Load level image sets
 wallset_stone = loadImageSet(images_stone)
@@ -430,7 +437,7 @@ levels = [
 
 # Title
 pygame.display.set_caption("Luolalentely")
-icon = pygame.image.load(GR_MYSHIP)
+icon = GR_MYSHIP
 pygame.display.set_icon(icon)
 
 # Main loop
