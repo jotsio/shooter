@@ -220,19 +220,33 @@ class NewShot(pygame.sprite.Sprite):
         self.animation = animation
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
+        self.alive = True
         self.speed = [0.0, speedy] 
 
     # Passive movement
     def update(self, level):
-        self.rect = self.rect.move(self.speed)
-        # Check if outside area
-        if self.rect.y < 0 or self.rect.y > height:
-            self.kill()
+
         # Check collision, kill itself and create explosion
         hitted_block = level.checkCollision(self.rect)
         if hitted_block:
-            self.kill()
             level.removeBlock(hitted_block[0], hitted_block[1])
+            self.explode()
+            self.kill()
+        # Check if outside area
+        elif self.rect.y < 0 or self.rect.y > height:
+            self.kill()
+
+        elif pygame.sprite.spritecollideany(self, enemy_group):
+            self.explode()
+            self.kill()
+
+        elif pygame.sprite.spritecollideany(self, player_group):
+            self.explode()
+            self.kill()
+            
+        self.rect = self.rect.move(self.speed)
+  
+    def explode(self):
             explosion = NewEffect(self.rect.centerx, self.rect.centery, self.animation)
             effects_group.add(explosion)
             snd_small_explo.play()
@@ -241,30 +255,59 @@ class NewShot(pygame.sprite.Sprite):
 class EnemyShip(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
-        global enemy_group
-        self.image = GR_ENEMYSHIP
+        global enemy_ammo_group
+        self.image_default = GR_ENEMYSHIP
+        self.image = self.image_default
+        self.animation = ANIM_ENEMYSHIP_BLINK
+        self.animation_frame = 0
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
+        self.hit_points = 3
+        self.damage = 0
         self.shoot_timer = 0
         self.shoot_delay = 100
+        self.id = round(random.random() * 10000)
+        self.blinking = False
+        self.animation_frame = 0
+        self.animation_delay = 4
+        self.animation_counter = 0
+ 
     
     # Passive movement & collision detection
     def update(self, level):
-        # Keep on scrolling
-        self.rect = self.rect.move(0, round(scrollSpeed))
-        
+        # Blinking
+        if self.blinking == True:
+            if self.animation_frame == len(self.animation):
+                self.animation_frame = 0
+                self.image = self.image_default
+                self.animation_counter = 0
+                self.blinking = False
+            else:
+                self.image = self.animation[self.animation_frame]
+                if self.animation_counter == self.animation_delay:
+                    self.animation_frame += 1
+                    self.animation_counter = 0
+                self.animation_counter +=1
+
         # Check if outside area
         if self.rect.y < -gridsize * 2 or self.rect.y > height:
             self.kill()
 
-        # Check collision to enemy or enemy ammo
-        if pygame.sprite.spritecollideany(self, player_group):
-            self.die()
+        # Check collision ammo
+        if pygame.sprite.spritecollideany(self, player_ammo_group):
+            print("Osuma!", self.id, "DMG:", self.damage, self.hit_points)
+            self.damage += 1
+            self.blinking = True
+            if self.damage >= self.hit_points:
+                self.die()
 
         # Check shooting delay
         if self.shoot_timer < self.shoot_delay:
             self.shoot_timer += 1
         self.shoot()
+
+        # Keep on scrolling
+        self.rect = self.rect.move(0, round(scrollSpeed))
 
     def die(self):
         snd_enemy_death.play()
@@ -275,8 +318,8 @@ class EnemyShip(pygame.sprite.Sprite):
     # Shooting
     def shoot(self):
         if self.shoot_timer >= self.shoot_delay:
-            shot = NewShot(self.rect.centerx, self.rect.y + self.rect[3], 6.0, GR_AMMO_ENEMY, ANIM_PINKEXP)
-            enemy_group.add(shot)
+            shot = NewShot(self.rect.centerx, self.rect.y + self.rect[3] + 8, 6.0, GR_AMMO_ENEMY, ANIM_PINKEXP)
+            enemy_ammo_group.add(shot)
             snd_laser_enemy.play()
             self.shoot_timer = 0 
 
@@ -285,9 +328,13 @@ class EnemyShip(pygame.sprite.Sprite):
 class PlayerShip(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
-        global player_group
+        global player_ammo_group
         self.alive = True
-        self.image = GR_MYSHIP
+        self.hit_points = 3
+        self.damage = 0
+        self.image_default = GR_MYSHIP
+        self.animation = ANIM_MYSHIP_BLINK
+        self.image = self.image_default
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
         self.speedx = 0.0
@@ -300,13 +347,41 @@ class PlayerShip(pygame.sprite.Sprite):
         self.frictionY = 0.1
         self.shoot_delay = 8
         self.shoot_timer = 0
+        self.blinking = False
+        self.animation_frame = 0
+        self.animation_delay = 4
+        self.animation_counter = 0
     
     # Passive movement & collision detection
     def update(self, level):
+        # Blinking
+        if self.blinking == True:
+            if self.animation_frame == len(self.animation):
+                self.animation_frame = 0
+                self.image = self.image_default
+                self.animation_counter = 0
+                self.blinking = False
+            else:
+                self.image = self.animation[self.animation_frame]
+                if self.animation_counter == self.animation_delay:
+                    self.animation_frame += 1
+                    self.animation_counter = 0
+                self.animation_counter +=1
+
+        # Check collision to walls
+        if self.alive == True and level.checkCollision(self.getHitbox()):
+            self.die()
+
+        # Check collision to ammo
+        if self.alive == True and pygame.sprite.spritecollideany(self, enemy_ammo_group):
+            self.damage += 1
+            self.blinking = True
+            if self.damage >= self.hit_points:
+                self.die()
+
         # Check shooting delay
         if self.shoot_timer < self.shoot_delay:
             self.shoot_timer += 1
-        self.rect = self.rect.move(round(self.speedx), round(self.speedy))
 
         # bounces from outside the area
         if self.rect.left < 0:
@@ -322,24 +397,20 @@ class PlayerShip(pygame.sprite.Sprite):
             self.rect.bottom = height
             self.speedy = -self.speedy
 
-        # Check collision to walls
-        if self.alive == True and level.checkCollision(self.getHitbox()):
-            self.die()
-
-        # Check collision to enemy or enemy ammo
-        if self.alive == True and pygame.sprite.spritecollideany(self, enemy_group):
-            self.die()
-
         # Horizontal friction
         if self.speedx > 0 :
             self.speedx -= self.frictionX
         if self.speedx < 0 :
             self.speedx += self.frictionX
+
         # Vertical friction
         if self.speedy > 0 :
             self.speedy -= self.frictionY
         if self.speedy < 0 :
             self.speedy += self.frictionY
+
+        # Move the player
+        self.rect = self.rect.move(round(self.speedx), round(self.speedy))
 
     def getHitbox(self):
         hitbox = (self.rect.x + self.hor_margin, self.rect.y + self.ver_margin, self.rect[2] - self.ver_margin * 2, self.rect[3] - self.hor_margin * 2)
@@ -364,8 +435,8 @@ class PlayerShip(pygame.sprite.Sprite):
     # Shooting
     def shoot(self, key):
         if self.alive == True and self.shoot_timer >= self.shoot_delay and key == True:
-            shot = NewShot(self.rect.centerx, self.rect.y, -10.0, GR_AMMO, ANIM_BLUEEXP)
-            player_group.add(shot)
+            shot = NewShot(self.rect.centerx, self.rect.y-20, -10.0, GR_AMMO, ANIM_BLUEEXP)
+            player_ammo_group.add(shot)
             snd_laser.play()
             self.shoot_timer = 0 
 
@@ -414,8 +485,8 @@ GR_AMMO = loadImage("ammo_blue.png")
 GR_AMMO_ENEMY = loadImage("ammo_pink.png")
 
 # Load animations
-ANIM_MYSHIP_BLINK = loadImageSet(["ship_default.png", "ship_hilight.png"])
-ANIM_ENEMYSHIP_BLINK = loadImageSet(["enemy_default.png", "enemy_hilight.png"])
+ANIM_MYSHIP_BLINK = loadImageSet(["ship_hilight.png", "ship_default.png", "ship_hilight.png", "ship_default.png", "ship_hilight.png"])
+ANIM_ENEMYSHIP_BLINK = loadImageSet(["enemy_hilight.png", "enemy_default.png", "enemy_hilight.png", "enemy_default.png", "enemy_hilight.png"])
 ANIM_BLUEEXP = loadImageSet(["exp_blue1.png", "exp_blue2.png", "exp_blue3.png", "exp_blue4.png"])
 ANIM_PINKEXP = loadImageSet(["exp_pink1.png", "exp_pink2.png", "exp_pink3.png", "exp_pink4.png"])
 
@@ -451,6 +522,8 @@ while True:
     # Create sprite groups
     player_group = pygame.sprite.Group()
     enemy_group = pygame.sprite.Group()
+    player_ammo_group = pygame.sprite.Group()
+    enemy_ammo_group = pygame.sprite.Group()
     effects_group = pygame.sprite.Group()
 
     # Create player
@@ -495,11 +568,15 @@ while True:
         # Objects update
         player_group.update(this_level)
         enemy_group.update(this_level)
+        player_ammo_group.update(this_level)
+        enemy_ammo_group.update(this_level)
         effects_group.update()
 
         # Draw all the objects
         player_group.draw(SCREEN)
         enemy_group.draw(SCREEN)
+        player_ammo_group.draw(SCREEN)
+        enemy_ammo_group.draw(SCREEN)
         effects_group.draw(SCREEN)
 
         pygame.display.flip()
@@ -512,7 +589,7 @@ while True:
     if player.alive == False:
         showText("Kuolit!")
     elif currentLevel == (len(levels)-1):
-        showText("HIENOA PELI LÄPÄISTY!")
+        showText("HIENOA, PELI LÄPÄISTY!")
         currentLevel = 0
     else:
         showText("Kenttä läpäisty!")
