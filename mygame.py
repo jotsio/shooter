@@ -155,7 +155,6 @@ class Walls:
                     # create enemy on screen
                     if self.map[k][i] == "X" and self.rect.y == -gridsize:
                         enemy = EnemyShip(self.rect.x, self.rect.y)
-                        enemy_group.add(enemy)
                     # select which wall asset to use
                     self.rect.x += gridsize
                     i += 1
@@ -188,11 +187,12 @@ class Walls:
     # Removes defined wallblock from level
     def removeBlock(self, col, row):
         self.map[row][col] = "."
-
+        
 
 class NewEffect(pygame.sprite.Sprite):
     def __init__(self, x, y, image_list):
         pygame.sprite.Sprite.__init__(self)
+        effects_group.add(self)
         self.animation = image_list
         self.image = self.animation[0]
         self.rect = self.image.get_rect() 
@@ -248,7 +248,6 @@ class NewShot(pygame.sprite.Sprite):
   
     def explode(self):
             explosion = NewEffect(self.rect.centerx, self.rect.centery, self.animation)
-            effects_group.add(explosion)
             snd_small_explo.play()
 
 # Enemy class
@@ -256,6 +255,7 @@ class EnemyShip(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         global enemy_ammo_group
+        enemy_group.add(self)
         self.image_default = GR_ENEMYSHIP
         self.image = self.image_default
         self.animation = ANIM_ENEMYSHIP_BLINK
@@ -265,14 +265,13 @@ class EnemyShip(pygame.sprite.Sprite):
         self.hit_points = 3
         self.damage = 0
         self.shoot_timer = 0
-        self.shoot_delay = 100
-        self.id = round(random.random() * 10000)
+        self.shoot_delay = 80
         self.blinking = False
         self.animation_frame = 0
         self.animation_delay = 4
         self.animation_counter = 0
- 
-    
+
+
     # Passive movement & collision detection
     def update(self, level):
         # Blinking
@@ -295,7 +294,6 @@ class EnemyShip(pygame.sprite.Sprite):
 
         # Check collision ammo
         if pygame.sprite.spritecollideany(self, player_ammo_group):
-            print("Osuma!", self.id, "DMG:", self.damage, self.hit_points)
             self.damage += 1
             self.blinking = True
             if self.damage >= self.hit_points:
@@ -311,8 +309,7 @@ class EnemyShip(pygame.sprite.Sprite):
 
     def die(self):
         snd_enemy_death.play()
-        explosion = NewEffect(self.rect.centerx, self.rect.centery, ANIM_BLUEEXP)
-        effects_group.add(explosion)
+        explosion = NewEffect(self.rect.centerx, self.rect.centery, ANIM_ORANGEEXP)
         self.kill()
 
     # Shooting
@@ -329,8 +326,9 @@ class PlayerShip(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         global player_ammo_group
+        player_group.add(self)
         self.alive = True
-        self.hit_points = 3
+        self.hit_points = 6
         self.damage = 0
         self.image_default = GR_MYSHIP
         self.animation = ANIM_MYSHIP_BLINK
@@ -444,8 +442,7 @@ class PlayerShip(pygame.sprite.Sprite):
         self.alive = False
         snd_player_death.play()
         player_group.remove(player)
-        explosion = NewEffect(self.rect.centerx, self.rect.centery, ANIM_BLUEEXP)
-        effects_group.add(explosion)
+        explosion = NewEffect(self.rect.centerx, self.rect.centery, ANIM_ORANGEEXP)
 
 # Main program
 #-------------
@@ -470,9 +467,9 @@ color_bg_default = BLACK
 textColor = WHITE
 
 # Define displays
-#pygame.FULLSCREEN
-#SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
-SCREEN = pygame.display.set_mode(size)  
+pygame.FULLSCREEN
+SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
+#SCREEN = pygame.display.set_mode(size)  
 
 # Asset folders for images and sounds
 IMG_FOLDER = "assets/"
@@ -489,6 +486,7 @@ ANIM_MYSHIP_BLINK = loadImageSet(["ship_hilight.png", "ship_default.png", "ship_
 ANIM_ENEMYSHIP_BLINK = loadImageSet(["enemy_hilight.png", "enemy_default.png", "enemy_hilight.png", "enemy_default.png", "enemy_hilight.png"])
 ANIM_BLUEEXP = loadImageSet(["exp_blue1.png", "exp_blue2.png", "exp_blue3.png", "exp_blue4.png"])
 ANIM_PINKEXP = loadImageSet(["exp_pink1.png", "exp_pink2.png", "exp_pink3.png", "exp_pink4.png"])
+ANIM_ORANGEEXP = loadImageSet(["exp_round1.png", "exp_round2.png", "exp_round3.png", "exp_round4.png", "exp_round5.png", "exp_round6.png"])
 
 # Load level image sets
 wallset_stone = loadImageSet(images_stone)
@@ -528,7 +526,6 @@ while True:
 
     # Create player
     player = PlayerShip(round(width/2),round(height-100))
-    player_group.add(player)
 
     # Play the level
     end_counter = 0
