@@ -45,6 +45,16 @@ def showText(message):
     SCREEN.blit(text, textRect)
     pygame.display.flip()
 
+def showHearts(amount):
+    image = GR_HEART
+    Rect = image.get_rect()
+    Rect.y = height - Rect.height
+    Rect.x = 0
+    i = 0
+    while i < amount:
+        SCREEN.blit(image, Rect)
+        Rect.x += Rect.width
+        i += 1
 # CLASSES
 # -------
 # Stars class
@@ -187,7 +197,7 @@ class Walls:
     # Removes defined wallblock from level
     def removeBlock(self, col, row):
         self.map[row][col] = "."
-        
+
 
 class NewEffect(pygame.sprite.Sprite):
     def __init__(self, x, y, image_list):
@@ -214,9 +224,10 @@ class NewEffect(pygame.sprite.Sprite):
 
 # Ammunition
 class NewShot(pygame.sprite.Sprite):
-    def __init__(self, x, y, speedy, graphics, animation):
+    def __init__(self, x, y, speedy, graphics, animation, group):
         pygame.sprite.Sprite.__init__(self)
         self.image = graphics
+        group.add(self)
         self.animation = animation
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
@@ -315,11 +326,9 @@ class EnemyShip(pygame.sprite.Sprite):
     # Shooting
     def shoot(self):
         if self.shoot_timer >= self.shoot_delay:
-            shot = NewShot(self.rect.centerx, self.rect.y + self.rect[3] + 8, 6.0, GR_AMMO_ENEMY, ANIM_PINKEXP)
-            enemy_ammo_group.add(shot)
+            shot = NewShot(self.rect.centerx, self.rect.y + self.rect[3] + 8, 6.0, GR_AMMO_ENEMY, ANIM_PINKEXP, enemy_ammo_group)
             snd_laser_enemy.play()
             self.shoot_timer = 0 
-
 
 # Player class
 class PlayerShip(pygame.sprite.Sprite):
@@ -433,8 +442,7 @@ class PlayerShip(pygame.sprite.Sprite):
     # Shooting
     def shoot(self, key):
         if self.alive == True and self.shoot_timer >= self.shoot_delay and key == True:
-            shot = NewShot(self.rect.centerx, self.rect.y-20, -10.0, GR_AMMO, ANIM_BLUEEXP)
-            player_ammo_group.add(shot)
+            shot = NewShot(self.rect.centerx, self.rect.y-20, -10.0, GR_AMMO, ANIM_BLUEEXP, player_ammo_group)
             snd_laser.play()
             self.shoot_timer = 0 
 
@@ -480,6 +488,7 @@ GR_MYSHIP = loadImage("ship_default.png")
 GR_ENEMYSHIP = loadImage("enemy_default.png")
 GR_AMMO = loadImage("ammo_blue.png")
 GR_AMMO_ENEMY = loadImage("ammo_pink.png")
+GR_HEART = loadImage("heart.png")
 
 # Load animations
 ANIM_MYSHIP_BLINK = loadImageSet(["ship_hilight.png", "ship_default.png", "ship_hilight.png", "ship_default.png", "ship_hilight.png"])
@@ -512,24 +521,25 @@ pygame.display.set_caption("Luolalentely")
 icon = GR_MYSHIP
 pygame.display.set_icon(icon)
 
+# Create stars on background
+stars = StarField(250)
+
+# Create sprite groups
+
+# Create player
+player_group = pygame.sprite.Group()
+player = PlayerShip(round(width/2),round(height-100))
+
 # Main loop
 while True: 
-    # Create stars on background
-    stars = StarField(250)
-
-    # Create sprite groups
-    player_group = pygame.sprite.Group()
+    # Play the level
     enemy_group = pygame.sprite.Group()
     player_ammo_group = pygame.sprite.Group()
     enemy_ammo_group = pygame.sprite.Group()
     effects_group = pygame.sprite.Group()
 
-    # Create player
-    player = PlayerShip(round(width/2),round(height-100))
-
-    # Play the level
-    end_counter = 0
     offset = 0
+    end_counter = 0
     this_level = levels[currentLevel]
     clock = pygame.time.Clock()
     
@@ -576,6 +586,9 @@ while True:
         enemy_ammo_group.draw(SCREEN)
         effects_group.draw(SCREEN)
 
+        #Show hearts of hitpoints
+        showHearts(player.hit_points - player.damage)
+
         pygame.display.flip()
         color_bg_default = BLACK
         
@@ -585,6 +598,9 @@ while True:
     # Show level ending text
     if player.alive == False:
         showText("Kuolit!")
+        # Reset player
+        player = PlayerShip(round(width/2), round(height-100))
+
     elif currentLevel == (len(levels)-1):
         showText("HIENOA, PELI LÄPÄISTY!")
         currentLevel = 0
