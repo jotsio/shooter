@@ -4,37 +4,7 @@ from pygame.locals import *
 import random
 import time
 from levels import *
-
-# HELPER FUNCTIONS
-# ----------------
-def loadImageSet(image_list):
-    folder = IMG_FOLDER
-    i = 0
-    while i < len(image_list):
-        image_list[i] = pygame.image.load(folder + image_list[i]).convert_alpha()
-        i += 1
-    return image_list
-
-def loadImage(filename):
-    folder = IMG_FOLDER
-    filename = folder + filename
-    image = pygame.image.load(filename).convert_alpha()
-    return image
-
-def loadSound(filename, volume):
-    folder = SND_FOLDER
-    filename = folder + filename
-    sound = pygame.mixer.Sound(filename)
-    sound.set_volume(volume)
-    return sound
-
-# Convert levels to lists
-def levelToList(map):
-    i = 0
-    while i < len(map):
-        map[i] = list(map[i])
-        i += 1
-    return map
+from assets import *
 
 # Show game titles
 def showText(message):
@@ -55,150 +25,9 @@ def showHearts(amount):
         SCREEN.blit(image, Rect)
         Rect.x += Rect.width
         i += 1
+
 # CLASSES
 # -------
-# Stars class
-class StarField:
-    def __init__(self, amount):
-        self.n = amount
-        self.spd = 0.5
-        self.y = [0.0] * amount
-        self.x = [0.0] * amount
-        self.z = [0.0] * amount
-        self.color = [0,0,0] * amount
-        self.speed = [0.0] * amount
-
-        #Create star a random.rect and speed
-        i = 0
-        while i < self.n:
-            self.y[i] = random.randrange(0, height)
-            self.x[i] = random.randrange(0, width)
-            rnd = random.random()
-            self.z[i] = rnd * rnd * 255
-            c = self.z[i]
-            self.color[i] = c, c, c
-            self.speed[i] = c / 255.0 * self.spd
-            i += 1
-
-    def draw(self): 
-        i = 0
-        while i < self.n:
-            self.y[i] += self.speed[i]
-            if self.y[i] > height: self.y[i] = 0
-            pygame.gfxdraw.pixel(SCREEN, self.x[i], int(self.y[i]), self.color[i])
-            i += 1
-
-#Walls class
-class Walls:
-    def __init__(self, map, tiles):
-        global offset
-        self.map = levelToList(map)  
-        self.img = tiles
-        self.start_point = -len(self.map) * gridsize
-        self.rect = pygame.Rect(0, self.start_point, gridsize, gridsize) 
-
-    def defineBlock(self, row, col):
-        block = 0
-        this = self.map[row][col]
-        up = "#"
-        down = "#"
-        left = "#" 
-        right = "#"
-        if row > 0:
-            up = self.map[row-1][col]
-        if row < len(self.map)-1:
-            down = self.map[row+1][col]
-        if col > 0:
-            left = self.map[row][col-1]
-        if col < len(self.map[row])-1:
-            right = self.map[row][col+1]
-        if this == "#":
-            if up == "#" and  down == "#" and left == "#" and  right == "#":
-                block = 0
-            elif up != "#" and  down != "#" and left != "#" and  right != "#":
-                block = 1
-            elif up != "#" and  down != "#" and left == "#" and  right == "#":
-                block = 2
-            elif up == "#" and  down == "#" and left != "#" and  right != "#":
-                block = 3
-            elif up != "#" and  down == "#" and left != "#" and  right != "#":
-                block = 4
-            elif up == "#" and  down != "#" and left != "#" and  right != "#":
-                block = 5
-            elif up != "#" and  down != "#" and left != "#" and  right == "#":
-                block = 6
-            elif up != "#" and  down != "#" and left == "#" and  right != "#":
-                block = 7
-            elif up != "#" and  down == "#" and left == "#" and  right == "#":
-                block = 8
-            elif up == "#" and  down != "#" and left == "#" and  right == "#":
-                block = 9
-            elif up == "#" and  down == "#" and left != "#" and  right == "#":
-                block = 10
-            elif up == "#" and  down == "#" and left == "#" and  right != "#":
-                block = 11
-            elif up != "#" and  down == "#" and left != "#" and  right == "#":
-                block = 12
-            elif up != "#" and  down == "#" and left == "#" and  right != "#":
-                block = 13
-            elif up == "#" and  down != "#" and left == "#" and  right != "#":
-                block = 14
-            elif up == "#" and  down != "#" and left != "#" and  right == "#":
-                block = 15
-            else:
-                block = 0
-        return block
-
-    def draw(self):
-        k = 0
-        self.rect.y += offset
-        #loop rows
-        
-        while k < len(self.map):
-            #draw one row of blocks and draw graphics if wall exists
-            if self.rect.y >= -gridsize and self.rect.y <= height:
-                i = 0 
-                while i < len(self.map[k]):
-                    # Draw right block on screen
-                    if self.map[k][i] == "#":
-                        SCREEN.blit(self.img[self.defineBlock(k,i)], self.rect)
-                    # create enemy on screen
-                    if self.map[k][i] == "X" and self.rect.y == -gridsize:
-                        enemy = EnemyShip(self.rect.x, self.rect.y)
-                    # select which wall asset to use
-                    self.rect.x += gridsize
-                    i += 1
-                self.rect.x = 0
-            k += 1
-            self.rect.y += gridsize
-        self.rect.y = self.start_point
-    
-    # Checks collision to walls for certain rectangle
-    def checkCollision(self, obj_rect):
-        k = 0
-        self.rect.y += offset
-        #loop rows
-        while k < len(self.map):
-            #check one row of blocks and mark collision if wall exists
-            if self.rect.y >= -gridsize and self.rect.y <= height:
-                i = 0
-                while i < len(self.map[k]):
-                    if self.map[k][i] == "#":
-                        if self.rect.colliderect(obj_rect):
-                            self.rect.y = self.start_point
-                            return (i, k)
-                    self.rect.x += gridsize
-                    i += 1            
-                self.rect.x = 0
-            k += 1
-            self.rect.y += gridsize
-        self.rect.y = self.start_point
-
-    # Removes defined wallblock from level
-    def removeBlock(self, col, row):
-        self.map[row][col] = "."
-
-
 class NewEffect(pygame.sprite.Sprite):
     def __init__(self, x, y, image_list):
         pygame.sprite.Sprite.__init__(self)
@@ -238,7 +67,7 @@ class NewShot(pygame.sprite.Sprite):
     def update(self, level):
 
         # Check collision, kill itself and create explosion
-        hitted_block = level.checkCollision(self.rect)
+        hitted_block = level.checkCollision(self.rect, offset)
         if hitted_block:
             level.removeBlock(hitted_block[0], hitted_block[1])
             self.explode()
@@ -376,7 +205,7 @@ class PlayerShip(pygame.sprite.Sprite):
                 self.animation_counter +=1
 
         # Check collision to walls
-        if self.alive == True and level.checkCollision(self.getHitbox()):
+        if self.alive == True and level.checkCollision(self.getHitbox(), offset):
             self.die()
 
         # Check collision to ammo
@@ -455,66 +284,13 @@ class PlayerShip(pygame.sprite.Sprite):
 # Main program
 #-------------
 # Pygame initials
-pygame.init()
-pygame.mixer.init(frequency=22050, size=-16, channels=1, buffer=4096, allowedchanges=AUDIO_ALLOW_FREQUENCY_CHANGE | AUDIO_ALLOW_CHANNELS_CHANGE) 
+
 
 # Global variables
 framerate = 100
 scrollSpeed = 2
 offset = 0
 currentLevel = 0
-size = width, height = 1366, 768
-gridsize = 64
-
-# Colors
-BLACK = 0, 0, 0
-WHITE = 255, 255, 255
-DARK_GREY = 64, 64, 64
-DARK_RED = 80, 0, 0
-color_bg_default = BLACK
-textColor = WHITE
-
-# Define displays
-pygame.FULLSCREEN
-SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
-#SCREEN = pygame.display.set_mode(size)  
-
-# Asset folders for images and sounds
-IMG_FOLDER = "assets/"
-SND_FOLDER = "sounds/"
-
-#graphics
-GR_MYSHIP = loadImage("ship_default.png")
-GR_ENEMYSHIP = loadImage("enemy_default.png")
-GR_AMMO = loadImage("ammo_blue.png")
-GR_AMMO_ENEMY = loadImage("ammo_pink.png")
-GR_HEART = loadImage("heart.png")
-
-# Load animations
-ANIM_MYSHIP_BLINK = loadImageSet(["ship_hilight.png", "ship_default.png", "ship_hilight.png", "ship_default.png", "ship_hilight.png"])
-ANIM_ENEMYSHIP_BLINK = loadImageSet(["enemy_hilight.png", "enemy_default.png", "enemy_hilight.png", "enemy_default.png", "enemy_hilight.png"])
-ANIM_BLUEEXP = loadImageSet(["exp_blue1.png", "exp_blue2.png", "exp_blue3.png", "exp_blue4.png"])
-ANIM_PINKEXP = loadImageSet(["exp_pink1.png", "exp_pink2.png", "exp_pink3.png", "exp_pink4.png"])
-ANIM_ORANGEEXP = loadImageSet(["exp_round1.png", "exp_round2.png", "exp_round3.png", "exp_round4.png", "exp_round5.png", "exp_round6.png"])
-
-# Load level image sets
-wallset_stone = loadImageSet(images_stone)
-wallset_tech = loadImageSet(images_tech)
-
-# Load sounds
-snd_laser = loadSound("laser1.ogg", 0.15)
-snd_laser_enemy = loadSound("laser2.ogg", 0.3)
-snd_player_death = loadSound("defeated.ogg", 0.8)
-snd_enemy_death = loadSound("hit1.ogg", 0.8)
-snd_small_explo = loadSound("hit3.ogg", 0.3)
-
-# Create levels
-levels = [
-    Walls(level1_map, wallset_tech), 
-    Walls(level2_map, wallset_stone),  
-    Walls(level3_map, wallset_tech),
-    Walls(level4_map, wallset_tech)
-    ]
 
 # Title
 pygame.display.set_caption("Luolalentely")
@@ -522,7 +298,6 @@ icon = GR_MYSHIP
 pygame.display.set_icon(icon)
 
 # Create stars on background
-stars = StarField(250)
 
 # Create sprite groups
 
@@ -537,9 +312,9 @@ while True:
     player_ammo_group = pygame.sprite.Group()
     enemy_ammo_group = pygame.sprite.Group()
     effects_group = pygame.sprite.Group()
-
     offset = 0
     end_counter = 0
+    stars = StarField(250)
     this_level = levels[currentLevel]
     clock = pygame.time.Clock()
     
@@ -567,17 +342,23 @@ while True:
         if offset == -this_level.start_point:
             break
 
-        # Background update
-        SCREEN.fill(color_bg_default)
-        stars.draw()
-        this_level.draw()
-
         # Objects update
         player_group.update(this_level)
         enemy_group.update(this_level)
         player_ammo_group.update(this_level)
         enemy_ammo_group.update(this_level)
         effects_group.update()
+
+        # Create enemies
+        enemy_list = this_level.getEnemies(offset)
+        if enemy_list:
+            for i in enemy_list:
+                enemy = EnemyShip(i[0], i[1])
+
+        # Background update
+        SCREEN.fill(color_bg_default)
+        stars.draw(SCREEN)
+        this_level.draw(offset, SCREEN)        
 
         # Draw all the objects
         player_group.draw(SCREEN)
