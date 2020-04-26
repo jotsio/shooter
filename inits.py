@@ -1,13 +1,14 @@
 import sys, pygame
 from pygame.locals import *
 
-# Screen parameters
-size = width, height = 1366, 768
-
 pygame.init()
 pygame.mixer.init(frequency=22050, size=-16, channels=1, buffer=4096, allowedchanges=AUDIO_ALLOW_FREQUENCY_CHANGE | AUDIO_ALLOW_CHANNELS_CHANGE) 
 
 # Define displays
+# Screen parameters
+size = width, height = 1366, 768
+player_start_x = round(width/2)
+player_start_y = round(height-100)
 #pygame.FULLSCREEN
 #SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
 SCREEN = pygame.display.set_mode(size)  
@@ -15,9 +16,8 @@ SCREEN = pygame.display.set_mode(size)
 # Colors
 BLACK = 0, 0, 0
 WHITE = 255, 255, 255
-
 color_bg_default = BLACK
-textColor = WHITE
+color_text = WHITE
 
 def loadImageSet(image_list):
     folder = IMG_FOLDER
@@ -54,16 +54,12 @@ GR_HEART = loadImage("heart.png")
 # Load animations
 ANIM_MYSHIP_BLINK = loadImageSet([
     "ship_hilight.png", 
-    "ship_default.png", 
     "ship_hilight.png", 
-    "ship_default.png", 
     "ship_hilight.png"])
 
 ANIM_ENEMYSHIP_BLINK = loadImageSet([
     "enemy_hilight.png", 
-    "enemy_default.png", 
     "enemy_hilight.png", 
-    "enemy_default.png", 
     "enemy_hilight.png"])
 
 ANIM_BLUEEXP = loadImageSet([
