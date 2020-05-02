@@ -28,6 +28,7 @@ def showHearts(amount):
 
 # CLASSES
 # -------
+
 class NewEffect(pygame.sprite.Sprite):
     def __init__(self, x, y, image_list):
         pygame.sprite.Sprite.__init__(self)
@@ -61,7 +62,7 @@ class NewShot(pygame.sprite.Sprite):
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
         self.alive = True
-        self.speed = [0.0, speedy] 
+        self.speed = [0, speedy] 
 
     # Passive movement
     def update(self, level):
@@ -69,7 +70,7 @@ class NewShot(pygame.sprite.Sprite):
         # Check collision, kill itself and create explosion
         hitted_block = level.checkCollision(self.rect, offset)
         if hitted_block:
-            level.removeBlock(hitted_block[0], hitted_block[1])
+            # level.removeBlock(hitted_block[0], hitted_block[1])
             self.explode()
             self.kill()
 
@@ -86,7 +87,7 @@ class NewShot(pygame.sprite.Sprite):
             self.kill()
   
     def explode(self):
-            explosion = NewEffect(self.rect.centerx, self.rect.centery, self.animation)
+            NewEffect(self.rect.centerx, self.rect.centery, self.animation)
             snd_small_explo.play()
 
     def move(self):
@@ -118,7 +119,7 @@ class EnemyShip(pygame.sprite.Sprite):
         # Check if dead
         if self.hit_points <= 0:
             snd_enemy_death.play()
-            explosion = NewEffect(self.rect.centerx, self.rect.centery, ANIM_ORANGEEXP)
+            NewEffect(self.rect.centerx, self.rect.centery, ANIM_ORANGEEXP)
             self.kill()
 
         # Check if outside area
@@ -144,6 +145,10 @@ class EnemyShip(pygame.sprite.Sprite):
             self.hit_points -= 1
             self.blinking = True
 
+        # Check collision to player
+        if pygame.sprite.spritecollideany(self, player_group):
+            self.hit_points = 0
+
         # Check shooting delay
         if self.shoot_timer >= self.shoot_delay:
             self.shoot()
@@ -156,7 +161,7 @@ class EnemyShip(pygame.sprite.Sprite):
 
     # Shooting
     def shoot(self):
-        shot = NewShot(self.rect.centerx, self.rect.y + self.rect[3] + 8, 6.0, GR_AMMO_ENEMY, ANIM_PINKEXP, enemy_ammo_group)
+        NewShot(self.rect.centerx, self.rect.y + self.rect[3] + 8, 6.0, GR_AMMO_ENEMY, ANIM_PINKEXP, enemy_ammo_group)
         snd_laser_enemy.play()
         self.shoot_timer = 0 
 
@@ -165,7 +170,6 @@ class PlayerShip(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         global player_ammo_group
-        player_group.add(self)
         self.alive = True
         self.hit_points = 5
         self.hit_points_max = 6
@@ -188,6 +192,8 @@ class PlayerShip(pygame.sprite.Sprite):
         self.animation_frame = 0
         self.animation_delay = 4
         self.animation_counter = 0
+        player_group.add(self)
+
     
     # Passive movement & collision detection
     def update(self, level):
@@ -196,7 +202,7 @@ class PlayerShip(pygame.sprite.Sprite):
             self.alive = False
             snd_player_death.play()
             player_group.remove(player)
-            explosion = NewEffect(self.rect.centerx, self.rect.centery, ANIM_ORANGEEXP)
+            NewEffect(self.rect.centerx, self.rect.centery, ANIM_ORANGEEXP)
 
         # Blinking
         if self.blinking == True:
@@ -220,6 +226,10 @@ class PlayerShip(pygame.sprite.Sprite):
         if self.alive == True and pygame.sprite.spritecollideany(self, enemy_ammo_group):
             self.hit_points -= 1
             self.blinking = True
+
+        # Check collision to enemy
+        if pygame.sprite.spritecollideany(self, enemy_group):
+            self.hit_points = 0
 
         # Check shooting delay
         if self.shoot_timer < self.shoot_delay:
@@ -278,7 +288,7 @@ class PlayerShip(pygame.sprite.Sprite):
     # Shooting
     def shoot(self, key):
         if self.alive == True and self.shoot_timer >= self.shoot_delay and key == True:
-            shot = NewShot(self.rect.centerx, self.rect.y-20, -10.0, GR_AMMO, ANIM_BLUEEXP, player_ammo_group)
+            NewShot(self.rect.centerx, self.rect.y-20, -10.0, GR_AMMO, ANIM_BLUEEXP, player_ammo_group)
             snd_laser.play()
             self.shoot_timer = 0 
 
@@ -315,7 +325,7 @@ while True:
     stars = StarField(250)
     this_level = levels[current_level]
     clock = pygame.time.Clock()
-    pygame.mixer.music.play(0)
+    pygame.mixer.music.play(-1)
     
     while clock.tick(framerate):
         # Keyevents listener
@@ -405,6 +415,7 @@ while True:
     pygame.event.clear()
     while True:
         event = pygame.event.wait()
+        pygame.mixer.music.stop()
         if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
             pygame.QUIT()
             sys.exit()
