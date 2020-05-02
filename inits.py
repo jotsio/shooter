@@ -40,9 +40,16 @@ def loadSound(filename, volume):
     sound.set_volume(volume)
     return sound
 
+def loadMusic(filename):
+    folder = MUS_FOLDER
+    filename = folder + filename
+    sound = pygame.mixer.music.load(filename)
+    return sound
+
 # Asset folders for images and sounds
 IMG_FOLDER = "assets/"
 SND_FOLDER = "sounds/"
+MUS_FOLDER = "music/"
 
 #graphics
 GR_MYSHIP = loadImage("ship_default.png")
@@ -126,3 +133,5 @@ snd_player_death = loadSound("defeated.ogg", 0.8)
 snd_enemy_death = loadSound("hit1.ogg", 0.8)
 snd_small_explo = loadSound("hit3.ogg", 0.3)
 
+# Load music
+music = loadMusic("Starmusic.mp3")

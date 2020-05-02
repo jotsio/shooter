@@ -315,6 +315,7 @@ while True:
     stars = StarField(250)
     this_level = levels[current_level]
     clock = pygame.time.Clock()
+    pygame.mixer.music.play(0)
     
     while clock.tick(framerate):
         # Keyevents listener
