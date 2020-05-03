@@ -26,6 +26,11 @@ def showHearts(amount):
         Rect.x += Rect.width
         i += 1
 
+
+def collided(sprite, other):
+    # Check if the hitboxes of the two sprites collide.
+    return sprite.hitbox.colliderect(other.hitbox)
+
 # CLASSES
 # -------
 
@@ -37,6 +42,7 @@ class NewEffect(pygame.sprite.Sprite):
         self.image = self.animation[0]
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(round(x - self.rect.w / 2), y - round(self.rect.h / 2))
+        self.hitbox = self.rect
         self.delay_multiplier = 4
         self.lifetime = len(self.animation) * self.delay_multiplier
         self.counter = 0
@@ -61,6 +67,7 @@ class NewShot(pygame.sprite.Sprite):
         self.animation = animation
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
+        self.hitbox = self.rect
         self.alive = True
         self.speed = [0, speedy] 
 
@@ -68,7 +75,7 @@ class NewShot(pygame.sprite.Sprite):
     def update(self, level):
 
         # Check collision, kill itself and create explosion
-        hitted_block = level.checkCollision(self.rect, offset)
+        hitted_block = level.checkCollision(self.hitbox, offset)
         if hitted_block:
             # level.removeBlock(hitted_block[0], hitted_block[1])
             self.explode()
@@ -78,11 +85,11 @@ class NewShot(pygame.sprite.Sprite):
         elif self.rect.y < 0 or self.rect.y > height:
             self.kill()
 
-        elif pygame.sprite.spritecollideany(self, enemy_group):
+        elif pygame.sprite.spritecollideany(self, enemy_group, collided):
             self.explode()
             self.kill()
 
-        elif pygame.sprite.spritecollideany(self, player_group):
+        elif pygame.sprite.spritecollideany(self, player_group, collided):
             self.explode()
             self.kill()
   
@@ -92,6 +99,7 @@ class NewShot(pygame.sprite.Sprite):
 
     def move(self):
         self.rect = self.rect.move(self.speed)
+        self.hitbox = self.hitbox.move(self.speed)
 
 # Enemy class
 class EnemyShip(pygame.sprite.Sprite):
@@ -105,6 +113,7 @@ class EnemyShip(pygame.sprite.Sprite):
         self.animation_frame = 0
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
+        self.hitbox = self.rect
         self.hit_points = 3
         self.shoot_timer = 0
         self.shoot_delay = 80
@@ -141,12 +150,12 @@ class EnemyShip(pygame.sprite.Sprite):
                 self.animation_counter +=1
 
         # Check collision ammo
-        if pygame.sprite.spritecollideany(self, player_ammo_group):
+        if pygame.sprite.spritecollideany(self, player_ammo_group, collided):
             self.hit_points -= 1
             self.blinking = True
 
         # Check collision to player
-        if pygame.sprite.spritecollideany(self, player_group):
+        if pygame.sprite.spritecollideany(self, player_group, collided):
             self.hit_points = 0
 
         # Check shooting delay
@@ -158,6 +167,7 @@ class EnemyShip(pygame.sprite.Sprite):
     def move(self, scroll_speed):
         # Keep on scrolling
         self.rect = self.rect.move(0, round(scroll_speed))
+        self.hitbox = self.hitbox.move(0, round(scroll_speed))
 
     # Shooting
     def shoot(self):
@@ -170,6 +180,8 @@ class PlayerShip(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         global player_ammo_group
+        self.start_x = x
+        self.start_y = y
         self.alive = True
         self.hit_points = 5
         self.hit_points_max = 6
@@ -177,11 +189,10 @@ class PlayerShip(pygame.sprite.Sprite):
         self.animation = ANIM_MYSHIP_BLINK
         self.image = self.image_default
         self.rect = self.image.get_rect() 
-        self.rect = self.rect.move(x, y)
         self.speedx = 0.0
         self.speedy = 0.0
-        self.hor_margin = 8
-        self.ver_margin = 15
+        self.hor_margin = -15
+        self.ver_margin = -30
         self.max_speedx = 4.0
         self.max_speedy = 2.0
         self.frictionX = 0.1 
@@ -192,9 +203,17 @@ class PlayerShip(pygame.sprite.Sprite):
         self.animation_frame = 0
         self.animation_delay = 4
         self.animation_counter = 0
+        self.setStartPosition()
         player_group.add(self)
-
     
+    # Set player to starting position on screen and initialize hitbox
+    def setStartPosition(self):
+        self.rect.x = 0
+        self.rect.y = 0
+        self.rect = self.rect.move(self.start_x, self.start_y)
+        self.hitbox = self.rect
+        self.hitbox = self.hitbox.inflate(self.hor_margin, self.ver_margin)
+
     # Passive movement & collision detection
     def update(self, level):
         # Check if dead
@@ -219,16 +238,16 @@ class PlayerShip(pygame.sprite.Sprite):
                 self.animation_counter +=1
 
         # Check collision to walls
-        if self.alive == True and level.checkCollision(self.getHitbox(), offset):
+        if self.alive == True and level.checkCollision(self.hitbox, offset):
             self.hit_points = 0
 
         # Check collision to ammo
-        if self.alive == True and pygame.sprite.spritecollideany(self, enemy_ammo_group):
+        if self.alive == True and pygame.sprite.spritecollideany(self, enemy_ammo_group, collided):
             self.hit_points -= 1
             self.blinking = True
 
         # Check collision to enemy
-        if pygame.sprite.spritecollideany(self, enemy_group):
+        if pygame.sprite.spritecollideany(self, enemy_group, collided):
             self.hit_points = 0
 
         # Check shooting delay
@@ -264,6 +283,8 @@ class PlayerShip(pygame.sprite.Sprite):
     def move(self):
         # Move the player
         self.rect = self.rect.move(round(self.speedx), round(self.speedy))
+        self.hitbox = self.hitbox.move(round(self.speedx), round(self.speedy))
+        
 
     def getHitbox(self):
         hitbox = (self.rect.x + self.hor_margin, self.rect.y + self.ver_margin, self.rect[2] - self.ver_margin * 2, self.rect[3] - self.hor_margin * 2)
@@ -311,7 +332,7 @@ pygame.display.set_icon(icon)
 
 # Create player
 player_group = pygame.sprite.Group()
-player = PlayerShip(round(width/2),round(height-100))
+player = PlayerShip(player_start_x, player_start_y)
 
 # Main loop
 while True: 
@@ -387,6 +408,8 @@ while True:
         player_ammo_group.draw(SCREEN)
         enemy_ammo_group.draw(SCREEN)
         effects_group.draw(SCREEN)
+        # Rectange for collision debugging
+        pygame.draw.rect(SCREEN, RED, player.hitbox, 1)
 
         # Show hearts of hitpoints
         showHearts(player.hit_points)
@@ -405,17 +428,16 @@ while True:
         
     elif current_level == (len(levels)-1):
         showText("HIENOA, PELI LÄPÄISTY!")
+        player.setStartPosition()
         current_level = 0
     else:
         showText("Kenttä läpäisty!")
-        player.rect.x = player_start_x
-        player.rect.y = player_start_y
+        player.setStartPosition()
         current_level += 1  
 
     pygame.event.clear()
     while True:
         event = pygame.event.wait()
-        pygame.mixer.music.stop()
         if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
             pygame.QUIT()
             sys.exit()

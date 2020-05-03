@@ -16,6 +16,7 @@ SCREEN = pygame.display.set_mode(size)
 # Colors
 BLACK = 0, 0, 0
 WHITE = 255, 255, 255
+RED = 255, 0, 0
 color_bg_default = BLACK
 color_text = WHITE
 
@@ -134,4 +135,4 @@ snd_enemy_death = loadSound("hit1.ogg", 0.8)
 snd_small_explo = loadSound("hit3.ogg", 0.3)
 
 # Load music
-music = loadMusic("Starmusic.mp3")
+music = loadMusic("Starmusic_02.mp3")
