@@ -7,7 +7,7 @@ gridsize = 64
 # Define map
 level1_map = [
 ".....................",
-".....................",
+"..........Z..........",
 ".....................",
 ".....................",
 ".....................",
@@ -492,13 +492,11 @@ class Walls:
             if y == -gridsize:
                 i = 0 
                 while i < len(self.map[k]):
-                    # Give the enemy positions as list
-                    if self.map[k][i] == "X":
-                        position = (x, y, enemy_ship)
-                        enemy_list.append(position)
-                    if self.map[k][i] == "O":
-                        position = (x, y, enemy_spike)
-                        enemy_list.append(position)
+                    # Give the enemy positions and style as list
+                    for j in enemy_types_list:
+                        if self.map[k][i] == j["character"]:
+                            position = (x, y, j)
+                            enemy_list.append(position)
                     x += gridsize
                     i += 1
                 x = 0

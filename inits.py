@@ -145,16 +145,32 @@ music = loadMusic("Starmusic_02.mp3")
 
 # Enemy feature dictionaries
 
-enemy_ship = {
-  "image_default": GR_ENEMYSHIP,
-  "animation_blink": ANIM_ENEMYSHIP_BLINK,
-  "hit_points": 3,
-  "shoot_delay": 80,
-}
-
-enemy_spike = {
-  "image_default": GR_ENEMYSPIKE,
-  "animation_blink": ANIM_ENEMYSPIKE_BLINK,
-  "hit_points": 1,
-  "shoot_delay": 1000,
-}
+enemy_types_list = [
+    {
+        "type": "Ship",
+        "character": "X",
+        "image_default": GR_ENEMYSHIP,
+        "animation_blink": ANIM_ENEMYSHIP_BLINK,
+        "hit_points": 1,
+        "shoot_delay": 40,
+        "moving": True
+    },
+    {
+        "type": "Spike",
+        "character": "O",
+        "image_default": GR_ENEMYSPIKE,
+        "animation_blink": ANIM_ENEMYSPIKE_BLINK,
+        "hit_points": 1,
+        "shoot_delay": 1000,
+        "moving": True
+    },
+    {
+        "type": "Boss",
+        "character": "Z",
+        "image_default": GR_ENEMYSPIKE,
+        "animation_blink": ANIM_ENEMYSPIKE_BLINK,
+        "hit_points": 5,
+        "shoot_delay": 80,
+        "moving": True
+    }
+]

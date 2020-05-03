@@ -121,7 +121,12 @@ class NewEnemy(pygame.sprite.Sprite):
         self.animation_frame = 0
         self.animation_delay = 4
         self.animation_counter = 0
+        self.hor_margin = -8
+        self.ver_margin = -8
 
+        self.speedx = 0
+        if features["moving"]:
+            self.speedx = 2
 
     # Passive movement & collision detection
     def update(self, level):
@@ -158,6 +163,10 @@ class NewEnemy(pygame.sprite.Sprite):
         if pygame.sprite.spritecollideany(self, player_group, collided):
             self.hit_points = 0
 
+        # Check collision to walls
+        if level.checkCollision(self.hitbox, offset):
+            self.speedx = -self.speedx
+
         # Check shooting delay
         if self.shoot_timer >= self.shoot_delay:
             self.shoot()
@@ -166,8 +175,13 @@ class NewEnemy(pygame.sprite.Sprite):
 
     def move(self, scroll_speed):
         # Keep on scrolling
-        self.rect = self.rect.move(0, round(scroll_speed))
-        self.hitbox = self.hitbox.move(0, round(scroll_speed))
+        self.rect = self.rect.move(self.speedx, round(scroll_speed))
+        self.resetHitbox()
+        
+    def resetHitbox(self):
+        # Align hitbox
+        self.hitbox = self.rect
+        self.hitbox = self.hitbox.inflate(self.hor_margin, self.ver_margin)
 
     # Shooting
     def shoot(self):
