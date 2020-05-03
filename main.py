@@ -195,8 +195,8 @@ class PlayerShip(pygame.sprite.Sprite):
         self.ver_margin = -30
         self.max_speedx = 4.0
         self.max_speedy = 2.0
-        self.frictionX = 0.1 
-        self.frictionY = 0.1
+        self.frictionX = 0.2 
+        self.frictionY = 0.2
         self.shoot_delay = 8
         self.shoot_timer = 0
         self.blinking = False
@@ -211,8 +211,7 @@ class PlayerShip(pygame.sprite.Sprite):
         self.rect.x = 0
         self.rect.y = 0
         self.rect = self.rect.move(self.start_x, self.start_y)
-        self.hitbox = self.rect
-        self.hitbox = self.hitbox.inflate(self.hor_margin, self.ver_margin)
+        self.resetHitbox()
 
     # Passive movement & collision detection
     def update(self, level):
@@ -279,16 +278,19 @@ class PlayerShip(pygame.sprite.Sprite):
             self.speedy -= self.frictionY
         if self.speedy < 0 :
             self.speedy += self.frictionY
+        
+        # Ensures that hitbox is following
+        self.resetHitbox()
 
     def move(self):
         # Move the player
         self.rect = self.rect.move(round(self.speedx), round(self.speedy))
-        self.hitbox = self.hitbox.move(round(self.speedx), round(self.speedy))
+        self.resetHitbox()
         
-
-    def getHitbox(self):
-        hitbox = (self.rect.x + self.hor_margin, self.rect.y + self.ver_margin, self.rect[2] - self.ver_margin * 2, self.rect[3] - self.hor_margin * 2)
-        return hitbox
+    def resetHitbox(self):
+        # Align hitbox
+        self.hitbox = self.rect
+        self.hitbox = self.hitbox.inflate(self.hor_margin, self.ver_margin)
 
     # Vertical acceleration
     def setSpeedX(self, amount):
