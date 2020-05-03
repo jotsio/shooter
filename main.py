@@ -102,21 +102,21 @@ class NewShot(pygame.sprite.Sprite):
         self.hitbox = self.hitbox.move(self.speed)
 
 # Enemy class
-class EnemyShip(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+class NewEnemy(pygame.sprite.Sprite):
+    def __init__(self, x, y, features):
         pygame.sprite.Sprite.__init__(self)
         global enemy_ammo_group
         enemy_group.add(self)
-        self.image_default = GR_ENEMYSHIP
+        self.image_default = features["image_default"]
         self.image = self.image_default
-        self.animation = ANIM_ENEMYSHIP_BLINK
+        self.animation = features["animation_blink"]
         self.animation_frame = 0
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(x, y)
         self.hitbox = self.rect
-        self.hit_points = 3
+        self.hit_points = features["hit_points"]
         self.shoot_timer = 0
-        self.shoot_delay = 80
+        self.shoot_delay = features["shoot_delay"]
         self.blinking = False
         self.animation_frame = 0
         self.animation_delay = 4
@@ -392,10 +392,10 @@ while True:
             each_enemy.move()
 
         # Create enemies
-        enemy_list = this_level.getEnemies(offset)
-        if enemy_list:
-            for i in enemy_list:
-                enemy = EnemyShip(i[0], i[1])
+        enemy_positions_list = this_level.getEnemies(offset)
+        if enemy_positions_list:
+            for i in enemy_positions_list:
+                enemy = NewEnemy(i[0], i[1], i[2])
 
         # Background update
         SCREEN.fill(color_bg_default)

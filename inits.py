@@ -55,6 +55,7 @@ MUS_FOLDER = "music/"
 #graphics
 GR_MYSHIP = loadImage("ship_default.png")
 GR_ENEMYSHIP = loadImage("enemy_default.png")
+GR_ENEMYSPIKE = loadImage("enemy_spike.png")
 GR_AMMO = loadImage("ammo_blue.png")
 GR_AMMO_ENEMY = loadImage("ammo_pink.png")
 GR_HEART = loadImage("heart.png")
@@ -69,6 +70,11 @@ ANIM_ENEMYSHIP_BLINK = loadImageSet([
     "enemy_hilight.png", 
     "enemy_hilight.png", 
     "enemy_hilight.png"])
+
+ANIM_ENEMYSPIKE_BLINK = loadImageSet([
+    "enemy_spike_hilight.png", 
+    "enemy_spike_hilight.png", 
+    "enemy_spike_hilight.png"])
 
 ANIM_BLUEEXP = loadImageSet([
     "exp_blue1.png", 
@@ -136,3 +142,19 @@ snd_small_explo = loadSound("hit3.ogg", 0.3)
 
 # Load music
 music = loadMusic("Starmusic_02.mp3")
+
+# Enemy feature dictionaries
+
+enemy_ship = {
+  "image_default": GR_ENEMYSHIP,
+  "animation_blink": ANIM_ENEMYSHIP_BLINK,
+  "hit_points": 3,
+  "shoot_delay": 80,
+}
+
+enemy_spike = {
+  "image_default": GR_ENEMYSPIKE,
+  "animation_blink": ANIM_ENEMYSPIKE_BLINK,
+  "hit_points": 1,
+  "shoot_delay": 1000,
+}
