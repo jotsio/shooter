@@ -115,7 +115,6 @@ class NewEnemy(pygame.sprite.Sprite):
         self.rect = self.rect.move(x, y)
         self.hitbox = self.rect
         self.hit_points = features["hit_points"]
-        self.shoot_timer = 0
         self.shoot_delay = features["shoot_delay"]
         self.blinking = False
         self.animation_frame = 0
@@ -123,10 +122,8 @@ class NewEnemy(pygame.sprite.Sprite):
         self.animation_counter = 0
         self.hor_margin = -8
         self.ver_margin = -8
-
-        self.speedx = 0
-        if features["moving"]:
-            self.speedx = 2
+        self.speedx, self.speedy = features["initial_speed"]
+        self.counter = 0
 
     # Passive movement & collision detection
     def update(self, level):
@@ -164,18 +161,19 @@ class NewEnemy(pygame.sprite.Sprite):
             self.hit_points = 0
 
         # Check collision to walls
-        if level.checkCollision(self.hitbox, offset):
+        if level.checkCollision(self.hitbox, offset) or self.rect.left <= 0 or self.rect.right >= width:
             self.speedx = -self.speedx
 
         # Check shooting delay
-        if self.shoot_timer >= self.shoot_delay:
+        if self.counter > 0 and self.counter % self.shoot_delay == 0:
             self.shoot()
-        else:
-            self.shoot_timer += 1
+        
+        self.counter += 1
 
     def move(self, scroll_speed):
         # Keep on scrolling
-        self.rect = self.rect.move(self.speedx, round(scroll_speed))
+        self.rect = self.rect.move(self.speedx, self.speedy)
+        self.rect = self.rect.move(0, round(scroll_speed))
         self.resetHitbox()
         
     def resetHitbox(self):
@@ -211,7 +209,7 @@ class PlayerShip(pygame.sprite.Sprite):
         self.max_speedy = 2.0
         self.frictionX = 0.2 
         self.frictionY = 0.2
-        self.shoot_delay = 8
+        self.shoot_delay = 16
         self.shoot_timer = 0
         self.blinking = False
         self.animation_frame = 0

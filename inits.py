@@ -152,8 +152,8 @@ enemy_types_list = [
         "image_default": GR_ENEMYSHIP,
         "animation_blink": ANIM_ENEMYSHIP_BLINK,
         "hit_points": 1,
-        "shoot_delay": 40,
-        "moving": True
+        "shoot_delay": 160,
+        "initial_speed": (1, 0)
     },
     {
         "type": "Spike",
@@ -162,7 +162,7 @@ enemy_types_list = [
         "animation_blink": ANIM_ENEMYSPIKE_BLINK,
         "hit_points": 1,
         "shoot_delay": 1000,
-        "moving": True
+        "initial_speed": (-1, 0)
     },
     {
         "type": "Boss",
@@ -171,6 +171,6 @@ enemy_types_list = [
         "animation_blink": ANIM_ENEMYSPIKE_BLINK,
         "hit_points": 5,
         "shoot_delay": 80,
-        "moving": True
+        "initial_speed": (0, 0)
     }
 ]
