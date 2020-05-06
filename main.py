@@ -124,13 +124,17 @@ class NewEnemy(pygame.sprite.Sprite):
         self.ver_margin = -8
         self.speedx, self.speedy = features["initial_speed"]
         self.counter = 0
+        self.type = features["type"]
 
     # Passive movement & collision detection
     def update(self, level):
+        global boss_alive
         # Check if dead
         if self.hit_points <= 0:
             snd_enemy_death.play()
             NewEffect(self.rect.centerx, self.rect.centery, ANIM_ORANGEEXP)
+            if self.type == "Boss":
+                boss_alive = False
             self.kill()
 
         # Check if outside area
@@ -335,9 +339,10 @@ class PlayerShip(pygame.sprite.Sprite):
 
 # Global variables
 framerate = 100
-scroll_speed = 2
+basic_scroll_speed = 2
 offset = 0
-current_level = 0
+current_level = 0 
+boss_alive = True
 
 # Title
 pygame.display.set_caption("Luolalentely")
@@ -356,11 +361,13 @@ while True:
     enemy_ammo_group = pygame.sprite.Group()
     effects_group = pygame.sprite.Group()
     offset = 0
+    scroll_speed = basic_scroll_speed
     end_counter = 0
     stars = StarField(250)
     this_level = levels[current_level]
     clock = pygame.time.Clock()
     pygame.mixer.music.play(-1)
+    boss_alive = True
     
     while clock.tick(framerate):
         # Keyevents listener
@@ -384,7 +391,13 @@ while True:
 
         # Is player reached the end of level?
         if offset == -this_level.start_point:
-            break
+            scroll_speed = 0  
+
+        # Check if boss is dead         
+        if boss_alive == False:
+            if end_counter > framerate * 2:
+                break
+            end_counter += 1
 
         # Objects update
         player_group.update(this_level)
@@ -413,7 +426,7 @@ while True:
 
         # Background update
         SCREEN.fill(color_bg_default)
-        stars.draw(SCREEN)
+        stars.draw(SCREEN, 2)
         this_level.draw(offset, SCREEN)        
 
         # Draw all the objects
@@ -423,7 +436,7 @@ while True:
         enemy_ammo_group.draw(SCREEN)
         effects_group.draw(SCREEN)
         # Rectange for collision debugging
-        pygame.draw.rect(SCREEN, RED, player.hitbox, 1)
+        #pygame.draw.rect(SCREEN, RED, player.hitbox, 1)
 
         # Show hearts of hitpoints
         showHearts(player.hit_points)
@@ -447,6 +460,7 @@ while True:
     else:
         showText("Kenttä läpäisty!")
         player.setStartPosition()
+        boss_alive = True
         current_level += 1  
 
     pygame.event.clear()

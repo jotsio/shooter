@@ -9,9 +9,9 @@ pygame.mixer.init(frequency=22050, size=-16, channels=1, buffer=4096, allowedcha
 size = width, height = 1366, 768
 player_start_x = round(width/2)
 player_start_y = round(height-100)
-#pygame.FULLSCREEN
-#SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
-SCREEN = pygame.display.set_mode(size)  
+pygame.FULLSCREEN
+SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
+#SCREEN = pygame.display.set_mode(size)  
 
 # Colors
 BLACK = 0, 0, 0
@@ -56,6 +56,7 @@ MUS_FOLDER = "music/"
 GR_MYSHIP = loadImage("ship_default.png")
 GR_ENEMYSHIP = loadImage("enemy_default.png")
 GR_ENEMYSPIKE = loadImage("enemy_spike.png")
+GR_ENEMYBIG = loadImage("enemy_big.png")
 GR_AMMO = loadImage("ammo_blue.png")
 GR_AMMO_ENEMY = loadImage("ammo_pink.png")
 GR_HEART = loadImage("heart.png")
@@ -75,6 +76,11 @@ ANIM_ENEMYSPIKE_BLINK = loadImageSet([
     "enemy_spike_hilight.png", 
     "enemy_spike_hilight.png", 
     "enemy_spike_hilight.png"])
+
+ANIM_ENEMYBIG_BLINK = loadImageSet([
+    "enemy_big_hilight.png", 
+    "enemy_big_hilight.png", 
+    "enemy_big_hilight.png"])
 
 ANIM_BLUEEXP = loadImageSet([
     "exp_blue1.png", 
@@ -167,10 +173,10 @@ enemy_types_list = [
     {
         "type": "Boss",
         "character": "Z",
-        "image_default": GR_ENEMYSPIKE,
-        "animation_blink": ANIM_ENEMYSPIKE_BLINK,
-        "hit_points": 5,
-        "shoot_delay": 80,
-        "initial_speed": (0, 0)
+        "image_default": GR_ENEMYBIG,
+        "animation_blink": ANIM_ENEMYBIG_BLINK,
+        "hit_points": 10,
+        "shoot_delay": 40,
+        "initial_speed": (-4, 0)
     }
 ]
