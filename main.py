@@ -17,12 +17,12 @@ def showText(message):
 
 def showHearts(amount):
     image = GR_HEART
-    Rect = image.get_rect()
+    Rect = image[0].get_rect()
     Rect.y = height - Rect.height
     Rect.x = 0
     i = 0
     while i < amount:
-        SCREEN.blit(image, Rect)
+        SCREEN.blit(image[0], Rect)
         Rect.x += Rect.width
         i += 1
 
@@ -62,7 +62,7 @@ class NewEffect(pygame.sprite.Sprite):
 class NewShot(pygame.sprite.Sprite):
     def __init__(self, x, y, speedy, graphics, animation, group):
         pygame.sprite.Sprite.__init__(self)
-        self.image = graphics
+        self.image = graphics[0]
         group.add(self)
         self.animation = animation
         self.rect = self.image.get_rect() 
@@ -108,7 +108,7 @@ class NewEnemy(pygame.sprite.Sprite):
         global enemy_ammo_group
         enemy_group.add(self)
         self.image_default = features["image_default"]
-        self.image = self.image_default
+        self.image = self.image_default[0]
         self.animation = features["animation_blink"]
         self.animation_frame = 0
         self.rect = self.image.get_rect() 
@@ -147,7 +147,7 @@ class NewEnemy(pygame.sprite.Sprite):
         if self.blinking == True:
             if self.animation_frame == len(self.animation):
                 self.animation_frame = 0
-                self.image = self.image_default
+                self.image = self.image_default[0]
                 self.animation_counter = 0
                 self.blinking = False
             else:
@@ -206,7 +206,7 @@ class PlayerShip(pygame.sprite.Sprite):
         self.hit_points_max = 6
         self.image_default = GR_MYSHIP
         self.animation = ANIM_MYSHIP_BLINK
-        self.image = self.image_default
+        self.image = self.image_default[0]
         self.rect = self.image.get_rect() 
         self.speedx = 0.0
         self.speedy = 0.0
@@ -245,7 +245,7 @@ class PlayerShip(pygame.sprite.Sprite):
         if self.blinking == True:
             if self.animation_frame == len(self.animation):
                 self.animation_frame = 0
-                self.image = self.image_default
+                self.image = self.image_default[0]
                 self.animation_counter = 0
                 self.blinking = False
             else:
@@ -350,7 +350,7 @@ boss_alive = True
 # Title
 pygame.display.set_caption("Luolalentely")
 icon = GR_MYSHIP
-pygame.display.set_icon(icon)
+pygame.display.set_icon(icon[0])
 
 # Create player
 player_group = pygame.sprite.Group()

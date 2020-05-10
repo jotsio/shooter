@@ -20,19 +20,13 @@ RED = 255, 0, 0
 color_bg_default = BLACK
 color_text = WHITE
 
-def loadImageSet(image_list):
+def loadImages(image_list):
     folder = IMG_FOLDER
     i = 0
     while i < len(image_list):
         image_list[i] = pygame.image.load(folder + image_list[i]).convert_alpha()
         i += 1
     return image_list
-
-def loadImage(filename):
-    folder = IMG_FOLDER
-    filename = folder + filename
-    image = pygame.image.load(filename).convert_alpha()
-    return image
 
 def loadSound(filename, volume):
     folder = SND_FOLDER
@@ -53,48 +47,48 @@ SND_FOLDER = "sounds/"
 MUS_FOLDER = "music/"
 
 #graphics
-GR_MYSHIP = loadImage("ship_default.png")
-GR_ENEMYSHIP = loadImage("enemy_default.png")
-GR_ENEMYSPIKE = loadImage("enemy_spike.png")
-GR_ENEMYBIG = loadImage("enemy_big.png")
-GR_AMMO = loadImage("ammo_blue.png")
-GR_AMMO_ENEMY = loadImage("ammo_pink.png")
-GR_HEART = loadImage("heart.png")
+GR_MYSHIP = loadImages(["ship_default.png"])
+GR_ENEMYSHIP = loadImages(["enemy_default.png"])
+GR_ENEMYSPIKE = loadImages(["enemy_spike.png"])
+GR_ENEMYBIG = loadImages(["enemy_big.png"])
+GR_AMMO = loadImages(["ammo_blue.png"])
+GR_AMMO_ENEMY = loadImages(["ammo_pink.png"])
+GR_HEART = loadImages(["heart.png"])
 
 # Load animations
-ANIM_MYSHIP_BLINK = loadImageSet([
+ANIM_MYSHIP_BLINK = loadImages([
     "ship_hilight.png", 
     "ship_hilight.png", 
     "ship_hilight.png"])
 
-ANIM_ENEMYSHIP_BLINK = loadImageSet([
+ANIM_ENEMYSHIP_BLINK = loadImages([
     "enemy_hilight.png", 
     "enemy_hilight.png", 
     "enemy_hilight.png"])
 
-ANIM_ENEMYSPIKE_BLINK = loadImageSet([
+ANIM_ENEMYSPIKE_BLINK = loadImages([
     "enemy_spike_hilight.png", 
     "enemy_spike_hilight.png", 
     "enemy_spike_hilight.png"])
 
-ANIM_ENEMYBIG_BLINK = loadImageSet([
+ANIM_ENEMYBIG_BLINK = loadImages([
     "enemy_big_hilight.png", 
     "enemy_big_hilight.png", 
     "enemy_big_hilight.png"])
 
-ANIM_BLUEEXP = loadImageSet([
+ANIM_BLUEEXP = loadImages([
     "exp_blue1.png", 
     "exp_blue2.png", 
     "exp_blue3.png", 
     "exp_blue4.png"])
 
-ANIM_PINKEXP = loadImageSet([
+ANIM_PINKEXP = loadImages([
     "exp_pink1.png", 
     "exp_pink2.png", 
     "exp_pink3.png", 
     "exp_pink4.png"])
 
-ANIM_ORANGEEXP = loadImageSet([
+ANIM_ORANGEEXP = loadImages([
     "exp_round1.png", 
     "exp_round2.png", 
     "exp_round3.png", 
@@ -103,7 +97,7 @@ ANIM_ORANGEEXP = loadImageSet([
     "exp_round6.png"])
 
 # Load level image sets
-wallset_stone = loadImageSet([
+wallset_stone = loadImages([
     "wall_middle.png",
     "wall_single.png",
     "bar_vertical.png",
@@ -121,7 +115,7 @@ wallset_stone = loadImageSet([
     "corner_bottom_right.png",
     "corner_bottom_left.png"])
     
-wallset_tech = loadImageSet([
+wallset_tech = loadImages([
     "tech_wall_middle.png",
     "tech_wall_single.png",
     "tech_bar_vertical.png",
