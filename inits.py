@@ -9,9 +9,9 @@ pygame.mixer.init(frequency=22050, size=-16, channels=1, buffer=4096, allowedcha
 size = width, height = 1366, 768
 player_start_x = round(width/2)
 player_start_y = round(height-100)
-pygame.FULLSCREEN
-SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
-#SCREEN = pygame.display.set_mode(size)  
+#pygame.FULLSCREEN
+#SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
+SCREEN = pygame.display.set_mode(size)
 
 # Colors
 BLACK = 0, 0, 0
