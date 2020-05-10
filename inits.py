@@ -157,8 +157,8 @@ enemy_types_list = [
         "character": "X",
         "image_default": GR_ENEMYSHIP,
         "animation_blink": ANIM_ENEMYSHIP_BLINK,
-        "hit_points": 1,
-        "shoot_delay": 160,
+        "hit_points": 2,
+        "shoot_delay": 40,
         "initial_speed": (1, 0)
     },
     {
@@ -166,7 +166,7 @@ enemy_types_list = [
         "character": "O",
         "image_default": GR_ENEMYSPIKE,
         "animation_blink": ANIM_ENEMYSPIKE_BLINK,
-        "hit_points": 1,
+        "hit_points": 2,
         "shoot_delay": 1000,
         "initial_speed": (-1, 0)
     },
@@ -175,8 +175,8 @@ enemy_types_list = [
         "character": "Z",
         "image_default": GR_ENEMYBIG,
         "animation_blink": ANIM_ENEMYBIG_BLINK,
-        "hit_points": 10,
-        "shoot_delay": 40,
-        "initial_speed": (-4, 0)
+        "hit_points": 15,
+        "shoot_delay": 10,
+        "initial_speed": (-1, 0)
     }
 ]

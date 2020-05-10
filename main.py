@@ -124,7 +124,9 @@ class NewEnemy(pygame.sprite.Sprite):
         self.ver_margin = -8
         self.speedx, self.speedy = features["initial_speed"]
         self.counter = 0
+        self.last_shoot = self.counter
         self.type = features["type"]
+        self.accuracy = 16
 
     # Passive movement & collision detection
     def update(self, level):
@@ -169,8 +171,9 @@ class NewEnemy(pygame.sprite.Sprite):
             self.speedx = -self.speedx
 
         # Check shooting delay
-        if self.counter > 0 and self.counter % self.shoot_delay == 0:
+        if self.counter - self.last_shoot > self.shoot_delay and abs(player.rect.centerx - self.rect.centerx) < self.accuracy:
             self.shoot()
+            self.last_shoot = self.counter
         
         self.counter += 1
 
