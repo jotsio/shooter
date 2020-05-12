@@ -16,7 +16,7 @@ def showText(message):
     pygame.display.flip()
 
 def showHearts(amount):
-    image = GR_HEART
+    image = GR_UI_HEART_DEFAULT
     Rect = image[0].get_rect()
     Rect.y = height - Rect.height
     Rect.x = 0
@@ -134,7 +134,7 @@ class NewEnemy(pygame.sprite.Sprite):
         # Check if dead
         if self.hit_points <= 0:
             snd_enemy_death.play()
-            NewEffect(self.rect.centerx, self.rect.centery, ANIM_ORANGEEXP)
+            NewEffect(self.rect.centerx, self.rect.centery, GR_EFFECT_EXPLOSION_BIG)
             if self.type == "Boss":
                 boss_alive = False
             self.kill()
@@ -190,7 +190,7 @@ class NewEnemy(pygame.sprite.Sprite):
 
     # Shooting
     def shoot(self):
-        NewShot(self.rect.centerx, self.rect.y + self.rect[3] + 8, 6.0, GR_AMMO_ENEMY, ANIM_PINKEXP, enemy_ammo_group)
+        NewShot(self.rect.centerx, self.rect.y + self.rect[3] + 8, 6.0, GR_AMMO_PINK_DEFAULT, GR_AMMO_PINK_EPXLOSION, enemy_ammo_group)
         snd_laser_enemy.play()
         self.shoot_timer = 0 
 
@@ -199,15 +199,20 @@ class PlayerShip(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         global player_ammo_group
+        self.imageset_default = GR_PLAYER_BODY_DEFAULT
+        self.imageset_hilight = GR_PLAYER_BODY_BLINK
+        self.imageset_up = GR_PLAYER_BODY_UP
+        self.animation = self.imageset_default
+        self.animation_duration = 0
+        self.animation_delay = 4
+        self.animation_frame = 0
+        self.image = self.animation[0]
+        self.rect = self.image.get_rect() 
         self.start_x = x
         self.start_y = y
         self.alive = True
         self.hit_points = 5
         self.hit_points_max = 6
-        self.image_default = GR_MYSHIP
-        self.animation = ANIM_MYSHIP_BLINK
-        self.image = self.image_default[0]
-        self.rect = self.image.get_rect() 
         self.speedx = 0.0
         self.speedy = 0.0
         self.hor_margin = -15
@@ -218,10 +223,8 @@ class PlayerShip(pygame.sprite.Sprite):
         self.frictionY = 0.2
         self.shoot_delay = 16
         self.shoot_timer = 0
-        self.blinking = False
-        self.animation_frame = 0
-        self.animation_delay = 4
-        self.animation_counter = 0
+
+        self.age = 0
         self.setStartPosition()
         player_group.add(self)
     
@@ -232,6 +235,22 @@ class PlayerShip(pygame.sprite.Sprite):
         self.rect = self.rect.move(self.start_x, self.start_y)
         self.resetHitbox()
 
+    def changeFrame(self):
+        if self.animation_frame >= len(self.animation):
+            self.animation_frame = 0
+        self.image = self.animation[self.animation_frame]
+        if self.animation_duration != 0 and self.age - self.animation_started > self.animation_duration:
+            self.animation = self.imageset_default
+            self.animation_frame = 0
+        if len(self.animation) > 1:
+            self.animation_frame += 1
+    
+    def setAnimation(self, imageset, duration):
+        self.animation_started = self.age
+        self.animation = imageset
+        self.animation_duration = duration 
+        
+
     # Passive movement & collision detection
     def update(self, level):
         # Check if dead
@@ -239,21 +258,7 @@ class PlayerShip(pygame.sprite.Sprite):
             self.alive = False
             snd_player_death.play()
             player_group.remove(player)
-            NewEffect(self.rect.centerx, self.rect.centery, ANIM_ORANGEEXP)
-
-        # Blinking
-        if self.blinking == True:
-            if self.animation_frame == len(self.animation):
-                self.animation_frame = 0
-                self.image = self.image_default[0]
-                self.animation_counter = 0
-                self.blinking = False
-            else:
-                self.image = self.animation[self.animation_frame]
-                if self.animation_counter == self.animation_delay:
-                    self.animation_frame += 1
-                    self.animation_counter = 0
-                self.animation_counter +=1
+            NewEffect(self.rect.centerx, self.rect.centery, GR_EFFECT_EXPLOSION_BIG)
 
         # Check collision to walls
         if self.alive == True and level.checkCollision(self.hitbox, offset):
@@ -262,7 +267,7 @@ class PlayerShip(pygame.sprite.Sprite):
         # Check collision to ammo
         if self.alive == True and pygame.sprite.spritecollideany(self, enemy_ammo_group, collided):
             self.hit_points -= 1
-            self.blinking = True
+            self.setAnimation(self.imageset_hilight, 12)
 
         # Check collision to enemy
         if pygame.sprite.spritecollideany(self, enemy_group, collided):
@@ -298,8 +303,16 @@ class PlayerShip(pygame.sprite.Sprite):
         if self.speedy < 0 :
             self.speedy += self.frictionY
         
+        # Set thruster animation if moved
+        if self.speedy < -1.0:
+            self.setAnimation(self.imageset_up, 4)
+
+        # Change animation frame
+        self.changeFrame()
+
         # Ensures that hitbox is following
         self.resetHitbox()
+        self.age += 1
 
     def move(self):
         # Move the player
@@ -330,7 +343,7 @@ class PlayerShip(pygame.sprite.Sprite):
     # Shooting
     def shoot(self, key):
         if self.alive == True and self.shoot_timer >= self.shoot_delay and key == True:
-            NewShot(self.rect.centerx, self.rect.y-20, -10.0, GR_AMMO, ANIM_BLUEEXP, player_ammo_group)
+            NewShot(self.rect.centerx, self.rect.y-20, -10.0, GR_AMMO_BLUE_DEFAULT, GR_AMMO_BLUE_EXPLOSION, player_ammo_group)
             snd_laser.play()
             self.shoot_timer = 0 
 
@@ -349,7 +362,7 @@ boss_alive = True
 
 # Title
 pygame.display.set_caption("Luolalentely")
-icon = GR_MYSHIP
+icon = GR_PLAYER_BODY_DEFAULT
 pygame.display.set_icon(icon[0])
 
 # Create player

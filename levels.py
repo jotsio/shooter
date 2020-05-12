@@ -421,8 +421,8 @@ class StarField:
 
 # Create levels
 levels = [
-    Walls(level1_map, wallset_tech), 
-    Walls(level2_map, wallset_tech),  
-    Walls(level3_map, wallset_tech),
-    Walls(level4_map, wallset_tech)
+    Walls(level1_map, GR_WALLSET_TECH), 
+    Walls(level2_map, GR_WALLSET_TECH),  
+    Walls(level3_map, GR_WALLSET_TECH),
+    Walls(level4_map, GR_WALLSET_TECH)
     ]

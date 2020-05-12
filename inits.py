@@ -47,57 +47,58 @@ SND_FOLDER = "sounds/"
 MUS_FOLDER = "music/"
 
 #graphics
-GR_MYSHIP = loadImages(["ship_default.png"])
-GR_ENEMYSHIP = loadImages(["enemy_default.png"])
-GR_ENEMYSPIKE = loadImages(["enemy_spike.png"])
-GR_ENEMYBIG = loadImages(["enemy_big.png"])
-GR_AMMO = loadImages(["ammo_blue.png"])
-GR_AMMO_ENEMY = loadImages(["ammo_pink.png"])
-GR_HEART = loadImages(["heart.png"])
-
-# Load animations
-ANIM_MYSHIP_BLINK = loadImages([
+GR_APPICON = loadImages([
+    "ship_default.png"])
+GR_PLAYER_BODY_DEFAULT = loadImages([
+    "ship_default.png"])
+GR_PLAYER_BODY_BLINK = loadImages([
     "ship_hilight.png", 
     "ship_hilight.png", 
     "ship_hilight.png"])
-
-ANIM_ENEMYSHIP_BLINK = loadImages([
+GR_PLAYER_BODY_UP = loadImages([
+    "ship_thrust1.png",
+    "ship_thrust2.png"])
+GR_ENEMY_FIGHTER_DEFAULT = loadImages([
+    "enemy_default.png"])
+GR_ENEMY_FIGHTER_BLINK = loadImages([
     "enemy_hilight.png", 
     "enemy_hilight.png", 
     "enemy_hilight.png"])
-
-ANIM_ENEMYSPIKE_BLINK = loadImages([
+GR_ENEMY_SPIKE_DEFAULT = loadImages([
+    "enemy_spike_default.png",
+    "enemy_spike_default2.png"])
+GR_ENEMY_SPIKE_BLINK = loadImages([
     "enemy_spike_hilight.png", 
     "enemy_spike_hilight.png", 
     "enemy_spike_hilight.png"])
-
-ANIM_ENEMYBIG_BLINK = loadImages([
+GR_ENEMY_BIG_DEFAULT = loadImages(["enemy_big.png"])
+GR_ENEMY_BIG_BLINK = loadImages([
     "enemy_big_hilight.png", 
     "enemy_big_hilight.png", 
     "enemy_big_hilight.png"])
-
-ANIM_BLUEEXP = loadImages([
+GR_AMMO_BLUE_DEFAULT = loadImages(["ammo_blue.png"])
+GR_AMMO_BLUE_EXPLOSION = loadImages([
     "exp_blue1.png", 
     "exp_blue2.png", 
     "exp_blue3.png", 
     "exp_blue4.png"])
-
-ANIM_PINKEXP = loadImages([
+GR_AMMO_PINK_DEFAULT = loadImages(["ammo_pink.png"])
+GR_AMMO_PINK_EPXLOSION = loadImages([
     "exp_pink1.png", 
     "exp_pink2.png", 
     "exp_pink3.png", 
     "exp_pink4.png"])
-
-ANIM_ORANGEEXP = loadImages([
+GR_EFFECT_EXPLOSION_BIG = loadImages([
     "exp_round1.png", 
     "exp_round2.png", 
     "exp_round3.png", 
     "exp_round4.png", 
     "exp_round5.png", 
     "exp_round6.png"])
+GR_UI_HEART_DEFAULT = loadImages(["heart.png"])
 
 # Load level image sets
-wallset_stone = loadImages([
+GR_WALLSET_STONE = loadImages([
     "wall_middle.png",
     "wall_single.png",
     "bar_vertical.png",
@@ -115,7 +116,7 @@ wallset_stone = loadImages([
     "corner_bottom_right.png",
     "corner_bottom_left.png"])
     
-wallset_tech = loadImages([
+GR_WALLSET_TECH = loadImages([
     "tech_wall_middle.png",
     "tech_wall_single.png",
     "tech_bar_vertical.png",
@@ -149,8 +150,8 @@ enemy_types_list = [
     {
         "type": "Ship",
         "character": "X",
-        "image_default": GR_ENEMYSHIP,
-        "animation_blink": ANIM_ENEMYSHIP_BLINK,
+        "image_default": GR_ENEMY_FIGHTER_DEFAULT,
+        "animation_blink": GR_ENEMY_FIGHTER_BLINK,
         "hit_points": 2,
         "shoot_delay": 40,
         "initial_speed": (1, 0)
@@ -158,8 +159,8 @@ enemy_types_list = [
     {
         "type": "Spike",
         "character": "O",
-        "image_default": GR_ENEMYSPIKE,
-        "animation_blink": ANIM_ENEMYSPIKE_BLINK,
+        "image_default": GR_ENEMY_SPIKE_DEFAULT,
+        "animation_blink": GR_ENEMY_SPIKE_BLINK,
         "hit_points": 2,
         "shoot_delay": 1000,
         "initial_speed": (-1, 0)
@@ -167,8 +168,8 @@ enemy_types_list = [
     {
         "type": "Boss",
         "character": "Z",
-        "image_default": GR_ENEMYBIG,
-        "animation_blink": ANIM_ENEMYBIG_BLINK,
+        "image_default": GR_ENEMY_BIG_DEFAULT,
+        "animation_blink": GR_ENEMY_BIG_BLINK,
         "hit_points": 15,
         "shoot_delay": 10,
         "initial_speed": (-1, 0)
