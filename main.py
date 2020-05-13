@@ -33,30 +33,54 @@ def collided(sprite, other):
 
 # CLASSES
 # -------
-
-class NewEffect(pygame.sprite.Sprite):
-    def __init__(self, x, y, image_list):
-        pygame.sprite.Sprite.__init__(self)
-        effects_group.add(self)
-        self.animation = image_list
+# Animated object class
+class AnimObject():
+    def __init__(self, imageset):
+        self.imageset_default = imageset
+        self.animation = self.imageset_default
+        self.animation_duration = 0
+        self.animation_delay = 4
+        self.animation_frame = 0 
         self.image = self.animation[0]
         self.rect = self.image.get_rect() 
+        self.age = 0
+        self.ticks_in_frame = 4
+
+    def changeFrame(self):
+        if self.age % self.ticks_in_frame == 0:
+            if self.animation_frame >= len(self.animation):
+                self.animation_frame = 0
+            if self.animation_duration != 0 and self.age - self.animation_started > self.animation_duration:
+                self.animation = self.imageset_default
+                self.animation_frame = 0
+            self.image = self.animation[self.animation_frame]
+            if len(self.animation) > 1:
+                self.animation_frame += 1
+        self.age += 1
+    
+    def setAnimation(self, imageset, duration):
+        self.animation_started = self.age
+        self.animation = imageset
+        self.animation_duration = duration 
+
+class NewEffect(pygame.sprite.Sprite, AnimObject):
+    def __init__(self, x, y, imageset):
+        pygame.sprite.Sprite.__init__(self)
+        AnimObject.__init__(self, imageset)
+        effects_group.add(self)
+        self.rect = self.image.get_rect() 
         self.rect = self.rect.move(round(x - self.rect.w / 2), y - round(self.rect.h / 2))
-        self.hitbox = self.rect
-        self.delay_multiplier = 4
-        self.lifetime = len(self.animation) * self.delay_multiplier
-        self.counter = 0
+        self.lifetime = len(self.animation) * self.ticks_in_frame
     
     def update(self):
         # Check if dead
-        if self.counter > self.lifetime:
-            self.counter = 0
+        if self.age > self.lifetime:
             self.kill()
         # Scoll down
         self.rect = self.rect.move(0, round(scroll_speed))
         # Change image
-        self.image = self.animation[round(self.counter / self.delay_multiplier) - 1]
-        self.counter += 1
+        self.changeFrame()
+        self.age += 1
 
 # Ammunition
 class NewShot(pygame.sprite.Sprite):
@@ -195,19 +219,13 @@ class NewEnemy(pygame.sprite.Sprite):
         self.shoot_timer = 0 
 
 # Player class
-class PlayerShip(pygame.sprite.Sprite):
+class PlayerShip(pygame.sprite.Sprite, AnimObject):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
-        global player_ammo_group
-        self.imageset_default = GR_PLAYER_BODY_DEFAULT
+        AnimObject.__init__(self, imageset = GR_PLAYER_BODY_DEFAULT)
         self.imageset_hilight = GR_PLAYER_BODY_BLINK
-        self.imageset_up = GR_PLAYER_BODY_UP
-        self.animation = self.imageset_default
-        self.animation_duration = 0
-        self.animation_delay = 4
-        self.animation_frame = 0
-        self.image = self.animation[0]
-        self.rect = self.image.get_rect() 
+        self.imageset_up = GR_PLAYER_BODY_UP 
+        global player_ammo_group
         self.start_x = x
         self.start_y = y
         self.alive = True
@@ -223,8 +241,6 @@ class PlayerShip(pygame.sprite.Sprite):
         self.frictionY = 0.2
         self.shoot_delay = 16
         self.shoot_timer = 0
-
-        self.age = 0
         self.setStartPosition()
         player_group.add(self)
     
@@ -234,23 +250,7 @@ class PlayerShip(pygame.sprite.Sprite):
         self.rect.y = 0
         self.rect = self.rect.move(self.start_x, self.start_y)
         self.resetHitbox()
-
-    def changeFrame(self):
-        if self.animation_frame >= len(self.animation):
-            self.animation_frame = 0
-        self.image = self.animation[self.animation_frame]
-        if self.animation_duration != 0 and self.age - self.animation_started > self.animation_duration:
-            self.animation = self.imageset_default
-            self.animation_frame = 0
-        if len(self.animation) > 1:
-            self.animation_frame += 1
-    
-    def setAnimation(self, imageset, duration):
-        self.animation_started = self.age
-        self.animation = imageset
-        self.animation_duration = duration 
         
-
     # Passive movement & collision detection
     def update(self, level):
         # Check if dead
@@ -312,7 +312,7 @@ class PlayerShip(pygame.sprite.Sprite):
 
         # Ensures that hitbox is following
         self.resetHitbox()
-        self.age += 1
+
 
     def move(self):
         # Move the player
