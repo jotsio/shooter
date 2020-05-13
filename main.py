@@ -15,6 +15,14 @@ def showText(message):
     SCREEN.blit(text, textRect)
     pygame.display.flip()
 
+def showScore(number):
+    font = pygame.font.Font('freesansbold.ttf', 32) 
+    text = font.render(number, True, color_text)
+    textRect = text.get_rect()
+    textRect.center = (width - 64, height - 64)
+    SCREEN.blit(text, textRect)
+    pygame.display.flip()
+
 def showHearts(amount):
     image = GR_UI_HEART_DEFAULT
     Rect = image[0].get_rect()
@@ -39,29 +47,30 @@ class AnimObject():
         self.imageset_default = imageset
         self.animation = self.imageset_default
         self.animation_duration = 0
-        self.animation_delay = 4
+        self.animation_delay = 2
         self.animation_frame = 0 
         self.image = self.animation[0]
         self.rect = self.image.get_rect() 
-        self.age = 0
         self.ticks_in_frame = 4
+        self.counter = 0
 
     def changeFrame(self):
-        if self.age % self.ticks_in_frame == 0:
+        if self.counter % self.animation_delay == 0:
             if self.animation_frame >= len(self.animation):
                 self.animation_frame = 0
-            if self.animation_duration != 0 and self.age - self.animation_started > self.animation_duration:
+            if self.animation_duration != 0 and self.counter > self.animation_duration:
                 self.animation = self.imageset_default
                 self.animation_frame = 0
+                self.counter = 0
             self.image = self.animation[self.animation_frame]
             if len(self.animation) > 1:
                 self.animation_frame += 1
-        self.age += 1
+        self.counter += 1
     
     def setAnimation(self, imageset, duration):
-        self.animation_started = self.age
         self.animation = imageset
         self.animation_duration = duration 
+        self.counter = 0
 
 class NewEffect(pygame.sprite.Sprite, AnimObject):
     def __init__(self, x, y, imageset):
@@ -70,25 +79,25 @@ class NewEffect(pygame.sprite.Sprite, AnimObject):
         effects_group.add(self)
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(round(x - self.rect.w / 2), y - round(self.rect.h / 2))
-        self.lifetime = len(self.animation) * self.ticks_in_frame
+        self.lifetime = len(self.animation) * self.animation_delay
     
     def update(self):
         # Check if dead
-        if self.age > self.lifetime:
+        if self.counter >= self.lifetime:
             self.kill()
         # Scoll down
         self.rect = self.rect.move(0, round(scroll_speed))
         # Change image
         self.changeFrame()
-        self.age += 1
+       
 
 # Ammunition
-class NewShot(pygame.sprite.Sprite):
-    def __init__(self, x, y, speedy, graphics, animation, group):
+class NewShotBeam(pygame.sprite.Sprite, AnimObject):
+    def __init__(self, x, y, speedy, imageset, sec_imageset, group):
         pygame.sprite.Sprite.__init__(self)
-        self.image = graphics[0]
+        AnimObject.__init__(self, imageset)
         group.add(self)
-        self.animation = animation
+        self.explosion = sec_imageset
         self.rect = self.image.get_rect() 
         self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
         self.hitbox = self.rect
@@ -97,7 +106,7 @@ class NewShot(pygame.sprite.Sprite):
 
     # Passive movement
     def update(self, level):
-
+        self.changeFrame()
         # Check collision, kill itself and create explosion
         hitted_block = level.checkCollision(self.hitbox, offset)
         if hitted_block:
@@ -118,7 +127,7 @@ class NewShot(pygame.sprite.Sprite):
             self.kill()
   
     def explode(self):
-            NewEffect(self.rect.centerx, self.rect.centery, self.animation)
+            NewEffect(self.rect.centerx, self.rect.centery, self.explosion)
             snd_small_explo.play()
 
     def move(self):
@@ -150,17 +159,21 @@ class NewEnemy(pygame.sprite.Sprite):
         self.counter = 0
         self.last_shoot = self.counter
         self.type = features["type"]
+        self.score = features["score"]
         self.accuracy = 16
 
     # Passive movement & collision detection
     def update(self, level):
         global boss_alive
+        global score
         # Check if dead
         if self.hit_points <= 0:
             snd_enemy_death.play()
             NewEffect(self.rect.centerx, self.rect.centery, GR_EFFECT_EXPLOSION_BIG)
             if self.type == "Boss":
+                
                 boss_alive = False
+            score += self.score
             self.kill()
 
         # Check if outside area
@@ -214,7 +227,7 @@ class NewEnemy(pygame.sprite.Sprite):
 
     # Shooting
     def shoot(self):
-        NewShot(self.rect.centerx, self.rect.y + self.rect[3] + 8, 6.0, GR_AMMO_PINK_DEFAULT, GR_AMMO_PINK_EPXLOSION, enemy_ammo_group)
+        NewShotBeam(self.rect.centerx, self.rect.y + self.rect[3] + 8, 6.0, GR_AMMO_PINK_DEFAULT, GR_AMMO_PINK_EPXLOSION, enemy_ammo_group)
         snd_laser_enemy.play()
         self.shoot_timer = 0 
 
@@ -343,7 +356,8 @@ class PlayerShip(pygame.sprite.Sprite, AnimObject):
     # Shooting
     def shoot(self, key):
         if self.alive == True and self.shoot_timer >= self.shoot_delay and key == True:
-            NewShot(self.rect.centerx, self.rect.y-20, -10.0, GR_AMMO_BLUE_DEFAULT, GR_AMMO_BLUE_EXPLOSION, player_ammo_group)
+            NewShotBeam(self.rect.centerx-16, self.rect.y-0, -10.0, GR_AMMO_BLUE_DEFAULT, GR_AMMO_BLUE_EXPLOSION, player_ammo_group)
+            NewShotBeam(self.rect.centerx+16, self.rect.y-0, -10.0, GR_AMMO_BLUE_DEFAULT, GR_AMMO_BLUE_EXPLOSION, player_ammo_group)
             snd_laser.play()
             self.shoot_timer = 0 
 
@@ -358,6 +372,7 @@ framerate = 100
 basic_scroll_speed = 2
 offset = 0
 current_level = 0 
+score = 0
 boss_alive = True
 
 # Title
@@ -456,6 +471,9 @@ while True:
 
         # Show hearts of hitpoints
         showHearts(player.hit_points)
+
+        # Show score
+        showScore(str(score))
 
         # Update screen
         pygame.display.flip()

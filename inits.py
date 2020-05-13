@@ -154,7 +154,8 @@ enemy_types_list = [
         "animation_blink": GR_ENEMY_FIGHTER_BLINK,
         "hit_points": 2,
         "shoot_delay": 40,
-        "initial_speed": (1, 0)
+        "initial_speed": (1, 0),
+        "score": 10
     },
     {
         "type": "Spike",
@@ -163,7 +164,8 @@ enemy_types_list = [
         "animation_blink": GR_ENEMY_SPIKE_BLINK,
         "hit_points": 2,
         "shoot_delay": 1000,
-        "initial_speed": (-1, 0)
+        "initial_speed": (-1, 0),
+        "score": 5
     },
     {
         "type": "Boss",
@@ -172,6 +174,7 @@ enemy_types_list = [
         "animation_blink": GR_ENEMY_BIG_BLINK,
         "hit_points": 15,
         "shoot_delay": 10,
-        "initial_speed": (-1, 0)
+        "initial_speed": (-1, 0),
+        "score": 50
     }
 ]
