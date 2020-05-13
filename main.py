@@ -238,7 +238,6 @@ class PlayerShip(pygame.sprite.Sprite, AnimObject):
         AnimObject.__init__(self, imageset = GR_PLAYER_BODY_DEFAULT)
         self.imageset_hilight = GR_PLAYER_BODY_BLINK
         self.imageset_up = GR_PLAYER_BODY_UP 
-        global player_ammo_group
         self.start_x = x
         self.start_y = y
         self.alive = True
@@ -252,9 +251,8 @@ class PlayerShip(pygame.sprite.Sprite, AnimObject):
         self.max_speedy = 2.0
         self.frictionX = 0.2 
         self.frictionY = 0.2
-        self.shoot_delay = 16
-        self.shoot_timer = 0
         self.setStartPosition()
+        self.weapon = WeaponDefault()
         player_group.add(self)
     
     # Set player to starting position on screen and initialize hitbox
@@ -286,9 +284,8 @@ class PlayerShip(pygame.sprite.Sprite, AnimObject):
         if pygame.sprite.spritecollideany(self, enemy_group, collided):
             self.hit_points = 0
 
-        # Check shooting delay
-        if self.shoot_timer < self.shoot_delay:
-            self.shoot_timer += 1
+        # Update shooting delay
+        self.weapon.shoot_timer += 1
 
         # bounces from outside the area
         if self.rect.left < 0:
@@ -353,14 +350,66 @@ class PlayerShip(pygame.sprite.Sprite, AnimObject):
         if self.speedy < -self.max_speedy :
             self.speedy = -self.max_speedy
 
+    # Change a weapon
+    def changeWeapon(self, key):
+        if key[pygame.K_1] == True:
+            self.weapon = WeaponDefault()
+        if key[pygame.K_2] == True:
+            self.weapon = WeaponDoubleBeam()
+        if key[pygame.K_3] == True:
+            self.weapon = WeaponMinigun()
+        if key[pygame.K_4] == True:
+            self.weapon = WeaponFlameThrower()
+
     # Shooting
     def shoot(self, key):
-        if self.alive == True and self.shoot_timer >= self.shoot_delay and key == True:
-            NewShotBeam(self.rect.centerx-16, self.rect.y-0, -10.0, GR_AMMO_BLUE_DEFAULT, GR_AMMO_BLUE_EXPLOSION, player_ammo_group)
-            NewShotBeam(self.rect.centerx+16, self.rect.y-0, -10.0, GR_AMMO_BLUE_DEFAULT, GR_AMMO_BLUE_EXPLOSION, player_ammo_group)
+        if self.alive == True and key == True:
+            self.weapon.launch(self.rect.centerx, self.rect.y)
+
+class WeaponDefault():
+    def __init__(self):
+        self.shoot_timer = 0
+        self.shoot_delay = 16
+
+    def launch(self, x, y):
+        if self.shoot_timer >= self.shoot_delay:
+            NewShotBeam(x, y, -10.0, GR_AMMO_BLUE_DEFAULT, GR_AMMO_BLUE_EXPLOSION, player_ammo_group)
             snd_laser.play()
             self.shoot_timer = 0 
 
+class WeaponDoubleBeam():
+    def __init__(self):
+        self.shoot_timer = 0
+        self.shoot_delay = 16
+
+    def launch(self, x, y):
+        if self.shoot_timer >= self.shoot_delay:
+            NewShotBeam(x - 16, y, -10.0, GR_AMMO_BLUE_DEFAULT, GR_AMMO_BLUE_EXPLOSION, player_ammo_group)
+            NewShotBeam(x + 16, y, -10.0, GR_AMMO_BLUE_DEFAULT, GR_AMMO_BLUE_EXPLOSION, player_ammo_group)
+            snd_laser.play()
+            self.shoot_timer = 0 
+
+class WeaponMinigun():
+    def __init__(self):
+        self.shoot_timer = 0
+        self.shoot_delay = 4
+
+    def launch(self, x, y):
+        if self.shoot_timer >= self.shoot_delay:
+            NewShotBeam(x, y, -10.0, GR_AMMO_BLUE_DEFAULT, GR_AMMO_BLUE_EXPLOSION, player_ammo_group)
+            snd_laser.play()
+            self.shoot_timer = 0 
+
+class WeaponFlameThrower():
+    def __init__(self):
+        self.shoot_timer = 0
+        self.shoot_delay = 4
+
+    def launch(self, x, y):
+        if self.shoot_timer >= self.shoot_delay:
+            NewShotBeam(x, y-48, -8.0, GR_EFFECT_EXPLOSION_BIG, GR_EFFECT_EXPLOSION_BIG, player_ammo_group)
+            snd_laser.play()
+            self.shoot_timer = 0 
 
 
 # Main program
@@ -411,6 +460,7 @@ while True:
         player.setSpeedX(pressed[pygame.K_RIGHT]-pressed[pygame.K_LEFT])
         player.setSpeedY(pressed[pygame.K_DOWN]-pressed[pygame.K_UP])
         player.shoot(pressed[pygame.K_SPACE])
+        player.changeWeapon(pressed)
          
        # Is player alive?
         if player.alive == False:
