@@ -13,6 +13,14 @@ player_start_y = round(height-100)
 #SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
 SCREEN = pygame.display.set_mode(size)
 
+# Global variables
+framerate = 100
+basic_scroll_speed = 2
+offset = 0
+current_level = 0 
+score = 0
+boss_alive = True
+
 # Colors
 BLACK = 0, 0, 0
 WHITE = 255, 255, 255

@@ -1,10 +1,13 @@
-import sys, pygame
+import pygame
+#import sys, pygame
 import pygame.gfxdraw
 from pygame.locals import *
 import random
 import time
-from levels import *
 from inits import *
+from levels import *
+from classes import *
+
 
 # Show game titles
 def showText(message):
@@ -34,44 +37,14 @@ def showHearts(amount):
         Rect.x += Rect.width
         i += 1
 
-
 def collided(sprite, other):
     # Check if the hitboxes of the two sprites collide.
     return sprite.hitbox.colliderect(other.hitbox)
 
+
+
 # CLASSES
 # -------
-# Animated object class
-class AnimObject():
-    def __init__(self, imageset):
-        self.imageset_default = imageset
-        self.animation = self.imageset_default
-        self.animation_duration = 0
-        self.animation_delay = 2
-        self.animation_frame = 0 
-        self.image = self.animation[0]
-        self.rect = self.image.get_rect() 
-        self.ticks_in_frame = 4
-        self.counter = 0
-
-    def changeFrame(self):
-        if self.counter % self.animation_delay == 0:
-            if self.animation_frame >= len(self.animation):
-                self.animation_frame = 0
-            if self.animation_duration != 0 and self.counter > self.animation_duration:
-                self.animation = self.imageset_default
-                self.animation_frame = 0
-                self.counter = 0
-            self.image = self.animation[self.animation_frame]
-            if len(self.animation) > 1:
-                self.animation_frame += 1
-        self.counter += 1
-    
-    def setAnimation(self, imageset, duration):
-        self.animation = imageset
-        self.animation_duration = duration 
-        self.counter = 0
-
 class NewEffect(pygame.sprite.Sprite, AnimObject):
     def __init__(self, x, y, imageset):
         pygame.sprite.Sprite.__init__(self)
@@ -90,7 +63,6 @@ class NewEffect(pygame.sprite.Sprite, AnimObject):
         # Change image
         self.changeFrame()
        
-
 # Ammunition
 class NewShotBeam(pygame.sprite.Sprite, AnimObject):
     def __init__(self, x, y, speedy, imageset, sec_imageset, group):
@@ -135,9 +107,10 @@ class NewShotBeam(pygame.sprite.Sprite, AnimObject):
         self.hitbox = self.hitbox.move(self.speed)
 
 # Enemy class
-class NewEnemy(pygame.sprite.Sprite):
+class NewEnemy(pygame.sprite.Sprite, AnimObject):
     def __init__(self, x, y, features):
         pygame.sprite.Sprite.__init__(self)
+        AnimObject.__init__(self, features["image_default"])
         global enemy_ammo_group
         enemy_group.add(self)
         self.image_default = features["image_default"]
@@ -411,18 +384,21 @@ class WeaponFlameThrower():
             snd_laser.play()
             self.shoot_timer = 0 
 
+def selectEnemy(x, y, character):
+    if character == "X": 
+#        return EnemyFighter()
+        return NewEnemy(x, y, enemy_types_list[0])
+    elif character == "O":
+#        return EnemySpike()
+        return NewEnemy(x, y, enemy_types_list[1])
+    elif character == "Z":    
+#        return EnemyFighterBig()
+        return NewEnemy(x, y, enemy_types_list[2])
+        
 
 # Main program
 #-------------
 # Pygame initials
-
-# Global variables
-framerate = 100
-basic_scroll_speed = 2
-offset = 0
-current_level = 0 
-score = 0
-boss_alive = True
 
 # Title
 pygame.display.set_caption("Luolalentely")
@@ -503,7 +479,7 @@ while True:
         enemy_positions_list = this_level.getEnemies(offset)
         if enemy_positions_list:
             for i in enemy_positions_list:
-                enemy = NewEnemy(i[0], i[1], i[2])
+                enemy = selectEnemy(i[0], i[1], i[2])
 
         # Background update
         SCREEN.fill(color_bg_default)

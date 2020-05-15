@@ -66,9 +66,9 @@ level1_map = [
 "##.................##",
 "###.................#",
 "##..................#",
+"#..............O....#",
 "#...................#",
-"#...................#",
-"#...................#"
+"....................."
 ]
 
 level2_map = [
@@ -403,10 +403,10 @@ class Walls:
                 i = 0 
                 while i < len(self.map[k]):
                     # Give the enemy positions and style as list
-                    for j in enemy_types_list:
-                        if self.map[k][i] == j["character"]:
-                            position = (x, y, j)
-                            enemy_list.append(position)
+                    character = self.map[k][i]
+                    if character != "#" and character != ".":
+                        position = (x, y, character)
+                        enemy_list.append(position)
                     x += gridsize
                     i += 1
                 x = 0
