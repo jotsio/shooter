@@ -284,7 +284,9 @@ level5_map = [
 
 #Walls class
 class Walls:
-    def __init__(self, map, tiles):
+    def __init__(self, map, tiles, width, height):
+        self.width = width
+        self.height = width
         self.map = self.levelToList(map)  
         self.img = tiles
         self.start_point = -len(self.map) * gridsize
@@ -390,7 +392,7 @@ class Walls:
     def removeBlock(self, col, row):
         self.map[row][col] = "."
 
-    # Gives a list of enemies from current row
+    # Gives a list of enemy characters from current row
     def getEnemies(self, offset):
         y = self.start_point
         y += offset
@@ -450,9 +452,9 @@ class StarField:
 
 # Create levels
 levels = [
-    Walls(level1_map, GR_WALLSET_TECH), 
-    Walls(level2_map, GR_WALLSET_TECH),  
-    Walls(level3_map, GR_WALLSET_TECH),
-    Walls(level4_map, GR_WALLSET_TECH),
-    Walls(level5_map, GR_WALLSET_TECH) 
+    Walls(level1_map, GR_WALLSET_TECH, width, height), 
+    Walls(level2_map, GR_WALLSET_TECH, width, height),  
+    Walls(level3_map, GR_WALLSET_TECH, width, height),
+    Walls(level4_map, GR_WALLSET_TECH, width, height),
+    Walls(level5_map, GR_WALLSET_TECH, width, height) 
     ]

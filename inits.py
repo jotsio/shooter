@@ -157,7 +157,7 @@ music = loadMusic("Starmusic_02.mp3")
 enemy_types_list = [
     {
         "type": "Ship",
-        "character": "X",
+        "character": "X", 
         "image_default": GR_ENEMY_FIGHTER_DEFAULT,
         "animation_blink": GR_ENEMY_FIGHTER_BLINK,
         "hit_points": 2,

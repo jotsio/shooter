@@ -37,75 +37,8 @@ def showHearts(amount):
         Rect.x += Rect.width
         i += 1
 
-def collided(sprite, other):
-    # Check if the hitboxes of the two sprites collide.
-    return sprite.hitbox.colliderect(other.hitbox)
-
-
-
 # CLASSES
 # -------
-class NewEffect(pygame.sprite.Sprite, AnimObject):
-    def __init__(self, x, y, imageset):
-        pygame.sprite.Sprite.__init__(self)
-        AnimObject.__init__(self, imageset)
-        effects_group.add(self)
-        self.rect = self.image.get_rect() 
-        self.rect = self.rect.move(round(x - self.rect.w / 2), y - round(self.rect.h / 2))
-        self.lifetime = len(self.animation) * self.animation_delay
-    
-    def update(self):
-        # Check if dead
-        if self.counter >= self.lifetime:
-            self.kill()
-        # Scoll down
-        self.rect = self.rect.move(0, round(scroll_speed))
-        # Change image
-        self.changeFrame()
-       
-# Ammunition
-class NewShotBeam(pygame.sprite.Sprite, AnimObject):
-    def __init__(self, x, y, speedy, imageset, sec_imageset, group):
-        pygame.sprite.Sprite.__init__(self)
-        AnimObject.__init__(self, imageset)
-        group.add(self)
-        self.explosion = sec_imageset
-        self.rect = self.image.get_rect() 
-        self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
-        self.hitbox = self.rect
-        self.alive = True
-        self.speed = [0, speedy] 
-
-    # Passive movement
-    def update(self, level):
-        self.changeFrame()
-        # Check collision, kill itself and create explosion
-        hitted_block = level.checkCollision(self.hitbox, offset)
-        if hitted_block:
-            # level.removeBlock(hitted_block[0], hitted_block[1])
-            self.explode()
-            self.kill()
-
-        # Check if outside area
-        elif self.rect.y < 0 or self.rect.y > height:
-            self.kill()
-
-        elif pygame.sprite.spritecollideany(self, enemy_group, collided):
-            self.explode()
-            self.kill()
-
-        elif pygame.sprite.spritecollideany(self, player_group, collided):
-            self.explode()
-            self.kill()
-  
-    def explode(self):
-            NewEffect(self.rect.centerx, self.rect.centery, self.explosion)
-            snd_small_explo.play()
-
-    def move(self):
-        self.rect = self.rect.move(self.speed)
-        self.hitbox = self.hitbox.move(self.speed)
-
 # Enemy class
 class NewEnemy(pygame.sprite.Sprite, AnimObject):
     def __init__(self, x, y, features):
@@ -297,7 +230,7 @@ class PlayerShip(pygame.sprite.Sprite, AnimObject):
         self.resetHitbox()
 
 
-    def move(self):
+    def move(self, scroll_speed): 
         # Move the player
         self.rect = self.rect.move(round(self.speedx), round(self.speedy))
         self.resetHitbox()
@@ -394,7 +327,6 @@ def selectEnemy(x, y, character):
     elif character == "Z":    
 #        return EnemyFighterBig()
         return NewEnemy(x, y, enemy_types_list[2])
-        
 
 # Main program
 #-------------
@@ -406,16 +338,11 @@ icon = GR_PLAYER_BODY_DEFAULT
 pygame.display.set_icon(icon[0])
 
 # Create player
-player_group = pygame.sprite.Group()
 player = PlayerShip(player_start_x, player_start_y)
 
 # Main loop
 while True: 
     # Play the level
-    enemy_group = pygame.sprite.Group()
-    player_ammo_group = pygame.sprite.Group()
-    enemy_ammo_group = pygame.sprite.Group()
-    effects_group = pygame.sprite.Group()
     offset = 0
     scroll_speed = basic_scroll_speed
     end_counter = 0
@@ -459,21 +386,24 @@ while True:
         # Objects update
         player_group.update(this_level)
         enemy_group.update(this_level)
-        player_ammo_group.update(this_level)
-        enemy_ammo_group.update(this_level)
-        effects_group.update()
+        player_ammo_group.update(this_level, offset)
+        enemy_ammo_group.update(this_level, offset)
+        effects_group.update(this_level, offset)
 
         # Objects movement
-        for each_enemy in enemy_group.sprites():
-            each_enemy.move(scroll_speed)
+        player.move(scroll_speed)
 
-        player.move()
+        for i in enemy_group.sprites():
+            i.move(scroll_speed)
 
-        for each_enemy in player_ammo_group.sprites():
-            each_enemy.move()
+        for i in player_ammo_group.sprites():
+            i.move(scroll_speed)
 
-        for each_enemy in enemy_ammo_group.sprites():
-            each_enemy.move()
+        for i in enemy_ammo_group.sprites():
+            i.move(scroll_speed)
+
+        for i in effects_group.sprites():
+            i.move(scroll_speed)
 
         # Create enemies
         enemy_positions_list = this_level.getEnemies(offset)
@@ -512,6 +442,10 @@ while True:
         showText("Kuolit!")
         # Reset player
         player = PlayerShip(player_start_x, player_start_y)
+        enemy_group.empty()
+        player_ammo_group.empty()
+        enemy_ammo_group.empty()
+        effects_group.empty()
         
     elif current_level == (len(levels)-1):
         showText("HIENOA, PELI LÄPÄISTY!")
