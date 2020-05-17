@@ -69,7 +69,7 @@ class NewEnemy(pygame.sprite.Sprite, AnimObject):
         self.accuracy = 16
 
     # Passive movement & collision detection
-    def update(self, level):
+    def update(self, level, offset):
         global boss_alive
         global score
         # Check if dead
@@ -133,8 +133,7 @@ class NewEnemy(pygame.sprite.Sprite, AnimObject):
 
     # Shooting
     def shoot(self):
-        NewShotBeam(self.rect.centerx, self.rect.y + self.rect[3] + 8, 6.0, GR_AMMO_PINK_DEFAULT, GR_AMMO_PINK_EPXLOSION, enemy_ammo_group)
-        snd_laser_enemy.play()
+        AmmoSingle(self.rect.centerx, self.rect.bottom, feat_enemy_beam_default)
         self.shoot_timer = 0 
 
 # Player class
@@ -169,7 +168,7 @@ class PlayerShip(pygame.sprite.Sprite, AnimObject):
         self.resetHitbox()
         
     # Passive movement & collision detection
-    def update(self, level):
+    def update(self, level, offset):
         # Check if dead
         if self.hit_points <= 0:
             self.alive = False
@@ -279,20 +278,18 @@ class WeaponDefault():
 
     def launch(self, x, y):
         if self.shoot_timer >= self.shoot_delay:
-            NewShotBeam(x, y, -10.0, GR_AMMO_BLUE_DEFAULT, GR_AMMO_BLUE_EXPLOSION, player_ammo_group)
-            snd_laser.play()
+            AmmoSingle(x, y, feat_player_beam_default)
             self.shoot_timer = 0 
 
 class WeaponDoubleBeam():
     def __init__(self):
         self.shoot_timer = 0
-        self.shoot_delay = 16
+        self.shoot_delay = 24
 
     def launch(self, x, y):
         if self.shoot_timer >= self.shoot_delay:
-            NewShotBeam(x - 16, y, -10.0, GR_AMMO_BLUE_DEFAULT, GR_AMMO_BLUE_EXPLOSION, player_ammo_group)
-            NewShotBeam(x + 16, y, -10.0, GR_AMMO_BLUE_DEFAULT, GR_AMMO_BLUE_EXPLOSION, player_ammo_group)
-            snd_laser.play()
+            AmmoSingle(x - 16, y, feat_player_beam_default)
+            AmmoSingle(x + 16, y, feat_player_beam_default)
             self.shoot_timer = 0 
 
 class WeaponMinigun():
@@ -302,8 +299,7 @@ class WeaponMinigun():
 
     def launch(self, x, y):
         if self.shoot_timer >= self.shoot_delay:
-            NewShotBeam(x, y, -10.0, GR_AMMO_BLUE_DEFAULT, GR_AMMO_BLUE_EXPLOSION, player_ammo_group)
-            snd_laser.play()
+            AmmoSingle(x, y, feat_player_beam_default)
             self.shoot_timer = 0 
 
 class WeaponFlameThrower():
@@ -313,8 +309,7 @@ class WeaponFlameThrower():
 
     def launch(self, x, y):
         if self.shoot_timer >= self.shoot_delay:
-            NewShotBeam(x, y-48, -8.0, GR_EFFECT_EXPLOSION_BIG, GR_EFFECT_EXPLOSION_BIG, player_ammo_group)
-            snd_laser.play()
+            AmmoSingle(x, y, feat_player_flame)
             self.shoot_timer = 0 
 
 def selectEnemy(x, y, character):
@@ -384,14 +379,15 @@ while True:
             end_counter += 1
 
         # Objects update
-        player_group.update(this_level)
-        enemy_group.update(this_level)
+        player_group.update(this_level, offset)
+        enemy_group.update(this_level, offset)
         player_ammo_group.update(this_level, offset)
         enemy_ammo_group.update(this_level, offset)
         effects_group.update(this_level, offset)
 
         # Objects movement
-        player.move(scroll_speed)
+        for i in player_group.sprites():
+            i.move(scroll_speed)
 
         for i in enemy_group.sprites():
             i.move(scroll_speed)

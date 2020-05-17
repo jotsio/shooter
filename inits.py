@@ -152,6 +152,7 @@ snd_small_explo = loadSound("hit3.ogg", 0.3)
 # Load music
 music = loadMusic("Starmusic_02.mp3")
 
+
 # Enemy feature dictionaries
 
 enemy_types_list = [
