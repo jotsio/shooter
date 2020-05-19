@@ -19,7 +19,6 @@ basic_scroll_speed = 2
 offset = 0
 current_level = 0 
 score = 0
-boss_alive = True
 
 # Colors
 BLACK = 0, 0, 0
@@ -152,38 +151,3 @@ snd_small_explo = loadSound("hit3.ogg", 0.3)
 # Load music
 music = loadMusic("Starmusic_02.mp3")
 
-
-# Enemy feature dictionaries
-
-enemy_types_list = [
-    {
-        "type": "Ship",
-        "character": "X", 
-        "image_default": GR_ENEMY_FIGHTER_DEFAULT,
-        "animation_blink": GR_ENEMY_FIGHTER_BLINK,
-        "hit_points": 2,
-        "shoot_delay": 40,
-        "initial_speed": (1, 0),
-        "score": 10
-    },
-    {
-        "type": "Spike",
-        "character": "O",
-        "image_default": GR_ENEMY_SPIKE_DEFAULT,
-        "animation_blink": GR_ENEMY_SPIKE_BLINK,
-        "hit_points": 2,
-        "shoot_delay": 1000,
-        "initial_speed": (-1, 0),
-        "score": 5
-    },
-    {
-        "type": "Boss",
-        "character": "Z",
-        "image_default": GR_ENEMY_BIG_DEFAULT,
-        "animation_blink": GR_ENEMY_BIG_BLINK,
-        "hit_points": 15,
-        "shoot_delay": 10,
-        "initial_speed": (-1, 0),
-        "score": 50
-    }
-]

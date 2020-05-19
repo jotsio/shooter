@@ -282,6 +282,19 @@ level5_map = [
 "....................."
 ]
 
+test_map = [
+".....................",
+".........Z.Z.........",
+".....................",
+"#...................#",
+"##...X.............##",
+"##...............O.##",
+"#...................#",
+".....................",
+".....................",
+"....................."
+]
+
 #Walls class
 class Walls:
     def __init__(self, map, tiles, width, height):
@@ -291,6 +304,7 @@ class Walls:
         self.img = tiles
         self.start_point = -len(self.map) * gridsize
         self.rect = pygame.Rect(0, self.start_point, gridsize, gridsize) 
+        self.level_finished = False
 
     # Convert levels to lists
     def levelToList(self, map):
@@ -452,7 +466,7 @@ class StarField:
 
 # Create levels
 levels = [
-    Walls(level1_map, GR_WALLSET_TECH, width, height), 
+    Walls(test_map, GR_WALLSET_TECH, width, height), 
     Walls(level2_map, GR_WALLSET_TECH, width, height),  
     Walls(level3_map, GR_WALLSET_TECH, width, height),
     Walls(level4_map, GR_WALLSET_TECH, width, height),
