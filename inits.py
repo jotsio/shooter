@@ -1,8 +1,9 @@
 import sys, pygame
 from pygame.locals import *
 
+
+pygame.mixer.init(frequency=44100, size=-16, channels=8, buffer=512, allowedchanges=AUDIO_ALLOW_FREQUENCY_CHANGE | AUDIO_ALLOW_CHANNELS_CHANGE) 
 pygame.init()
-pygame.mixer.init(frequency=22050, size=-16, channels=1, buffer=4096, allowedchanges=AUDIO_ALLOW_FREQUENCY_CHANGE | AUDIO_ALLOW_CHANNELS_CHANGE) 
 
 # Define displays
 # Screen parameters
@@ -103,6 +104,12 @@ GR_EFFECT_EXPLOSION_BIG = loadImages([
     "exp_round5.png", 
     "exp_round6.png"])
 GR_UI_HEART_DEFAULT = loadImages(["heart.png"])
+GR_ACCESSORIES_COIN = loadImages([
+    "coin_1.png", 
+    "coin_2.png",
+    "coin_3.png",
+    "coin_4.png",])
+
 
 # Load level image sets
 GR_WALLSET_STONE = loadImages([
@@ -147,6 +154,7 @@ snd_laser_enemy = loadSound("laser2.ogg", 0.3)
 snd_player_death = loadSound("defeated.ogg", 0.8)
 snd_enemy_death = loadSound("hit1.ogg", 0.8)
 snd_small_explo = loadSound("hit3.ogg", 0.3)
+snd_coin = loadSound("coin.ogg", 0.3)
 
 # Load music
 music = loadMusic("Starmusic_02.mp3")

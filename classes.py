@@ -86,6 +86,11 @@ class Solid():
     def collisionToEnemy(self):
         return pygame.sprite.spritecollideany(self, self.collision_group, self.collided)
 
+    def move(self, scroll_speed):
+        # Scoll down
+        self.rect = self.rect.move(0, round(scroll_speed))
+        self.alignHitBox(self.rect)
+
     def explode(self, animation, sound):
         NewEffect(self.hitbox.centerx, self.hitbox.centery, animation)
         sound.play()
@@ -110,6 +115,27 @@ class NewEffect(pygame.sprite.Sprite, AnimObject):
         # Scoll down
         self.rect = self.rect.move(0, round(scroll_speed))
 
+class Collectable(pygame.sprite.Sprite, AnimObject, Solid):
+    def __init__(self, x, y, imageset):
+        pygame.sprite.Sprite.__init__(self)
+        AnimObject.__init__(self, imageset, 4)
+        Solid.__init__(self, self.rect, 0, 0, player_group)
+        effects_group.add(self)
+        # Centrify position
+        self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
+        self.hitbox = self.rect
+    
+    def update(self, level, offset):
+        # Explode if collided to collision group
+        if self.collisionToEnemy():
+            self.hitpoints = 0
+            snd_coin.play()
+        if self.destroyed() == True:
+            self.kill()
+        # Disappear if outside the area
+        if self.outsideArea(level):
+            self.kill()
+        self.changeFrame()
 
 # Ammunition new
 class AmmoBasic(pygame.sprite.Sprite, AnimObject, Solid):
@@ -392,6 +418,8 @@ class NewEnemy(pygame.sprite.Sprite, AnimObject, Solid):
         if self.destroyed() == True:
             self.explode(GR_EFFECT_EXPLOSION_BIG, snd_enemy_death)
             self.killed = True
+            # Create coin
+            coin = Collectable(self.rect.centerx, self.rect.centery, GR_ACCESSORIES_COIN)
 
         # Check if outside area
         if self.outsideArea(level):
