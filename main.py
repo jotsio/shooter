@@ -132,10 +132,10 @@ while True:
         this_level.draw(offset, SCREEN)        
 
         # Draw all the objects
-        player_group.draw(SCREEN)
-        enemy_group.draw(SCREEN)
         player_ammo_group.draw(SCREEN)
         enemy_ammo_group.draw(SCREEN)
+        enemy_group.draw(SCREEN)
+        player_group.draw(SCREEN)
         effects_group.draw(SCREEN)
         # Rectange for collision debugging
         #pygame.draw.rect(SCREEN, RED, player.hitbox, 1)

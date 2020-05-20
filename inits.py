@@ -90,6 +90,7 @@ GR_AMMO_BLUE_EXPLOSION = loadImages([
     "exp_blue2.png", 
     "exp_blue3.png", 
     "exp_blue4.png"])
+GR_AMMO_ROCKET_DEFAULT = loadImages(["ammo_rocket.png"])
 GR_AMMO_PINK_DEFAULT = loadImages(["ammo_pink.png"])
 GR_AMMO_PINK_EPXLOSION = loadImages([
     "exp_pink1.png", 

@@ -149,7 +149,7 @@ class AmmoBasic(pygame.sprite.Sprite, AnimObject, Solid):
         self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
         self.hitbox = self.rect
         # Vertical speed
-        self.speed = [0, features["speedy"]]
+        self.speed = [0.0, features["speedy"]]
         self.energy = features["energy"]
         features["sound_launch"].play()
 
@@ -182,6 +182,16 @@ class AmmoBasic(pygame.sprite.Sprite, AnimObject, Solid):
     def move(self, scroll_speed):
         self.rect = self.rect.move(self.speed)
         self.alignHitBox(self.rect)
+
+class AmmoRocket(AmmoBasic):
+    def move(self, scroll_speed):
+        self.rect = self.rect.move(self.speed)
+        self.rect = self.rect.move(0, scroll_speed)
+        self.alignHitBox(self.rect)
+        if self.speed[1] > -12:    
+            self.speed[1] += self.speed[1]
+        else:
+            self.speed[1] = -12.0
 
 # Player class
 class PlayerShip(pygame.sprite.Sprite, AnimObject, Solid):
@@ -302,7 +312,7 @@ class PlayerShip(pygame.sprite.Sprite, AnimObject, Solid):
         if key[pygame.K_3] == True:
             self.weapon = WeaponMinigun(feat_player_beam_default)
         if key[pygame.K_4] == True:
-            self.weapon = WeaponFlameThrower(feat_player_flame)
+            self.weapon = WeaponLauncher(feat_player_rocket)
 
     # Shooting
     def shoot(self, key):
@@ -345,15 +355,21 @@ class WeaponMinigun():
             AmmoBasic(x, y, self.ammo)
             self.shoot_timer = 0 
 
-class WeaponFlameThrower():
+class WeaponLauncher():
     def __init__(self, ammo):
+        self.side = 1
         self.shoot_timer = 0
-        self.shoot_delay = 4
+        self.shoot_delay = 16
         self.ammo = ammo
 
     def launch(self, x, y):
         if self.shoot_timer >= self.shoot_delay:
-            AmmoBasic(x, y, self.ammo)
+            if self.side == 1:
+                AmmoRocket(x - 16, y, self.ammo)
+                self.side = 2
+            else:
+                AmmoRocket(x + 16, y, self.ammo)
+                self.side = 1
             self.shoot_timer = 0 
 
 
@@ -365,7 +381,7 @@ feat_player_beam_default = {
     "imageset_explosion": GR_AMMO_BLUE_EXPLOSION,
     "sound_launch": snd_laser,
     "sound_explosion": snd_small_explo,
-    "speedy": -10,
+    "speedy": -10.0,
     "energy": 10,  
 }
 
@@ -376,7 +392,18 @@ feat_player_flame = {
     "imageset_explosion": GR_EFFECT_EXPLOSION_BIG,
     "sound_launch": snd_laser_enemy,
     "sound_explosion": snd_small_explo,
-    "speedy": -8,
+    "speedy": -8.0,
+    "energy": 12,  
+}
+
+feat_player_rocket = {
+    "own_group": player_ammo_group,
+    "collision_group": enemy_group,
+    "imageset_default": GR_AMMO_ROCKET_DEFAULT,
+    "imageset_explosion": GR_EFFECT_EXPLOSION_BIG,
+    "sound_launch": snd_laser_enemy,
+    "sound_explosion": snd_small_explo,
+    "speedy": -0.01,
     "energy": 12,  
 }
 
@@ -387,7 +414,7 @@ feat_enemy_beam_default = {
     "imageset_explosion": GR_AMMO_PINK_EPXLOSION,
     "sound_launch": snd_laser_enemy,
     "sound_explosion": snd_laser_enemy,
-    "speedy": 8,
+    "speedy": 8.0,
     "energy": 2,  
 }
 
