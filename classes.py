@@ -21,20 +21,25 @@ def checkBosses():
 # CLASSES
 # -------
 # Animated object class
-class AnimObject():
-    def __init__(self, imageset, delay):
+class Base():
+    def __init__(self, x, y, imageset, group):
+        group.add(self)
+        self.hostile_group = []
         self.imageset_default = imageset
         self.animation = self.imageset_default
         self.animation_duration = 0
-        self.animation_delay = delay
         self.animation_frame = 0 
         self.image = self.animation[0]
         self.rect = self.image.get_rect() 
         self.ticks_in_frame = 4
         self.counter = 0
+        self.hor_margin = 0
+        self.ver_margin = 0
+        self.alignHitBox(self.rect)
+        self.hitpoints = 1
 
     def changeFrame(self):
-        if self.counter % self.animation_delay == 0:
+        if self.counter % self.ticks_in_frame == 0:
             if self.animation_frame >= len(self.animation):
                 self.animation_frame = 0
             if self.animation_duration != 0 and self.counter > self.animation_duration:
@@ -51,14 +56,6 @@ class AnimObject():
         self.animation = imageset
         self.animation_duration = duration 
         self.counter = 0
-
-class Solid():
-    def __init__(self, rect, hor_margin, ver_margin, collision_group):
-        self.hor_margin = hor_margin
-        self.ver_margin = ver_margin
-        self.alignHitBox(rect)
-        self.collision_group = collision_group
-        self.hitpoints = 1
 
     def alignHitBox(self, rect):
         self.hitbox = rect
@@ -84,7 +81,7 @@ class Solid():
         return sprite.hitbox.colliderect(other.hitbox)
 
     def collisionToEnemy(self):
-        return pygame.sprite.spritecollideany(self, self.collision_group, self.collided)
+        return pygame.sprite.spritecollideany(self, self.hostile_group, self.collided)
 
     def move(self, scroll_speed):
         # Scoll down
@@ -95,14 +92,12 @@ class Solid():
         NewEffect(self.hitbox.centerx, self.hitbox.centery, animation)
         sound.play()
 
-class NewEffect(pygame.sprite.Sprite, AnimObject):
+class NewEffect(pygame.sprite.Sprite, Base):
     def __init__(self, x, y, imageset):
         pygame.sprite.Sprite.__init__(self)
-        AnimObject.__init__(self, imageset, 4)
-        effects_group.add(self)
-        self.rect = self.image.get_rect() 
+        Base.__init__(self, x, y, imageset, effects_group)
         self.rect = self.rect.move(round(x - self.rect.w / 2), y - round(self.rect.h / 2))
-        self.lifetime = len(self.animation) * self.animation_delay
+        self.lifetime = len(self.animation) * self.ticks_in_frame
     
     def update(self, level, offset):
         # Erase if lifetime spent
@@ -111,19 +106,14 @@ class NewEffect(pygame.sprite.Sprite, AnimObject):
         # Change image
         self.changeFrame()
 
-    def move(self, scroll_speed):
-        # Scoll down
-        self.rect = self.rect.move(0, round(scroll_speed))
-
-class Collectable(pygame.sprite.Sprite, AnimObject, Solid):
+class Collectable(pygame.sprite.Sprite, Base):
     def __init__(self, x, y, imageset):
         pygame.sprite.Sprite.__init__(self)
-        AnimObject.__init__(self, imageset, 4)
-        Solid.__init__(self, self.rect, 0, 0, player_group)
-        effects_group.add(self)
+        Base.__init__(self, x, y, imageset, effects_group)
+        self.hostile_group = player_group
         # Centrify position
         self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
-        self.hitbox = self.rect
+        self.alignHitBox(self.rect)
     
     def update(self, level, offset):
         # Explode if collided to collision group
@@ -138,16 +128,15 @@ class Collectable(pygame.sprite.Sprite, AnimObject, Solid):
         self.changeFrame()
 
 # Ammunition new
-class AmmoBasic(pygame.sprite.Sprite, AnimObject, Solid):
+class AmmoBasic(pygame.sprite.Sprite, Base):
     def __init__(self, x, y, features):
         pygame.sprite.Sprite.__init__(self)
-        AnimObject.__init__(self, features["imageset_default"], 2)
-        Solid.__init__(self, self.rect, 0, 0, features["collision_group"])
-        features["own_group"].add(self)
+        Base.__init__(self, x, y, features["imageset_default"], features["own_group"])
+        self.hostile_group = features["enemy_group"]
         self.features = features
         # Centrify position
         self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
-        self.hitbox = self.rect
+        self.alignHitBox(self.rect)
         # Vertical speed
         self.speed = [0.0, features["speedy"]]
         self.energy = features["energy"]
@@ -194,12 +183,13 @@ class AmmoRocket(AmmoBasic):
             self.speed[1] = -12.0
 
 # Player class
-class PlayerShip(pygame.sprite.Sprite, AnimObject, Solid):
+class PlayerShip(pygame.sprite.Sprite, Base):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
-        AnimObject.__init__(self, GR_PLAYER_BODY_DEFAULT, 4)
-        Solid.__init__(self, self.rect, -15, -30, enemy_ammo_group)
-        player_group.add(self)
+        Base.__init__(self, x, y, GR_PLAYER_BODY_DEFAULT, player_group)
+        self.hostile_group = enemy_ammo_group
+        self.hor_margin = -15
+        self.ver_margin = -30
         self.imageset_hilight = GR_PLAYER_BODY_BLINK
         self.imageset_up = GR_PLAYER_BODY_UP 
         self.start_x = x
@@ -215,7 +205,6 @@ class PlayerShip(pygame.sprite.Sprite, AnimObject, Solid):
         self.frictionY = 0.2
         self.setStartPosition()
         self.weapon = WeaponSingle(feat_player_beam_default)
-        
     
     # Set player to starting position on screen and initialize hitbox
     def setStartPosition(self):
@@ -321,22 +310,30 @@ class PlayerShip(pygame.sprite.Sprite, AnimObject, Solid):
 
 
 # Weapons
-class WeaponSingle():
+class WeaponBase():
     def __init__(self, ammo):
-        self.shoot_timer = 0
-        self.shoot_delay = 16
         self.ammo = ammo
+        self.shoot_delay = 0
+        self.power = 1.0
+        self.shoot_timer = 0
+    
+    def setFirerate(self, rpm):
+        self.shoot_delay = round(100 * 60 / rpm)
+
+class WeaponSingle(WeaponBase):
+    def __init__(self, ammo):
+        WeaponBase.__init__(self, ammo)
+        self.setFirerate(600)
 
     def launch(self, x, y):
         if self.shoot_timer >= self.shoot_delay:
             AmmoBasic(x, y, self.ammo)
             self.shoot_timer = 0 
 
-class WeaponDouble():
+class WeaponDouble(WeaponBase):
     def __init__(self, ammo):
-        self.shoot_timer = 0
-        self.shoot_delay = 24
-        self.ammo = ammo
+        WeaponBase.__init__(self, ammo)
+        self.setFirerate(450)
 
     def launch(self, x, y):
         if self.shoot_timer >= self.shoot_delay:
@@ -344,23 +341,21 @@ class WeaponDouble():
             AmmoBasic(x + 16, y, self.ammo)
             self.shoot_timer = 0 
 
-class WeaponMinigun():
+class WeaponMinigun(WeaponBase):
     def __init__(self, ammo):
-        self.shoot_timer = 0
-        self.shoot_delay = 4
-        self.ammo = ammo
+        WeaponBase.__init__(self, ammo)
+        self.setFirerate(1200)
 
     def launch(self, x, y):
         if self.shoot_timer >= self.shoot_delay:
             AmmoBasic(x, y, self.ammo)
             self.shoot_timer = 0 
 
-class WeaponLauncher():
+class WeaponLauncher(WeaponBase):
     def __init__(self, ammo):
+        WeaponBase.__init__(self, ammo)
+        self.setFirerate(450)
         self.side = 1
-        self.shoot_timer = 0
-        self.shoot_delay = 16
-        self.ammo = ammo
 
     def launch(self, x, y):
         if self.shoot_timer >= self.shoot_delay:
@@ -376,7 +371,7 @@ class WeaponLauncher():
 # Ammo types
 feat_player_beam_default = {
     "own_group": player_ammo_group,
-    "collision_group": enemy_group,
+    "enemy_group": enemy_group,
     "imageset_default": GR_AMMO_BLUE_DEFAULT,
     "imageset_explosion": GR_AMMO_BLUE_EXPLOSION,
     "sound_launch": snd_laser,
@@ -387,7 +382,7 @@ feat_player_beam_default = {
 
 feat_player_flame = {
     "own_group": player_ammo_group,
-    "collision_group": enemy_group,
+    "enemy_group": enemy_group,
     "imageset_default": GR_EFFECT_EXPLOSION_BIG,
     "imageset_explosion": GR_EFFECT_EXPLOSION_BIG,
     "sound_launch": snd_laser_enemy,
@@ -398,7 +393,7 @@ feat_player_flame = {
 
 feat_player_rocket = {
     "own_group": player_ammo_group,
-    "collision_group": enemy_group,
+    "enemy_group": enemy_group,
     "imageset_default": GR_AMMO_ROCKET_DEFAULT,
     "imageset_explosion": GR_EFFECT_EXPLOSION_BIG,
     "sound_launch": snd_laser_enemy,
@@ -409,7 +404,7 @@ feat_player_rocket = {
 
 feat_enemy_beam_default = {
     "own_group": enemy_ammo_group,
-    "collision_group": player_group,
+    "enemy_group": player_group,
     "imageset_default": GR_AMMO_PINK_DEFAULT,
     "imageset_explosion": GR_AMMO_PINK_EPXLOSION,
     "sound_launch": snd_laser_enemy,
@@ -419,13 +414,13 @@ feat_enemy_beam_default = {
 }
 
 # Enemy class
-class NewEnemy(pygame.sprite.Sprite, AnimObject, Solid):
+class NewEnemy(pygame.sprite.Sprite, Base):
     def __init__(self, x, y, features):
         pygame.sprite.Sprite.__init__(self)
-        AnimObject.__init__(self, features["image_default"], 8)
-        Solid.__init__(self, self.rect, -24, -24, player_ammo_group)
-        global enemy_ammo_group
-        enemy_group.add(self)
+        Base.__init__(self, x, y, features["image_default"], enemy_group)
+        self.hostile_group = player_ammo_group
+        self.hor_margin = -24
+        self.ver_margin = -24
         self.features = features
         self.setAnimation(self.imageset_default, 0)
         self.imageset_hilight = features["animation_blink"]
