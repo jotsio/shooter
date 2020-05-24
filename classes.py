@@ -37,6 +37,7 @@ class Base():
         self.ver_margin = 0
         self.alignHitBox(self.rect)
         self.hitpoints = 1
+        self.speed = (0, 0)
 
     def changeFrame(self):
         if self.counter % self.ticks_in_frame == 0:
@@ -82,6 +83,19 @@ class Base():
 
     def collisionToEnemy(self):
         return pygame.sprite.spritecollideany(self, self.hostile_group, self.collided)
+
+    def applyFriction(self, x, y):
+        # Horizontal friction
+        if self.speed[0] > 0.0 :
+            self.speed[0] -= x
+        if self.speed[0] < 0.0 :
+            self.speed[0] += x
+
+        # Vertical friction
+        if self.speed[1] > 0.0 :
+            self.speed[1] -= y
+        if self.speed[1] < 0.0 :
+            self.speed[1] += y
 
     def move(self, scroll_speed):
         # Scoll down
@@ -182,6 +196,33 @@ class AmmoRocket(AmmoBasic):
         else:
             self.speed[1] = -12.0
 
+class AmmoFlame(AmmoBasic):
+    def update(self, level, offset):
+
+        # Explode if collided to level walls
+        hitted_block = level.checkCollision(self.hitbox, offset)
+        if hitted_block:
+            if self.energy > 10: 
+                level.removeBlock(hitted_block[0], hitted_block[1])
+            self.hitpoints = 0
+        # Explode if collided to collision group
+        elif self.collisionToEnemy():
+            self.hitpoints = 0
+        # Updates possible animation
+
+        if self.destroyed() == True:
+            self.explode(self.features["imageset_explosion"], self.features["sound_explosion"])
+            self.kill()
+        # Disappear if outside the area
+        if self.outsideArea(level):
+            self.kill()
+        
+        if self.counter >= len(self.animation) * self.ticks_in_frame:
+            self.kill()
+
+        self.applyFriction(0.0, 0.2)
+        self.changeFrame()
+
 # Player class
 class PlayerShip(pygame.sprite.Sprite, Base):
     def __init__(self, x, y):
@@ -249,18 +290,9 @@ class PlayerShip(pygame.sprite.Sprite, Base):
                 self.rect.bottom = height
                 self.speedy = -self.speedy
 
-            # Horizontal friction
-            if self.speedx > 0 :
-                self.speedx -= self.frictionX
-            if self.speedx < 0 :
-                self.speedx += self.frictionX
-
-            # Vertical friction
-            if self.speedy > 0 :
-                self.speedy -= self.frictionY
-            if self.speedy < 0 :
-                self.speedy += self.frictionY
-            
+            # Apply Friction
+            self.applyFriction(0.2, 0.2)
+           
             # Set thruster animation if moved
             if self.speedy < -1.0:
                 self.setAnimation(self.imageset_up, 4)
@@ -270,6 +302,20 @@ class PlayerShip(pygame.sprite.Sprite, Base):
 
             # Ensures that hitbox is following
             self.alignHitBox(self.rect)
+
+    def applyFriction(self, x, y):
+        # Horizontal friction
+        if self.speedx > 0 :
+            self.speedx -= x
+        if self.speedx < 0 :
+            self.speedx += x
+
+        # Vertical friction
+        if self.speedy > 0 :
+            self.speedy -= y
+        if self.speedy < 0 :
+            self.speedy += y
+
 
     def move(self, scroll_speed): 
         # Move the player
@@ -302,6 +348,8 @@ class PlayerShip(pygame.sprite.Sprite, Base):
             self.weapon = WeaponMinigun(feat_player_beam_default)
         if key[pygame.K_4] == True:
             self.weapon = WeaponLauncher(feat_player_rocket)
+        if key[pygame.K_5] == True:
+            self.weapon = WeaponThrower(feat_player_flame)
 
     # Shooting
     def shoot(self, key):
@@ -367,6 +415,16 @@ class WeaponLauncher(WeaponBase):
                 self.side = 1
             self.shoot_timer = 0 
 
+class WeaponThrower(WeaponBase):
+    def __init__(self, ammo):
+        WeaponBase.__init__(self, ammo)
+        self.setFirerate(2000)
+
+    def launch(self, x, y):
+        if self.shoot_timer >= self.shoot_delay:
+            AmmoFlame(x, y, self.ammo)
+            self.shoot_timer = 0 
+
 
 # Ammo types
 feat_player_beam_default = {
@@ -383,12 +441,12 @@ feat_player_beam_default = {
 feat_player_flame = {
     "own_group": player_ammo_group,
     "enemy_group": enemy_group,
-    "imageset_default": GR_EFFECT_EXPLOSION_BIG,
-    "imageset_explosion": GR_EFFECT_EXPLOSION_BIG,
+    "imageset_default": GR_AMMO_FLAME,
+    "imageset_explosion": GR_AMMO_FLAME_EXPLOSION,
     "sound_launch": snd_laser_enemy,
     "sound_explosion": snd_small_explo,
-    "speedy": -8.0,
-    "energy": 12,  
+    "speedy": -10.0,
+    "energy": 4,  
 }
 
 feat_player_rocket = {
