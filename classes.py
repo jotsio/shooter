@@ -1,4 +1,5 @@
 import pygame
+import math
 from pygame.locals import *
 from inits import *
 
@@ -133,6 +134,11 @@ class Collectable(pygame.sprite.Sprite, Base):
         # Centrify position
         self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
         self.alignHitBox(self.rect)
+        self.frequency = 80
+        self.amplitude = 24
+        self.pivot = self.rect
+        self.wave_y = 0.0
+        self.wave_x = 0.0
     
     def update(self, level, offset):
         # Explode if collided to collision group
@@ -146,8 +152,18 @@ class Collectable(pygame.sprite.Sprite, Base):
         if self.outsideArea(level):
             self.kill()
         
+        # Wave up and down
+        self.wave_y = round(self.amplitude * math.sin(2 * math.pi * (self.counter / self.frequency)))
+        self.wave_x = round(self.amplitude/2 * math.cos(2 * math.pi * (self.counter / self.frequency)))
+
         # Update animation
         self.changeFrame()
+
+    def move(self, scroll_speed):
+        self.pivot = self.pivot.move(0.0, scroll_speed)
+        self.rect.y = self.pivot.y + self.wave_x
+        self.rect.x = self.pivot.x + self.wave_y
+        self.alignHitBox(self.rect)
 
 # Ammunition new
 class AmmoBasic(pygame.sprite.Sprite, Base):
@@ -196,10 +212,10 @@ class AmmoRocket(AmmoBasic):
         self.rect = self.rect.move(0, scroll_speed)
         self.alignHitBox(self.rect)
         sy = self.speed[1]
-        if sy > -12:    
+        if sy > -10.0:    
             sy += sy
         else:
-            sy = -12.0
+            sy = -10.0
         self.speed = (self.speed[0], sy) 
 
 class AmmoFlame(AmmoBasic):
@@ -458,7 +474,7 @@ feat_player_rocket = {
     "own_group": player_ammo_group,
     "enemy_group": enemy_group,
     "imageset_default": GR_AMMO_ROCKET_DEFAULT,
-    "imageset_explosion": GR_EFFECT_EXPLOSION_BIG,
+    "imageset_explosion": GR_AMMO_ROCKET_EXPLOSION,
     "sound_launch": snd_laser_enemy,
     "sound_explosion": snd_small_explo,
     "speedy": -0.01,
@@ -472,7 +488,7 @@ feat_enemy_beam_default = {
     "imageset_explosion": GR_AMMO_PINK_EPXLOSION,
     "sound_launch": snd_laser_enemy,
     "sound_explosion": snd_laser_enemy,
-    "speedy": 8.0,
+    "speedy": 6.0,
     "energy": 2,  
 }
 
