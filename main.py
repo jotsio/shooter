@@ -8,7 +8,6 @@ from inits import *
 from levels import *
 from classes import *
 
-
 # Show game titles
 def showText(message):
     font = pygame.font.Font('freesansbold.ttf', 48) 
@@ -67,13 +66,7 @@ while True:
             if event.type == pygame.QUIT: 
                 pygame.quit()
                 sys.exit()
-
-        pressed = pygame.key.get_pressed()
-        player.setSpeedX(pressed[pygame.K_RIGHT]-pressed[pygame.K_LEFT])
-        player.setSpeedY(pressed[pygame.K_DOWN]-pressed[pygame.K_UP])
-        player.shoot(pressed[pygame.K_SPACE])
-        player.changeWeapon(pressed)
-         
+        
        # Is player alive?
         if player.alive == False:
             player.speedx = 0.0
@@ -97,6 +90,14 @@ while True:
         player_ammo_group.update(this_level, offset)
         enemy_ammo_group.update(this_level, offset)
         effects_group.update(this_level, offset)
+
+        # Key Controls
+        pressed = pygame.key.get_pressed()
+        acc_x = pressed[pygame.K_RIGHT]-pressed[pygame.K_LEFT]
+        acc_y = pressed[pygame.K_DOWN]-pressed[pygame.K_UP]
+        player.setSpeed(acc_x, acc_y)
+        player.shoot(pressed[pygame.K_LCTRL] + pressed[pygame.K_SPACE])
+        player.changeWeapon(pressed)
 
         # Objects movement
         for i in player_group.sprites():

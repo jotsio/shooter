@@ -20,7 +20,7 @@ def checkBosses():
 
 # CLASSES
 # -------
-# Animated object class
+# Base object class
 class Base():
     def __init__(self, x, y, imageset, group):
         group.add(self)
@@ -37,7 +37,9 @@ class Base():
         self.ver_margin = 0
         self.alignHitBox(self.rect)
         self.hitpoints = 1
-        self.speed = (0, 0)
+        self.max_speedx = 32.0
+        self.max_speedy = 32.0
+        self.speed = (0.0, 0.0)
 
     def changeFrame(self):
         if self.counter % self.ticks_in_frame == 0:
@@ -84,22 +86,24 @@ class Base():
     def collisionToEnemy(self):
         return pygame.sprite.spritecollideany(self, self.hostile_group, self.collided)
 
-    def applyFriction(self, x, y):
+    def applyFriction(self, x_friction, y_friction):
         # Horizontal friction
-        if self.speed[0] > 0.0 :
-            self.speed[0] -= x
-        if self.speed[0] < 0.0 :
-            self.speed[0] += x
+        sx, sy = self.speed
+        if sx > 0.0 :
+            sx -= x_friction
+        if sx < 0.0 :
+            sx += x_friction
 
         # Vertical friction
-        if self.speed[1] > 0.0 :
-            self.speed[1] -= y
-        if self.speed[1] < 0.0 :
-            self.speed[1] += y
+        if sy > 0.0 :
+            sy -= y_friction
+        if sy < 0.0 :
+            sy += y_friction
+        self.speed = (sx, sy)
 
     def move(self, scroll_speed):
-        # Scoll down
-        self.rect = self.rect.move(0, round(scroll_speed))
+        self.rect = self.rect.move(self.speed)
+        self.rect = self.rect.move(0.0, scroll_speed)
         self.alignHitBox(self.rect)
 
     def explode(self, animation, sound):
@@ -117,7 +121,8 @@ class NewEffect(pygame.sprite.Sprite, Base):
         # Erase if lifetime spent
         if self.counter >= self.lifetime:
             self.kill()
-        # Change image
+        
+        # Update animation
         self.changeFrame()
 
 class Collectable(pygame.sprite.Sprite, Base):
@@ -136,9 +141,12 @@ class Collectable(pygame.sprite.Sprite, Base):
             snd_coin.play()
         if self.destroyed() == True:
             self.kill()
+        
         # Disappear if outside the area
         if self.outsideArea(level):
             self.kill()
+        
+        # Update animation
         self.changeFrame()
 
 # Ammunition new
@@ -152,7 +160,7 @@ class AmmoBasic(pygame.sprite.Sprite, Base):
         self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
         self.alignHitBox(self.rect)
         # Vertical speed
-        self.speed = [0.0, features["speedy"]]
+        self.speed = (0.0, features["speedy"])
         self.energy = features["energy"]
         features["sound_launch"].play()
 
@@ -182,19 +190,17 @@ class AmmoBasic(pygame.sprite.Sprite, Base):
         NewEffect(self.rect.centerx, self.rect.centery, animation)
         sound.play()
 
-    def move(self, scroll_speed):
-        self.rect = self.rect.move(self.speed)
-        self.alignHitBox(self.rect)
-
 class AmmoRocket(AmmoBasic):
     def move(self, scroll_speed):
         self.rect = self.rect.move(self.speed)
         self.rect = self.rect.move(0, scroll_speed)
         self.alignHitBox(self.rect)
-        if self.speed[1] > -12:    
-            self.speed[1] += self.speed[1]
+        sy = self.speed[1]
+        if sy > -12:    
+            sy += sy
         else:
-            self.speed[1] = -12.0
+            sy = -12.0
+        self.speed = (self.speed[0], sy) 
 
 class AmmoFlame(AmmoBasic):
     def update(self, level, offset):
@@ -238,8 +244,6 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         self.alive = True
         self.hitpoints = 5
         self.hitpoints_max = 6
-        self.speedx = 0.0
-        self.speedy = 0.0
         self.max_speedx = 4.0
         self.max_speedy = 2.0
         self.frictionX = 0.2 
@@ -256,12 +260,14 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         
     # Passive movement & collision detection
     def update(self, level, offset):
+        sx, sy = self.speed
         # Check if dead        
         if self.alive == True:
             if self.destroyed() == True:
                 self.alive = False
                 self.explode(GR_EFFECT_EXPLOSION_BIG, snd_player_death)
                 player_group.remove(self)
+            
             # Check collision to walls
             if level.checkCollision(self.hitbox, offset):
                 self.hitpoints = 0
@@ -279,23 +285,24 @@ class PlayerShip(pygame.sprite.Sprite, Base):
             # bounces from outside the area
             if self.rect.left < 0:
                 self.rect.left = 0
-                self.speedx = -self.speedx
+                sx = -sx
             if self.rect.right > width:
                 self.rect.right = width
-                self.speedx = -self.speedx
+                sx = -sx
             if self.rect.top < 0:
                 self.rect.top = 0
-                self.speedy = -self.speedy
+                sy = -sy
             if self.rect.bottom > height:
                 self.rect.bottom = height
-                self.speedy = -self.speedy
+                sy = -sy
+            self.speed = (sx, sy)
+
+            # Set thruster animation if moved
+            if self.speed[1] < -1.0:
+                self.setAnimation(self.imageset_up, 4)
 
             # Apply Friction
-            self.applyFriction(0.2, 0.2)
-           
-            # Set thruster animation if moved
-            if self.speedy < -1.0:
-                self.setAnimation(self.imageset_up, 4)
+            self.applyFriction(self.frictionX, self.frictionY)
 
             # Change animation frame
             self.changeFrame()
@@ -303,40 +310,25 @@ class PlayerShip(pygame.sprite.Sprite, Base):
             # Ensures that hitbox is following
             self.alignHitBox(self.rect)
 
-    def applyFriction(self, x, y):
-        # Horizontal friction
-        if self.speedx > 0 :
-            self.speedx -= x
-        if self.speedx < 0 :
-            self.speedx += x
-
-        # Vertical friction
-        if self.speedy > 0 :
-            self.speedy -= y
-        if self.speedy < 0 :
-            self.speedy += y
-
 
     def move(self, scroll_speed): 
         # Move the player
-        self.rect = self.rect.move(round(self.speedx), round(self.speedy))
+        self.rect = self.rect.move(self.speed)
         self.alignHitBox(self.rect)
 
-    # Vertical acceleration
-    def setSpeedX(self, amount):
-        self.speedx += amount
-        if self.speedx > self.max_speedx :
-            self.speedx = self.max_speedx
-        if self.speedx < -self.max_speedx :
-            self.speedx = -self.max_speedx
-
-    # Horizontal acceleration
-    def setSpeedY(self, amount):
-        self.speedy += amount
-        if self.speedy > self.max_speedy :
-            self.speedy = self.max_speedy
-        if self.speedy < -self.max_speedy :
-            self.speedy = -self.max_speedy
+    def setSpeed(self, acc_x, acc_y):
+        sx, sy = self.speed
+        sx += acc_x
+        sy += acc_y
+        if sx > self.max_speedx :
+            sx = self.max_speedx
+        if sx < -self.max_speedx :
+            sx = -self.max_speedx
+        if sy > self.max_speedy :
+            sy = self.max_speedy
+        if sy < -self.max_speedy :
+            sy = -self.max_speedy
+        self.speed = (sx, sy)
 
     # Change a weapon
     def changeWeapon(self, key):
@@ -349,6 +341,19 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         if key[pygame.K_4] == True:
             self.weapon = WeaponLauncher(feat_player_rocket)
         if key[pygame.K_5] == True:
+            self.weapon = WeaponThrower(feat_player_flame)
+
+    # Change a weapon
+    def getWeapon(self, key):
+        if key == 1:
+            self.weapon = WeaponSingle(feat_player_beam_default)
+        if key == 2:
+            self.weapon = WeaponDouble(feat_player_beam_default)
+        if key == 3:
+            self.weapon = WeaponMinigun(feat_player_beam_default)
+        if key == 4:
+            self.weapon = WeaponLauncher(feat_player_rocket)
+        if key == 5:
             self.weapon = WeaponThrower(feat_player_flame)
 
     # Shooting
@@ -489,7 +494,7 @@ class NewEnemy(pygame.sprite.Sprite, Base):
         self.accuracy = 16
         self.rect = self.rect.move(x, y)
         self.alignHitBox(self.rect)
-        self.speedx, self.speedy = features["initial_speed"]
+        self.speed = features["initial_speed"]
         self.killed = False
 
     # Passive movement & collision detection
@@ -499,7 +504,7 @@ class NewEnemy(pygame.sprite.Sprite, Base):
             self.explode(GR_EFFECT_EXPLOSION_BIG, snd_enemy_death)
             self.killed = True
             # Create coin
-            coin = Collectable(self.rect.centerx, self.rect.centery, GR_ACCESSORIES_COIN)
+            Collectable(self.rect.centerx, self.rect.centery, GR_ACCESSORIES_COIN)
 
         # Check if outside area
         if self.outsideArea(level):
@@ -516,7 +521,7 @@ class NewEnemy(pygame.sprite.Sprite, Base):
 
         # Check collision to walls
         if level.checkCollision(self.hitbox, offset) or self.hitbox.left <= 0 or self.hitbox.right >= width:
-            self.speedx = -self.speedx
+            self.speed = (-self.speed[0], self.speed[1]) 
 
         # Check shooting delay
         if abs(player.rect.centerx - self.rect.centerx) < self.accuracy:
@@ -530,8 +535,8 @@ class NewEnemy(pygame.sprite.Sprite, Base):
 
     def move(self, scroll_speed):
         # Keep on scrolling
-        self.rect = self.rect.move(self.speedx, self.speedy)
-        self.rect = self.rect.move(0, round(scroll_speed))
+        self.rect = self.rect.move(self.speed)
+        self.rect = self.rect.move(0, scroll_speed)
         self.alignHitBox(self.rect)
 
 def selectEnemy(x, y, character):
@@ -550,7 +555,7 @@ feat_enemy_fighter = {
     "ammo": feat_enemy_beam_default,
     "hitpoints": 2,
     "shoot_delay": 40,
-    "initial_speed": (1, 0),
+    "initial_speed": (1.0, 0.0),
     "score": 10
 }
 feat_enemy_spike = {
@@ -561,7 +566,7 @@ feat_enemy_spike = {
     "ammo": feat_enemy_beam_default,
     "hitpoints": 2,
     "shoot_delay": 1000,
-    "initial_speed": (-1, 0),
+    "initial_speed": (-1.0, 0.0),
     "score": 5
 } 
 feat_enemy_boss = {
@@ -572,7 +577,7 @@ feat_enemy_boss = {
     "ammo": feat_enemy_beam_default,
     "hitpoints": 15,
     "shoot_delay": 10,
-    "initial_speed": (-1, 0),
+    "initial_speed": (-1.0, 0.0),
     "score": 50
 }
 
