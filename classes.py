@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 from pygame.locals import *
 from inits import *
 
@@ -84,6 +85,11 @@ class Base():
         # Check if the hitboxes of the two sprites collide.
         return sprite.hitbox.colliderect(other.hitbox)
 
+    def bounceFromWalls(self, level, offset):
+        # Check collision to walls
+        if level.checkCollision(self.hitbox, offset) or self.hitbox.left <= 0 or self.hitbox.right >= width:
+            self.speed = (-self.speed[0], self.speed[1]) 
+
     def collisionToEnemy(self):
         return pygame.sprite.spritecollideany(self, self.hostile_group, self.collided)
 
@@ -101,6 +107,11 @@ class Base():
         if sy < 0.0 :
             sy += y_friction
         self.speed = (sx, sy)
+
+    def sprinkle(self, speed):
+        x = (random.random()-0.5) * speed
+        y = (random.random()-0.5) * speed/2
+        self.speed = (x, y)
 
     def move(self, scroll_speed):
         self.rect = self.rect.move(self.speed)
@@ -135,10 +146,12 @@ class Collectable(pygame.sprite.Sprite, Base):
         self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
         self.alignHitBox(self.rect)
         self.frequency = 80
-        self.amplitude = 24
+        self.amplitude = 2
         self.pivot = self.rect
+        self.counter = round(random.random() * self.frequency)
         self.wave_y = 0.0
         self.wave_x = 0.0
+        self.sprinkle(12)
     
     def update(self, level, offset):
         # Explode if collided to collision group
@@ -148,21 +161,24 @@ class Collectable(pygame.sprite.Sprite, Base):
         if self.destroyed() == True:
             self.kill()
         
+        self.bounceFromWalls(level, offset)
+
         # Disappear if outside the area
         if self.outsideArea(level):
             self.kill()
         
         # Wave up and down
         self.wave_y = round(self.amplitude * math.sin(2 * math.pi * (self.counter / self.frequency)))
-        self.wave_x = round(self.amplitude/2 * math.cos(2 * math.pi * (self.counter / self.frequency)))
 
         # Update animation
         self.changeFrame()
+        self.applyFriction(0.1, 0.1)
 
     def move(self, scroll_speed):
+        self.pivot = self.pivot.move(self.speed)
         self.pivot = self.pivot.move(0.0, scroll_speed)
-        self.rect.y = self.pivot.y + self.wave_x
-        self.rect.x = self.pivot.x + self.wave_y
+        self.rect = self.pivot
+        self.rect.y = self.pivot.y + self.wave_y
         self.alignHitBox(self.rect)
 
 # Ammunition new
@@ -261,7 +277,7 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         self.hitpoints = 5
         self.hitpoints_max = 6
         self.max_speedx = 4.0
-        self.max_speedy = 2.0
+        self.max_speedy = 3.0
         self.frictionX = 0.2 
         self.frictionY = 0.2
         self.setStartPosition()
@@ -521,6 +537,7 @@ class NewEnemy(pygame.sprite.Sprite, Base):
             self.killed = True
             # Create coin
             Collectable(self.rect.centerx, self.rect.centery, GR_ACCESSORIES_COIN)
+            Collectable(self.rect.centerx, self.rect.centery, GR_ACCESSORIES_COIN)
 
         # Check if outside area
         if self.outsideArea(level):
@@ -535,9 +552,7 @@ class NewEnemy(pygame.sprite.Sprite, Base):
         if pygame.sprite.spritecollideany(self, player_group, self.collided):
             self.hitpoints = 0
 
-        # Check collision to walls
-        if level.checkCollision(self.hitbox, offset) or self.hitbox.left <= 0 or self.hitbox.right >= width:
-            self.speed = (-self.speed[0], self.speed[1]) 
+        self.bounceFromWalls(level, offset)
 
         # Check shooting delay
         if abs(player.rect.centerx - self.rect.centerx) < self.accuracy:

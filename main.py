@@ -84,6 +84,12 @@ while True:
                     break
                 end_counter += 1
 
+        # Is player at the bottom of level
+        if player.rect.bottom >= height:
+            scroll_speed = round(basic_scroll_speed / 2)
+        else:
+            scroll_speed = basic_scroll_speed
+
         # Objects update
         player_group.update(this_level, offset)
         enemy_group.update(this_level, offset, player)
