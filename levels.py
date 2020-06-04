@@ -388,6 +388,7 @@ class Walls:
             rect.y += gridsize
     
     # Parses the level map and returns block position if wall is found
+
     def checkCollision(self, obj_rect, offset):
         rect = pygame.Rect(0, self.start_point, gridsize, gridsize)
         rect.y += offset
@@ -398,8 +399,24 @@ class Walls:
                 while i < len(self.map[k]):
                     if self.map[k][i] == "#":
                         if rect.colliderect(obj_rect):
-                            rect.y = self.start_point
                             return (i, k)
+                    rect.x += gridsize
+                    i += 1            
+                rect.x = 0
+            k += 1
+            rect.y += gridsize
+
+    def locateCollision(self, obj_rect, offset):
+        rect = pygame.Rect(0, self.start_point, gridsize, gridsize)
+        rect.y += offset
+        k = 0
+        while k < len(self.map):
+            if rect.y >= -gridsize and rect.y <= height:
+                i = 0 
+                while i < len(self.map[k]):
+                    if self.map[k][i] == "#":
+                        if rect.colliderect(obj_rect):
+                            return rect
                     rect.x += gridsize
                     i += 1            
                 rect.x = 0

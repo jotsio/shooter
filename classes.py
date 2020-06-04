@@ -67,6 +67,10 @@ class Base():
         self.hitbox = rect
         self.hitbox = self.hitbox.inflate(self.hor_margin, self.ver_margin)
 
+    def alignRect(self, hitbox):
+        self.rect.centerx = hitbox.centerx
+        self.rect.centery = hitbox.centery
+
     def outsideArea(self, level):
         # Check if outside area
         result = False
@@ -88,8 +92,39 @@ class Base():
 
     def bounceFromWalls(self, level, offset):
         # Check collision to walls
-        if level.checkCollision(self.hitbox, offset) or self.hitbox.left <= 0 or self.hitbox.right >= width:
+        if level.checkCollision(self.hitbox, offset):
             self.speed = (-self.speed[0], self.speed[1]) 
+
+    def bounceFromSides(self, level, offset):
+        # Keeps object horizontally on screen
+        if self.hitbox.left < 0:
+            while self.hitbox.left < 0:
+                self.rect.left += 1
+                self.alignHitBox(self.rect)
+            self.speed = (-self.speed[0], self.speed[1]) 
+        if self.hitbox.right > width:
+            while self.hitbox.right > width: 
+                self.rect.right -= 1
+                self.alignHitBox(self.rect)
+            self.speed = (-self.speed[0], self.speed[1]) 
+
+    def bounceFromRect(self, obj_rect):
+        if obj_rect != None:
+            dx = self.hitbox.centerx - obj_rect.centerx
+            dy = self.hitbox.centery - obj_rect.centery
+            if abs(dx) >= abs(dy):
+                if dx <= 0:
+                    self.hitbox.right = obj_rect.left
+                if dx > 0:
+                    self.hitbox.left = obj_rect.right
+                self.speed = (-self.speed[0], self.speed[1]) 
+            else:
+                if dy <= 0:
+                    self.hitbox.bottom = obj_rect.top
+                if dy > 0:
+                    self.hitbox.top = obj_rect.bottom
+                self.speed = (self.speed[0], -self.speed[1]) 
+            self.alignRect(self.hitbox)
 
     def collisionToEnemy(self):
         return pygame.sprite.spritecollideany(self, self.hostile_group, self.collided)
@@ -301,9 +336,17 @@ class PlayerShip(pygame.sprite.Sprite, Base):
                 self.explode(GR_EFFECT_EXPLOSION_BIG, snd_player_death)
                 player_group.remove(self)
             
-            # Check collision to walls
-            if level.checkCollision(self.hitbox, offset):
-                self.hitpoints = 0
+            # Dies if touches walls
+            #if level.checkCollision(self.hitbox, offset):
+            #    self.hitpoints = 0
+            self.tryout = 0
+            while level.locateCollision(self.hitbox, offset):
+                self.bounceFromRect(level.locateCollision(self.hitbox, offset))
+                self.tryout += 1
+                if self.tryout > 10: 
+                    self.hitpoints = 0
+                    break
+
             # Check collision to ammo
             if self.collisionToEnemy():
                 self.hitpoints -= 1
@@ -315,13 +358,10 @@ class PlayerShip(pygame.sprite.Sprite, Base):
             # Update shooting delay
             self.weapon.shoot_timer += 1
 
-            # bounces from outside the area
-            if self.rect.left < 0:
-                self.rect.left = 0
-                sx = -sx
-            if self.rect.right > width:
-                self.rect.right = width
-                sx = -sx
+            # Bounces from sides of level
+            self.bounceFromSides(level, offset)
+
+            # bounces from top and bottom of the area
             if self.rect.top < 0:
                 self.rect.top = 0
                 sy = -sy
@@ -329,6 +369,9 @@ class PlayerShip(pygame.sprite.Sprite, Base):
                 self.rect.bottom = level.height
                 sy = -sy
             self.speed = (sx, sy)
+
+            # Bounces from walls 
+            self.bounceFromWalls(level, offset)
 
             # Set thruster animation if moved
             if self.speed[1] < -1.0:
@@ -554,6 +597,7 @@ class NewEnemy(pygame.sprite.Sprite, Base):
             self.hitpoints = 0
 
         self.bounceFromWalls(level, offset)
+        self.bounceFromSides(level, offset)
 
         # Check shooting delay
         if abs(player.rect.centerx - self.rect.centerx) < self.accuracy:

@@ -59,7 +59,7 @@ while True:
     stars = StarField(250)
     this_level = Walls(levels[current_level])
     pygame.mixer.music.play(-1)
-    
+     
     while clock.tick(framerate):
         # Keyevents listener
         pressed = pygame.key.get_pressed()
