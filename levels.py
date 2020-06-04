@@ -297,22 +297,26 @@ test_map = [
 
 #Walls class
 class Walls:
-    def __init__(self, map, tiles, width, height):
-        self.width = width
-        self.height = width
-        self.map = self.levelToList(map)  
-        self.img = tiles
+    def __init__(self, features):
+        self.reset(features)
+
+    def reset(self, features):
+        self.map = self.levelToList(features[0])
+        self.img = features[1]  
+        self.width = features[2]
+        self.height = features[3]-32
         self.start_point = -len(self.map) * gridsize
         self.rect = pygame.Rect(0, self.start_point, gridsize, gridsize) 
         self.level_finished = False
-
+    
     # Convert levels to lists
     def levelToList(self, map):
         i = 0
+        list_map = []
         while i < len(map):
-            map[i] = list(map[i])
+            list_map.append(list(map[i]))
             i += 1
-        return map
+        return list_map
 
     def defineBlock(self, row, col):
         block = 0
@@ -423,6 +427,7 @@ class Walls:
                     if character != "#" and character != ".":
                         position = (x, y, character)
                         enemy_list.append(position)
+                        self.removeBlock(i, k)
                     x += gridsize
                     i += 1
                 x = 0
@@ -464,11 +469,11 @@ class StarField:
             pygame.gfxdraw.pixel(screen, self.x[i], int(self.y[i]), self.color[i])
             i += 1
 
-# Create levels
+# Level parameters
 levels = [
-    Walls(level1_map, GR_WALLSET_TECH, width, height), 
-    Walls(level2_map, GR_WALLSET_TECH, width, height),  
-    Walls(level3_map, GR_WALLSET_TECH, width, height),
-    Walls(level4_map, GR_WALLSET_TECH, width, height),
-    Walls(level5_map, GR_WALLSET_TECH, width, height) 
+    (level1_map, GR_WALLSET_TECH, width, height), 
+    (level2_map, GR_WALLSET_TECH, width, height),  
+    (level3_map, GR_WALLSET_TECH, width, height),
+    (level4_map, GR_WALLSET_TECH, width, height),
+    (level5_map, GR_WALLSET_TECH, width, height) 
     ]

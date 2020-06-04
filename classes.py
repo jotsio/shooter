@@ -1,6 +1,7 @@
 import pygame
 import math
 import random
+from levels import *
 from pygame.locals import *
 from inits import *
 
@@ -69,7 +70,7 @@ class Base():
     def outsideArea(self, level):
         # Check if outside area
         result = False
-        if self.hitbox.bottom < -256 or self.hitbox.top > level.height + 64:
+        if self.hitbox.bottom < -2560 or self.hitbox.top > level.height + 256:
             result = True
         elif self.hitbox.right < 0 or self.hitbox.left > level.width:
             result = True
@@ -324,8 +325,8 @@ class PlayerShip(pygame.sprite.Sprite, Base):
             if self.rect.top < 0:
                 self.rect.top = 0
                 sy = -sy
-            if self.rect.bottom > height:
-                self.rect.bottom = height
+            if self.rect.bottom > level.height:
+                self.rect.bottom = level.height
                 sy = -sy
             self.speed = (sx, sy)
 

@@ -54,19 +54,20 @@ while True:
     clock = pygame.time.Clock()
     scroll_speed = basic_scroll_speed   
     offset = 0
-    
+    counter_backwards = 0
     end_counter = 0
     stars = StarField(250)
-    this_level = levels[current_level]
+    this_level = Walls(levels[current_level])
     pygame.mixer.music.play(-1)
     
     while clock.tick(framerate):
         # Keyevents listener
+        pressed = pygame.key.get_pressed()
         for event in pygame.event.get():
             if event.type == pygame.QUIT: 
                 pygame.quit()
                 sys.exit()
-        
+
        # Is player alive?
         if player.alive == False:
             player.speedx = 0.0
@@ -84,11 +85,19 @@ while True:
                     break
                 end_counter += 1
 
-        # Is player at the bottom of level
-        if player.rect.bottom >= height:
-            scroll_speed = round(basic_scroll_speed / 2)
+        # Is player pressing down at the bottom of level
+        
+        elif player.rect.bottom >= this_level.height and pressed[pygame.K_DOWN]:
+            if counter_backwards > 0: 
+                scroll_speed = round(basic_scroll_speed / 2)
+            if counter_backwards > 16:
+                scroll_speed = 0
+            if counter_backwards > 32:
+                scroll_speed = -round(basic_scroll_speed / 2)
+            counter_backwards += 1
         else:
             scroll_speed = basic_scroll_speed
+            counter_backwards = 0
 
         # Objects update
         player_group.update(this_level, offset)
@@ -98,7 +107,6 @@ while True:
         effects_group.update(this_level, offset)
 
         # Key Controls
-        pressed = pygame.key.get_pressed()
         acc_x = pressed[pygame.K_RIGHT]-pressed[pygame.K_LEFT]
         acc_y = pressed[pygame.K_DOWN]-pressed[pygame.K_UP]
         player.setSpeed(acc_x, acc_y)
@@ -164,6 +172,7 @@ while True:
         showText("Kuolit!")
         # Reset player
         player = PlayerShip(player_start_x, player_start_y)
+        this_level.reset(levels[current_level])
         
     elif current_level == (len(levels)-1):
         showText("HIENOA, PELI LÄPÄISTY!")
