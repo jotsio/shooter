@@ -394,7 +394,7 @@ class Walls:
         rect.y += offset
         k = 0
         while k < len(self.map):
-            if rect.y >= -gridsize and rect.y <= height:
+            if rect.y >= update_offset_up and rect.y <= height + update_offset_down:
                 i = 0 
                 while i < len(self.map[k]):
                     if self.map[k][i] == "#":
@@ -436,7 +436,7 @@ class Walls:
         # Loop rows
         k = 0
         while k < len(self.map):
-            if y == -gridsize:
+            if y >= -gridsize:
                 i = 0 
                 while i < len(self.map[k]):
                     # Give the enemy positions and style as list

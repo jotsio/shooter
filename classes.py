@@ -33,16 +33,19 @@ class Base():
         self.animation_duration = 0
         self.animation_frame = 0 
         self.image = self.animation[0]
-        self.rect = self.image.get_rect() 
-        self.ticks_in_frame = 4
-        self.counter = 0
+        self.rect = self.image.get_rect()
         self.hor_margin = 0
         self.ver_margin = 0
+        self.alignHitBox(self.rect) 
+        self.ticks_in_frame = 4
+        self.counter = 0
         self.alignHitBox(self.rect)
         self.hitpoints = 1
         self.max_speedx = 32.0
         self.max_speedy = 32.0
         self.speed = (0.0, 0.0)
+        self.hit_energy = 0
+        
 
     def changeFrame(self):
         if self.counter % self.ticks_in_frame == 0:
@@ -74,7 +77,7 @@ class Base():
     def outsideArea(self, level):
         # Check if outside area
         result = False
-        if self.hitbox.bottom < -2560 or self.hitbox.top > level.height + 256:
+        if self.hitbox.bottom < update_offset_up or self.hitbox.top > level.height + update_offset_down:
             result = True
         elif self.hitbox.right < 0 or self.hitbox.left > level.width:
             result = True
@@ -89,6 +92,11 @@ class Base():
     def collided(self, sprite, other):
         # Check if the hitboxes of the two sprites collide.
         return sprite.hitbox.colliderect(other.hitbox)
+
+    def getCollisionDamage(self, group):
+        for subject in group:
+            if self.collided(self, subject):
+                return subject.hit_energy
 
     def bounceFromWalls(self, level, offset):
         # Check collision to walls
@@ -117,13 +125,13 @@ class Base():
                     self.hitbox.right = obj_rect.left
                 if dx > 0:
                     self.hitbox.left = obj_rect.right
-                self.speed = (-self.speed[0], self.speed[1]) 
+                self.speed = (-self.speed[0], self.speed[1])     
             else:
                 if dy <= 0:
                     self.hitbox.bottom = obj_rect.top
                 if dy > 0:
                     self.hitbox.top = obj_rect.bottom
-                self.speed = (self.speed[0], -self.speed[1]) 
+                self.speed = (self.speed[0], -self.speed[1])   
             self.alignRect(self.hitbox)
 
     def collisionToEnemy(self):
@@ -229,7 +237,7 @@ class AmmoBasic(pygame.sprite.Sprite, Base):
         self.alignHitBox(self.rect)
         # Vertical speed
         self.speed = (0.0, features["speedy"])
-        self.energy = features["energy"]
+        self.hit_energy = features["energy"]
         features["sound_launch"].play()
 
     def update(self, level, offset):
@@ -237,7 +245,7 @@ class AmmoBasic(pygame.sprite.Sprite, Base):
         # Explode if collided to level walls
         hitted_block = level.checkCollision(self.hitbox, offset)
         if hitted_block:
-            if self.energy > 10: 
+            if self.hit_energy > 10: 
                 level.removeBlock(hitted_block[0], hitted_block[1])
             self.hitpoints = 0
         # Explode if collided to collision group
@@ -276,7 +284,7 @@ class AmmoFlame(AmmoBasic):
         # Explode if collided to level walls
         hitted_block = level.checkCollision(self.hitbox, offset)
         if hitted_block:
-            if self.energy > 10: 
+            if self.hit_energy > 10: 
                 level.removeBlock(hitted_block[0], hitted_block[1])
             self.hitpoints = 0
         # Explode if collided to collision group
@@ -310,8 +318,8 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         self.start_x = x
         self.start_y = y
         self.alive = True
-        self.hitpoints = 5
-        self.hitpoints_max = 6
+        self.hitpoints = 10
+        self.hitpoints_max = 12
         self.max_speedx = 4.0
         self.max_speedy = 3.0
         self.frictionX = 0.2 
@@ -339,18 +347,17 @@ class PlayerShip(pygame.sprite.Sprite, Base):
             # Dies if touches walls
             #if level.checkCollision(self.hitbox, offset):
             #    self.hitpoints = 0
-            self.tryout = 0
-            while level.locateCollision(self.hitbox, offset):
-                self.bounceFromRect(level.locateCollision(self.hitbox, offset))
-                self.tryout += 1
-                if self.tryout > 10: 
-                    self.hitpoints = 0
-                    break
 
             # Check collision to ammo
-            if self.collisionToEnemy():
-                self.hitpoints -= 1
+            damage = self.getCollisionDamage(self.hostile_group)
+            if damage:
+                self.hitpoints -= damage
                 self.setAnimation(self.imageset_hilight, 12)
+            
+            #if self.collisionToEnemy():
+            #    self.hitpoints -= 1
+            #    self.setAnimation(self.imageset_hilight, 12)
+            
             # Check collision to enemy
             if pygame.sprite.spritecollideany(self, enemy_group, self.collided):
                 self.hitpoints = 0
@@ -358,8 +365,9 @@ class PlayerShip(pygame.sprite.Sprite, Base):
             # Update shooting delay
             self.weapon.shoot_timer += 1
 
-            # Bounces from sides of level
-            self.bounceFromSides(level, offset)
+            # Set thruster animation if moved
+            if self.speed[1] < -1.0:
+                self.setAnimation(self.imageset_up, 4)
 
             # bounces from top and bottom of the area
             if self.rect.top < 0:
@@ -370,12 +378,16 @@ class PlayerShip(pygame.sprite.Sprite, Base):
                 sy = -sy
             self.speed = (sx, sy)
 
-            # Bounces from walls 
-            self.bounceFromWalls(level, offset)
+            # Bounces from sides of level
+            self.bounceFromSides(level, offset)
 
-            # Set thruster animation if moved
-            if self.speed[1] < -1.0:
-                self.setAnimation(self.imageset_up, 4)
+            self.tryout = 0
+            while level.locateCollision(self.hitbox, offset):
+                self.bounceFromRect(level.locateCollision(self.hitbox, offset))
+                self.tryout += 1
+                if self.tryout > 10: 
+                    self.hitpoints = 0
+                    break
 
             # Apply Friction
             self.applyFriction(self.frictionX, self.frictionY)
@@ -413,7 +425,7 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         if key[pygame.K_2] == True:
             self.weapon = WeaponDouble(feat_player_beam_default)
         if key[pygame.K_3] == True:
-            self.weapon = WeaponMinigun(feat_player_beam_default)
+            self.weapon = WeaponMinigun(feat_player_beam_minigun)
         if key[pygame.K_4] == True:
             self.weapon = WeaponLauncher(feat_player_rocket)
         if key[pygame.K_5] == True:
@@ -516,7 +528,18 @@ feat_player_beam_default = {
     "sound_launch": snd_laser,
     "sound_explosion": snd_small_explo,
     "speedy": -10.0,
-    "energy": 10,  
+    "energy": 8,  
+}
+
+feat_player_beam_minigun = {
+    "own_group": player_ammo_group,
+    "enemy_group": enemy_group,
+    "imageset_default": GR_AMMO_BLUE_DEFAULT,
+    "imageset_explosion": GR_AMMO_BLUE_EXPLOSION,
+    "sound_launch": snd_laser,
+    "sound_explosion": snd_small_explo,
+    "speedy": -10.0,
+    "energy": 3,  
 }
 
 feat_player_flame = {
@@ -527,7 +550,7 @@ feat_player_flame = {
     "sound_launch": snd_laser_enemy,
     "sound_explosion": snd_small_explo,
     "speedy": -10.0,
-    "energy": 4,  
+    "energy": 2,  
 }
 
 feat_player_rocket = {
@@ -538,7 +561,7 @@ feat_player_rocket = {
     "sound_launch": snd_laser_enemy,
     "sound_explosion": snd_small_explo,
     "speedy": -0.01,
-    "energy": 12,  
+    "energy": 10,  
 }
 
 feat_enemy_beam_default = {
@@ -549,7 +572,7 @@ feat_enemy_beam_default = {
     "sound_launch": snd_laser_enemy,
     "sound_explosion": snd_laser_enemy,
     "speedy": 6.0,
-    "energy": 2,  
+    "energy": 1,  
 }
 
 # Enemy class
@@ -587,9 +610,10 @@ class NewEnemy(pygame.sprite.Sprite, Base):
         if self.outsideArea(level):
             self.kill()
 
-        # Check collision ammo
-        if self.collisionToEnemy():
-            self.hitpoints -= 1
+        # Check collision to ammo
+        damage = self.getCollisionDamage(self.hostile_group)
+        if damage:
+            self.hitpoints -= damage
             self.setAnimation(self.imageset_hilight, 12)
 
         # Check collision to player
@@ -629,7 +653,7 @@ feat_enemy_fighter = {
     "animation_blink": GR_ENEMY_FIGHTER_BLINK,
     "weapon": WeaponDouble,
     "ammo": feat_enemy_beam_default,
-    "hitpoints": 2,
+    "hitpoints": 10,
     "shoot_delay": 40,
     "initial_speed": (1.0, 0.0),
     "score": 10
@@ -640,7 +664,7 @@ feat_enemy_spike = {
     "animation_blink": GR_ENEMY_SPIKE_BLINK,
     "weapon": WeaponSingle,
     "ammo": feat_enemy_beam_default,
-    "hitpoints": 2,
+    "hitpoints": 10,
     "shoot_delay": 1000,
     "initial_speed": (-1.0, 0.0),
     "score": 5
@@ -651,7 +675,7 @@ feat_enemy_boss = {
     "animation_blink": GR_ENEMY_BIG_BLINK,
     "weapon": WeaponMinigun,
     "ammo": feat_enemy_beam_default,
-    "hitpoints": 15,
+    "hitpoints": 120,
     "shoot_delay": 10,
     "initial_speed": (-1.0, 0.0),
     "score": 50

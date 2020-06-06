@@ -10,6 +10,8 @@ pygame.init()
 size = width, height = 1366, 768
 player_start_x = round(width/2)
 player_start_y = round(height-100)
+update_offset_up = -2560
+update_offset_down = 256
 #pygame.FULLSCREEN
 #SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
 SCREEN = pygame.display.set_mode(size)
