@@ -135,7 +135,16 @@ GR_ACCESSORIES_COIN = loadImages([
     "coin_2.png",
     "coin_3.png",
     "coin_4.png",])
-
+GR_ACCESSORIES_WEAPON_SINGLE = loadImages([
+    "accessory_weapon_single.png"])
+GR_ACCESSORIES_WEAPON_DOUBLE = loadImages([
+    "accessory_weapon_double.png"])
+GR_ACCESSORIES_WEAPON_MINIGUN = loadImages([
+    "accessory_weapon_minigun.png"])
+GR_ACCESSORIES_WEAPON_LAUNCHER = loadImages([
+    "accessory_weapon_launcher.png"])
+GR_ACCESSORIES_WEAPON_THROWER = loadImages([
+    "accessory_weapon_thrower.png"])
 
 # Load level image sets
 GR_WALLSET_STONE = loadImages([
@@ -173,6 +182,7 @@ GR_WALLSET_TECH = loadImages([
     "tech_corner_top_right.png",
     "tech_corner_bottom_right.png",
     "tech_corner_bottom_left.png"])
+
 
 # Load sounds
 snd_laser = loadSound("laser1.ogg", 0.15)

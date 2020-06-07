@@ -7,6 +7,8 @@ import time
 from inits import *
 from levels import *
 from classes import *
+from enemy import *
+from player import *
 
 # Show game titles
 def showText(message):
