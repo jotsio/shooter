@@ -20,14 +20,13 @@ class Collectable(pygame.sprite.Sprite, Base):
         self.wave_y = 0.0
         self.wave_x = 0.0
         self.sprinkle(12)
+        self.score = 1
     
     def update(self, level, offset):
         # Explode if collided to collision group
         if self.collisionToEnemy():
-            self.hitpoints = 0
+            self.killed = True
             snd_coin.play()
-        if self.destroyed() == True:
-            self.kill()
         
         # Bounce from walls
         self.bounceFromRect(level.locateCollision(self.hitbox, offset))

@@ -9,34 +9,7 @@ from levels import *
 from classes import *
 from enemy import *
 from player import *
-
-# Show game titles
-def showText(message):
-    font = pygame.font.Font('freesansbold.ttf', 48) 
-    text = font.render(message, True, color_text)
-    textRect = text.get_rect()
-    textRect.center = (width // 2, height // 2)
-    SCREEN.blit(text, textRect)
-    pygame.display.flip()
-
-def showScore(number):
-    font = pygame.font.Font('freesansbold.ttf', 32) 
-    text = font.render(number, True, color_text)
-    textRect = text.get_rect()
-    textRect.center = (width - 64, height - 64)
-    SCREEN.blit(text, textRect)
-    pygame.display.flip()
-
-def showHearts(amount):
-    image = GR_UI_HEART_DEFAULT
-    Rect = image[0].get_rect()
-    Rect.y = height - Rect.height
-    Rect.x = 0
-    i = 0
-    while i < amount:
-        SCREEN.blit(image[0], Rect)
-        Rect.x += Rect.width
-        i += 1
+from interface import *
 
 # Main program
 #-------------
@@ -137,6 +110,12 @@ while True:
                 score += i.score
                 i.kill()
 
+        # Count collected money
+        for i in effects_group:
+            if i.killed == True:
+                money += i.score
+                i.kill()
+
         # Create new enemies
         enemy_positions_list = this_level.getEnemies(offset)
         if enemy_positions_list:
@@ -160,8 +139,10 @@ while True:
         # Show hearts of hitpoints
         showHearts(player.hitpoints)
 
-        # Show score
-        showScore(str(score))
+        # Show score and money
+        showText(str(money), textplace_rightdown_second, textsize_medium)
+        showText(str(score), textplace_rightdown_first, textsize_medium)
+        
 
         # Update screen
         pygame.display.flip()
@@ -171,17 +152,17 @@ while True:
 
     # Show level ending text
     if player.alive == False:
-        showText("Kuolit!")
+        showText("Kuolit!", textplace_center, textsize_large)
         # Reset player
         player = PlayerShip(player_start_x, player_start_y)
         this_level.reset(levels[current_level])
         
     elif current_level == (len(levels)-1):
-        showText("HIENOA, PELI LÄPÄISTY!")
+        showText("HIENOA, PELI LÄPÄISTY!", textplace_center, textsize_large)
         player.setStartPosition()
         current_level = 0
     else:
-        showText("Kenttä läpäisty!")
+        showText("Kenttä läpäisty!", textplace_center, textsize_large)
         player.setStartPosition()
         current_level += 1
 

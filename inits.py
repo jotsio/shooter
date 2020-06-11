@@ -12,6 +12,16 @@ player_start_x = round(width/2)
 player_start_y = round(height-100)
 update_offset_up = -2560
 update_offset_down = 256
+
+# Text positions
+textplace_center = (width // 2, height // 2)
+textplace_rightdown_first = (width - 64, height - 64)
+textplace_rightdown_second = (width - 128, height - 64)
+
+# Text size
+textsize_medium = 32
+textsize_large = 48
+
 #pygame.FULLSCREEN
 #SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
 SCREEN = pygame.display.set_mode(size)
@@ -22,6 +32,7 @@ basic_scroll_speed = 2
 offset = 0
 current_level = 0 
 score = 0
+money = 0
 
 # Colors
 BLACK = 0, 0, 0
