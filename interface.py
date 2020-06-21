@@ -7,7 +7,7 @@ def showText(message, place, size):
     textRect = text.get_rect()
     textRect.center = place
     SCREEN.blit(text, textRect)
-    pygame.display.flip()
+  
 
 def showHearts(amount):
     image = GR_UI_HEART_DEFAULT
