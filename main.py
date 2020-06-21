@@ -113,7 +113,10 @@ while True:
         # Count collected money
         for i in effects_group:
             if i.killed == True:
-                money += i.score
+                if i.boost == 0:
+                    money += i.score
+                elif i.boost > 0:
+                    player.getWeapon(i.boost)
                 i.kill()
 
         # Create new enemies
@@ -156,15 +159,19 @@ while True:
         # Reset player
         player = PlayerShip(player_start_x, player_start_y)
         this_level.reset(levels[current_level])
-        
+
     elif current_level == (len(levels)-1):
         showText("HIENOA, PELI LÄPÄISTY!", textplace_center, textsize_large)
         player.setStartPosition()
         current_level = 0
+    
     else:
         showText("Kenttä läpäisty!", textplace_center, textsize_large)
         player.setStartPosition()
         current_level += 1
+    
+    # Update screen
+    pygame.display.flip()
 
     enemy_group.empty()
     player_ammo_group.empty()

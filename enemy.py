@@ -24,7 +24,14 @@ class NewEnemy(pygame.sprite.Sprite, Base):
         self.rect = self.rect.move(x, y)
         self.alignHitBox(self.rect)
         self.speed = features["initial_speed"]
-        self.killed = False
+        self.level = features["level"]
+
+    def createCollectables(self, bonus):
+        value = random.randint(0, 3) + random.randint(0, 3) + random.randint(0, 3) + bonus
+        table = collectables_list
+        if value >= len(table) - 1:
+            value = len(table) -1
+        Collectable(self.rect.centerx, self.rect.centery, table[value])
 
     # Passive movement & collision detection
     def update(self, level, offset, player):
@@ -32,9 +39,8 @@ class NewEnemy(pygame.sprite.Sprite, Base):
         if self.destroyed() == True:
             self.explode(GR_EFFECT_EXPLOSION_BIG, snd_enemy_death)
             self.killed = True
-            # Create coin
-            Collectable(self.rect.centerx, self.rect.centery, GR_ACCESSORIES_COIN, 0)
-            Collectable(self.rect.centerx, self.rect.centery, GR_ACCESSORIES_WEAPON_SINGLE, 1)
+            # Create collectables
+            self.createCollectables(self.level)
 
         # Check if outside area
         if self.outsideArea(level):
@@ -81,6 +87,7 @@ def selectEnemy(x, y, character):
 
 feat_enemy_fighter = {
     "type": "Ship",
+    "level": 2,
     "image_default": GR_ENEMY_FIGHTER_DEFAULT,
     "animation_blink": GR_ENEMY_FIGHTER_BLINK,
     "weapon": WeaponDouble,
@@ -90,8 +97,10 @@ feat_enemy_fighter = {
     "initial_speed": (1.0, 0.0),
     "score": 10
 }
+
 feat_enemy_spike = {
     "type": "Spike",
+    "level": 2,
     "image_default": GR_ENEMY_SPIKE_DEFAULT,
     "animation_blink": GR_ENEMY_SPIKE_BLINK,
     "weapon": WeaponSingle,
@@ -101,8 +110,10 @@ feat_enemy_spike = {
     "initial_speed": (-1.0, 0.0),
     "score": 5
 } 
+
 feat_enemy_boss = {
     "type": "Boss",
+    "level": 10,
     "image_default": GR_ENEMY_BIG_DEFAULT,
     "animation_blink": GR_ENEMY_BIG_BLINK,
     "weapon": WeaponMinigun,
