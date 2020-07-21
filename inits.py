@@ -204,5 +204,7 @@ snd_small_explo = loadSound("hit3.ogg", 0.3)
 snd_coin = loadSound("coin.ogg", 0.3)
 
 # Load music
-music = loadMusic("Starmusic_02.mp3")
-
+music_star = "Starmusic_gameplay.mp3"
+music_planet = "Planetmusic_gameplay.mp3"
+music_star_boss = "Starmusic_boss.mp3"
+music_planet_boss = "Planetmusic_boss.mp3"

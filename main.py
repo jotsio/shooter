@@ -23,6 +23,7 @@ pygame.display.set_icon(icon[0])
 # Create player
 player = PlayerShip(player_start_x, player_start_y)
 
+
 # Main loop
 while True: 
     # Play the level
@@ -33,6 +34,7 @@ while True:
     end_counter = 0
     stars = StarField(250)
     this_level = Walls(levels[current_level])
+    loadMusic(this_level.music)
     pygame.mixer.music.play(-1)
      
     while clock.tick(framerate):

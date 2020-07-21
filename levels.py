@@ -303,8 +303,9 @@ class Walls:
     def reset(self, features):
         self.map = self.levelToList(features[0])
         self.img = features[1]  
-        self.width = features[2]
-        self.height = features[3]-32
+        self.music = features[2]
+        self.width = features[3]
+        self.height = features[4]-32
         self.start_point = -len(self.map) * gridsize
         self.rect = pygame.Rect(0, self.start_point, gridsize, gridsize) 
         self.level_finished = False
@@ -488,9 +489,9 @@ class StarField:
 
 # Level parameters
 levels = [
-    (level1_map, GR_WALLSET_TECH, width, height), 
-    (level2_map, GR_WALLSET_TECH, width, height),  
-    (level3_map, GR_WALLSET_TECH, width, height),
-    (level4_map, GR_WALLSET_TECH, width, height),
-    (level5_map, GR_WALLSET_TECH, width, height) 
+    (level1_map, GR_WALLSET_TECH, music_star, width, height), 
+    (level2_map, GR_WALLSET_TECH, music_planet, width, height),  
+    (level3_map, GR_WALLSET_TECH, music_star, width, height),
+    (level4_map, GR_WALLSET_TECH, music_planet, width, height),
+    (level5_map, GR_WALLSET_TECH, music_star, width, height) 
     ]
