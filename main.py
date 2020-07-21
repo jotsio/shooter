@@ -32,9 +32,10 @@ while True:
     offset = 0
     counter_backwards = 0
     end_counter = 0
+    boss_music = False
     stars = StarField(250)
     this_level = Walls(levels[current_level])
-    loadMusic(this_level.music)
+    loadMusic(this_level.music[0])
     pygame.mixer.music.play(-1)
      
     while clock.tick(framerate):
@@ -55,7 +56,12 @@ while True:
 
         # Is player reached the end of level?
         if offset >= -this_level.start_point:
-            scroll_speed = 0  
+            scroll_speed = 0 
+            # Toggles boss music
+            if boss_music == False:
+                loadMusic(this_level.music[1])
+                pygame.mixer.music.play(-1)
+                boss_music = True
             # Check if boss is dead         
             if checkBosses() == False:
                 if end_counter > framerate * 2:
