@@ -49,6 +49,16 @@ def loadImages(image_list):
         i += 1
     return image_list
 
+def loadTileset(subfolder):
+    folder = TILES_FOLDER + subfolder
+    filenames = TILES_LIST
+    i = 0
+    image_list = []
+    while i < len(filenames):
+        image_list.append(pygame.image.load(folder + filenames[i]).convert_alpha())
+        i += 1
+    return image_list
+
 def loadSound(filename, volume):
     folder = SND_FOLDER
     filename = folder + filename
@@ -64,8 +74,32 @@ def loadMusic(filename):
 
 # Asset folders for images and sounds
 IMG_FOLDER = "assets/"
+TILES_FOLDER = "tilesets/"
 SND_FOLDER = "sounds/"
 MUS_FOLDER = "music/"
+
+# Tileset file names in right order
+TILES_LIST = [
+    "wall_middle.png",
+    "wall_single.png",
+    "bar_vertical.png",
+    "bar_horizontal.png",
+    "point_up.png",
+    "point_down.png",
+    "point_left.png",
+    "point_right.png",
+    "wall_top.png",
+    "wall_bottom.png",
+    "wall_left.png",
+    "wall_right.png",
+    "corner_top_left.png",
+    "corner_top_right.png",
+    "corner_bottom_right.png",
+    "corner_bottom_left.png"]
+
+# Load level image sets
+GR_WALLSET_STONE = loadTileset("stone/")
+GR_WALLSET_TECH = loadTileset("tech/")
 
 #graphics
 GR_APPICON = loadImages([
@@ -156,43 +190,6 @@ GR_ACCESSORIES_WEAPON_LAUNCHER = loadImages([
     "accessory_weapon_launcher.png"])
 GR_ACCESSORIES_WEAPON_THROWER = loadImages([
     "accessory_weapon_thrower.png"])
-
-# Load level image sets
-GR_WALLSET_STONE = loadImages([
-    "wall_middle.png",
-    "wall_single.png",
-    "bar_vertical.png",
-    "bar_horizontal.png",
-    "point_up.png",
-    "point_down.png",
-    "point_left.png",
-    "point_right.png",
-    "wall_top.png",
-    "wall_bottom.png",
-    "wall_left.png",
-    "wall_right.png",
-    "corner_top_left.png",
-    "corner_top_right.png",
-    "corner_bottom_right.png",
-    "corner_bottom_left.png"])
-    
-GR_WALLSET_TECH = loadImages([
-    "tech_wall_middle.png",
-    "tech_wall_single.png",
-    "tech_bar_vertical.png",
-    "tech_bar_horizontal.png",
-    "tech_point_up.png",
-    "tech_point_down.png",
-    "tech_point_left.png",
-    "tech_point_right.png",
-    "tech_wall_top.png",
-    "tech_wall_bottom.png",
-    "tech_wall_left.png",
-    "tech_wall_right.png",
-    "tech_corner_top_left.png",
-    "tech_corner_top_right.png",
-    "tech_corner_bottom_right.png",
-    "tech_corner_bottom_left.png"])
 
 
 # Load sounds
