@@ -1,6 +1,6 @@
 import sys, pygame
 from pygame.locals import *
-
+import random
 
 pygame.mixer.init(frequency=44100, size=-16, channels=8, buffer=512, allowedchanges=AUDIO_ALLOW_FREQUENCY_CHANGE | AUDIO_ALLOW_CHANNELS_CHANGE) 
 pygame.init()
@@ -33,6 +33,12 @@ offset = 0
 current_level = 0 
 score = 0
 money = 0
+
+# Random list for maps
+random.seed(1)
+randomlist = []
+for x in range(100):
+    randomlist.append(random.randint(1,15))
 
 # Colors
 BLACK = 0, 0, 0
@@ -95,7 +101,23 @@ TILES_LIST = [
     "corner_top_left.png",
     "corner_top_right.png",
     "corner_bottom_right.png",
-    "corner_bottom_left.png"]
+    "corner_bottom_left.png",
+    "sec_wall_middle.png",
+    "sec_wall_single.png",
+    "sec_bar_vertical.png",
+    "sec_bar_horizontal.png",
+    "sec_point_up.png",
+    "sec_point_down.png",
+    "sec_point_left.png",
+    "sec_point_right.png",
+    "sec_wall_top.png",
+    "sec_wall_bottom.png",
+    "sec_wall_left.png",
+    "sec_wall_right.png",
+    "sec_corner_top_left.png",
+    "sec_corner_top_right.png",
+    "sec_corner_bottom_right.png",
+    "sec_corner_bottom_left.png"]
 
 # Load level image sets
 GR_WALLSET_STONE = loadTileset("stone/")

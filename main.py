@@ -54,7 +54,7 @@ while True:
                 break
             end_counter += 1
 
-        # Is player reached the end of level?
+        # Is player reached the end of level?             
         if offset >= -this_level.start_point:
             scroll_speed = 0 
             # Toggles boss music

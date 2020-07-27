@@ -284,14 +284,26 @@ level5_map = [
 
 test_map = [
 ".....................",
-".........Z.Z.........",
-".....................",
+"....#....Z.....###...",
+"....#................",
+"#...#........#......#",
+"##...X......###....##",
+"##...........#...O.##",
 "#...................#",
-"##...X.............##",
-"##...............O.##",
-"#...................#",
 ".....................",
 ".....................",
+".....................",
+"..####..........##...",
+"..####..........##...",
+"..####...............",
+".............###..#..",
+"....#.............#..",
+"...###............#..",
+"....#.............#..",
+".....................",
+"######.........######",
+"######.........######",
+"######.........######",
 "....................."
 ]
 
@@ -381,7 +393,12 @@ class Walls:
                 i = 0 
                 while i < len(self.map[k]):
                     if self.map[k][i] == "#":
-                        screen.blit(self.img[self.defineBlock(k,i)], rect)
+                        # Draw from secondary tiles
+                        if randomlist[(k * 21 + i) % 100] == 1:
+                            screen.blit(self.img[self.defineBlock(k,i) + 16], rect)
+                        # Draw from normal tiles
+                        else:
+                            screen.blit(self.img[self.defineBlock(k,i)], rect)
                     rect.x += gridsize
                     i += 1
                 rect.x = 0
@@ -493,5 +510,5 @@ levels = [
     (level2_map, GR_WALLSET_TECH, music_planet, width, height),  
     (level3_map, GR_WALLSET_STONE, music_star, width, height),
     (level4_map, GR_WALLSET_TECH, music_planet, width, height),
-    (level5_map, GR_WALLSET_TECH, music_star, width, height) 
+    (level5_map, GR_WALLSET_STONE, music_star, width, height) 
     ]
