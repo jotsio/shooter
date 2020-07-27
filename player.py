@@ -24,7 +24,7 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         self.frictionX = 0.2 
         self.frictionY = 0.2
         self.setStartPosition()
-        self.weapon = WeaponSingle(feat_player_beam_default)
+        self.getWeapon(1)
         self.tryout = 0
     
     # Set player to starting position on screen and initialize hitbox
@@ -64,6 +64,10 @@ class PlayerShip(pygame.sprite.Sprite, Base):
 
             # Update shooting delay
             self.weapon.shoot_timer += 1
+
+            # Check special weapon ammo left and go back to default weapon
+            if self.weapon.magazine == 0:
+                self.getWeapon(1)
 
             # Set thruster animation if moved
             if self.speed[1] < -1.0:
@@ -117,27 +121,37 @@ class PlayerShip(pygame.sprite.Sprite, Base):
     def changeWeapon(self, key):
         if key[pygame.K_1] == True:
             self.weapon = WeaponSingle(feat_player_beam_default)
+            self.weapon.magazine = -1
         if key[pygame.K_2] == True:
             self.weapon = WeaponDouble(feat_player_beam_default)
+            self.weapon.magazine = -1
         if key[pygame.K_3] == True:
             self.weapon = WeaponMinigun(feat_player_beam_minigun)
+            self.weapon.magazine = -1
         if key[pygame.K_4] == True:
             self.weapon = WeaponLauncher(feat_player_rocket)
+            self.weapon.magazine = -1
         if key[pygame.K_5] == True:
             self.weapon = WeaponThrower(feat_player_flame)
+            self.weapon.magazine = -1
 
     # Change a weapon
     def getWeapon(self, key):
         if key == 1:
             self.weapon = WeaponSingle(feat_player_beam_default)
+            self.weapon.magazine = -1
         if key == 2:
             self.weapon = WeaponDouble(feat_player_beam_default)
+            self.weapon.magazine = 15
         if key == 3:
             self.weapon = WeaponMinigun(feat_player_beam_default)
+            self.weapon.magazine = 30
         if key == 4:
             self.weapon = WeaponLauncher(feat_player_rocket)
+            self.weapon.magazine = 15
         if key == 5:
             self.weapon = WeaponThrower(feat_player_flame)
+            self.weapon.magazine = 60
 
     # Shooting
     def shoot(self, key):

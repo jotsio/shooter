@@ -27,7 +27,7 @@ class NewEnemy(pygame.sprite.Sprite, Base):
         self.level = features["level"]
 
     def createCollectables(self, bonus):
-        value = random.randint(0, 3) + random.randint(0, 3) + random.randint(0, 3) + bonus
+        value = random.randint(0, 3) + random.randint(0, 4) + random.randint(0, 3) + bonus
         table = collectables_list
         if value >= len(table) - 1:
             value = len(table) -1
@@ -87,7 +87,7 @@ def selectEnemy(x, y, character):
 
 feat_enemy_fighter = {
     "type": "Ship",
-    "level": 2,
+    "level": 10,
     "image_default": GR_ENEMY_FIGHTER_DEFAULT,
     "animation_blink": GR_ENEMY_FIGHTER_BLINK,
     "weapon": WeaponDouble,
@@ -100,7 +100,7 @@ feat_enemy_fighter = {
 
 feat_enemy_spike = {
     "type": "Spike",
-    "level": 2,
+    "level": 5,
     "image_default": GR_ENEMY_SPIKE_DEFAULT,
     "animation_blink": GR_ENEMY_SPIKE_BLINK,
     "weapon": WeaponSingle,
@@ -113,7 +113,7 @@ feat_enemy_spike = {
 
 feat_enemy_boss = {
     "type": "Boss",
-    "level": 10,
+    "level": 20,
     "image_default": GR_ENEMY_BIG_DEFAULT,
     "animation_blink": GR_ENEMY_BIG_BLINK,
     "weapon": WeaponMinigun,

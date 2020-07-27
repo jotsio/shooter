@@ -12,7 +12,7 @@ from player import *
 from interface import *
 
 # Main program
-#-------------
+#------------- 
 # Pygame initials
 
 # Title
