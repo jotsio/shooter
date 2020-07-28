@@ -1,5 +1,6 @@
-# Jotsio Pygame programming
-Testing simple games with python and pygame.
+# Jotsio Vertical Shooter
+
+Retro-style vertical shooter.
 
 To run this you need pygame:
 https://www.pygame.org/
