@@ -117,9 +117,9 @@ feat_enemy_boss = {
     "image_default": GR_ENEMY_BIG_DEFAULT,
     "animation_blink": GR_ENEMY_BIG_BLINK,
     "weapon": WeaponMinigun,
-    "ammo": feat_enemy_beam_default,
+    "ammo": feat_enemy_missile,
     "hitpoints": 120,
-    "shoot_delay": 10,
+    "shoot_delay": 4,
     "initial_speed": (-1.0, 0.0),
     "score": 50
 }

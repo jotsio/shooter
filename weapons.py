@@ -207,9 +207,20 @@ feat_enemy_beam_default = {
     "own_group": enemy_ammo_group,
     "enemy_group": player_group,
     "imageset_default": GR_AMMO_PINK_DEFAULT,
-    "imageset_explosion": GR_AMMO_PINK_EPXLOSION,
+    "imageset_explosion": GR_AMMO_PINK_EXPLOSION,
     "sound_launch": snd_laser_enemy,
     "sound_explosion": snd_laser_enemy,
     "speedy": 5.0,
+    "energy": 1,  
+}
+
+feat_enemy_missile = {
+    "own_group": enemy_ammo_group,
+    "enemy_group": player_group,
+    "imageset_default": GR_AMMO_PINKBIG_DEFAULT,
+    "imageset_explosion": GR_AMMO_PINK_EXPLOSION,
+    "sound_launch": snd_laser_enemy,
+    "sound_explosion": snd_small_explo,
+    "speedy": 8.0,
     "energy": 1,  
 }

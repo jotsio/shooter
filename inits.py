@@ -136,13 +136,18 @@ GR_PLAYER_BODY_UP = loadImages([
     "ship_thrust1.png",
     "ship_thrust2.png"])
 GR_ENEMY_FIGHTER_DEFAULT = loadImages([
-    "enemy_default.png"])
+    "enemy_default.png",
+    "enemy_default2.png",
+    "enemy_default3.png",
+    "enemy_default2.png"])
 GR_ENEMY_FIGHTER_BLINK = loadImages([
     "enemy_hilight.png", 
     "enemy_hilight.png", 
     "enemy_hilight.png"])
 GR_ENEMY_SPIKE_DEFAULT = loadImages([
     "enemy_spike_default.png",
+    "enemy_spike_default2.png",
+    "enemy_spike_default3.png",
     "enemy_spike_default2.png"])
 GR_ENEMY_SPIKE_BLINK = loadImages([
     "enemy_spike_hilight.png", 
@@ -184,7 +189,12 @@ GR_AMMO_FLAME_EXPLOSION = loadImages([
     "exp_flame_3.png"
     ])
 GR_AMMO_PINK_DEFAULT = loadImages(["ammo_pink.png"])
-GR_AMMO_PINK_EPXLOSION = loadImages([
+GR_AMMO_PINKBIG_DEFAULT = loadImages([
+    "ammo_pink_big.png",
+    "ammo_pink_big2.png",
+    "ammo_pink_big3.png",
+    "ammo_pink_big4.png"])
+GR_AMMO_PINK_EXPLOSION = loadImages([
     "exp_pink1.png", 
     "exp_pink2.png", 
     "exp_pink3.png", 
