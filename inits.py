@@ -23,8 +23,8 @@ textsize_medium = 32
 textsize_large = 48
 
 #pygame.FULLSCREEN
-#SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
-SCREEN = pygame.display.set_mode(size)
+SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
+#SCREEN = pygame.display.set_mode(size)
 
 # Global variables
 framerate = 100
