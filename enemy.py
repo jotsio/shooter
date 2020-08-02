@@ -84,6 +84,22 @@ def selectEnemy(x, y, character):
         return NewEnemy(x, y, feat_enemy_spike)
     elif character == "Z":    
         return NewEnemy(x, y, feat_enemy_boss)
+    elif character == "U":    
+        return NewEnemy(x, y, feat_enemy_turret)
+
+feat_enemy_turret = {
+    "type": "Turret",
+    "level": 0,
+    "image_default": GR_ENEMY_TURRET_DEFAULT,
+    "animation_blink": GR_ENEMY_TURRET_BLINK,
+    "weapon": WeaponSingle,
+    "ammo": feat_enemy_beam_default,
+    "hitpoints": 8,
+    "shoot_delay": 20,
+    "initial_speed": (0.0, 0.0),
+    "direction": (0.0, -1.0),
+    "score": 5
+}
 
 feat_enemy_fighter = {
     "type": "Ship",
