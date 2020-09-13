@@ -506,7 +506,7 @@ class StarField:
 
 # Level parameters
 levels = [
-    (test_map, GR_WALLSET_STONE, music_star, width, height), 
+    (test_map, GR_WALLSET_STONE, music_solar, width, height), 
     (level2_map, GR_WALLSET_TECH, music_planet, width, height),  
     (level3_map, GR_WALLSET_STONE, music_star, width, height),
     (level4_map, GR_WALLSET_TECH, music_planet, width, height),

@@ -248,3 +248,7 @@ music_star = [
 music_planet = [
     "Planetmusic_gameplay.mp3",
     "Planetmusic_boss.mp3"]
+
+music_solar = [
+    "Solarmusic_gameplay.mp3",
+    "Solarmusic_boss.mp3"]
