@@ -41,8 +41,9 @@ while True:
     while clock.tick(framerate):
         # Keyevents listener
         pressed = pygame.key.get_pressed()
+
         for event in pygame.event.get():
-            if event.type == pygame.QUIT: 
+            if event.type == pygame.QUIT or pressed[pygame.K_ESCAPE]: 
                 pygame.quit()
                 sys.exit()
 
