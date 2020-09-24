@@ -13,18 +13,20 @@ class NewEnemy(pygame.sprite.Sprite, Base):
         self.hostile_group = player_ammo_group
         self.hor_margin = -24
         self.ver_margin = -24
+        self.orientation = features["orientation"]
         self.features = features
         self.setAnimation(self.imageset_default, 0)
         self.imageset_hilight = features["animation_blink"]
         self.type = features["type"]
         self.score = features["score"]
         self.hitpoints = features["hitpoints"]
-        self.weapon = features["weapon"](features["ammo"])
+        self.weapon = features["weapon"](features["ammo"], self.orientation)
         self.accuracy = 16
         self.rect = self.rect.move(x, y)
         self.alignHitBox(self.rect)
         self.speed = features["initial_speed"]
         self.level = features["level"]
+        
 
     def createCollectables(self, bonus):
         value = random.randint(0, 3) + random.randint(0, 4) + random.randint(0, 3) + bonus
@@ -97,8 +99,8 @@ feat_enemy_turret = {
     "hitpoints": 8,
     "shoot_delay": 20,
     "initial_speed": (0.0, 0.0),
-    "direction": (0.0, -1.0),
-    "score": 5
+    "score": 5,
+    "orientation": (0.0, 1.0)
 }
 
 feat_enemy_fighter = {
@@ -111,7 +113,8 @@ feat_enemy_fighter = {
     "hitpoints": 10,
     "shoot_delay": 40,
     "initial_speed": (1.0, 0.0),
-    "score": 10
+    "score": 10,
+    "orientation": (0.0, 1.0)
 }
 
 feat_enemy_spike = {
@@ -124,7 +127,8 @@ feat_enemy_spike = {
     "hitpoints": 10,
     "shoot_delay": 1000,
     "initial_speed": (-1.0, 0.0),
-    "score": 5
+    "score": 5,
+    "orientation": (0.0, 1.0)
 } 
 
 feat_enemy_boss = {
@@ -137,6 +141,7 @@ feat_enemy_boss = {
     "hitpoints": 120,
     "shoot_delay": 4,
     "initial_speed": (-1.0, 0.0),
-    "score": 50
+    "score": 50,
+    "orientation": (0.0, 1.0)
 }
 

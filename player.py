@@ -12,6 +12,7 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         self.hostile_group = enemy_ammo_group
         self.hor_margin = -15
         self.ver_margin = -30
+        self.orientation = (-0.0, -1.0)
         self.imageset_hilight = GR_PLAYER_BODY_BLINK
         self.imageset_up = GR_PLAYER_BODY_UP 
         self.start_x = x
@@ -26,6 +27,7 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         self.setStartPosition()
         self.getWeapon(1)
         self.tryout = 0
+        
     
     # Set player to starting position on screen and initialize hitbox
     def setStartPosition(self):
@@ -120,37 +122,37 @@ class PlayerShip(pygame.sprite.Sprite, Base):
     # Change a weapon
     def changeWeapon(self, key):
         if key[pygame.K_1] == True:
-            self.weapon = WeaponSingle(feat_player_beam_default)
+            self.weapon = WeaponSingle(feat_player_beam_default, self.orientation)
             self.weapon.magazine = -1
         if key[pygame.K_2] == True:
-            self.weapon = WeaponDouble(feat_player_beam_default)
+            self.weapon = WeaponDouble(feat_player_beam_default, self.orientation)
             self.weapon.magazine = -1
         if key[pygame.K_3] == True:
-            self.weapon = WeaponMinigun(feat_player_beam_minigun)
+            self.weapon = WeaponMinigun(feat_player_beam_minigun, self.orientation)
             self.weapon.magazine = -1
         if key[pygame.K_4] == True:
-            self.weapon = WeaponLauncher(feat_player_rocket)
+            self.weapon = WeaponLauncher(feat_player_rocket, self.orientation)
             self.weapon.magazine = -1
         if key[pygame.K_5] == True:
-            self.weapon = WeaponThrower(feat_player_flame)
+            self.weapon = WeaponThrower(feat_player_flame, self.orientation)
             self.weapon.magazine = -1
 
     # Change a weapon
     def getWeapon(self, key):
         if key == 1:
-            self.weapon = WeaponSingle(feat_player_beam_default)
+            self.weapon = WeaponSingle(feat_player_beam_default, self.orientation)
             self.weapon.magazine = -1
         if key == 2:
-            self.weapon = WeaponDouble(feat_player_beam_default)
+            self.weapon = WeaponDouble(feat_player_beam_default, self.orientation)
             self.weapon.magazine = 15
         if key == 3:
-            self.weapon = WeaponMinigun(feat_player_beam_default)
+            self.weapon = WeaponMinigun(feat_player_beam_default, self.orientation)
             self.weapon.magazine = 30
         if key == 4:
-            self.weapon = WeaponLauncher(feat_player_rocket)
+            self.weapon = WeaponLauncher(feat_player_rocket, self.orientation)
             self.weapon.magazine = 15
         if key == 5:
-            self.weapon = WeaponThrower(feat_player_flame)
+            self.weapon = WeaponThrower(feat_player_flame, self.orientation)
             self.weapon.magazine = 60
 
     # Shooting

@@ -5,7 +5,7 @@ from classes import *
 
 # Basic Ammunition
 class AmmoBasic(pygame.sprite.Sprite, Base):
-    def __init__(self, x, y, features):
+    def __init__(self, x, y, direction, features):
         pygame.sprite.Sprite.__init__(self)
         Base.__init__(self, x, y, features["imageset_default"], features["own_group"])
         self.hostile_group = features["enemy_group"]
@@ -14,7 +14,8 @@ class AmmoBasic(pygame.sprite.Sprite, Base):
         self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
         self.alignHitBox(self.rect)
         # Vertical speed
-        self.speed = (0.0, features["speedy"])
+        self.speed = direction
+        self.speed = (self.speed[0] * features["speed"], self.speed[1] * features["speed"])
         self.hit_energy = features["energy"]
         features["sound_launch"].play()
 
@@ -85,75 +86,76 @@ class AmmoFlame(AmmoBasic):
 
 # Weapons
 class WeaponBase():
-    def __init__(self, ammo):
+    def __init__(self, ammo, orientation):
         self.ammo = ammo
         self.shoot_delay = 0
         self.power = 1.0
         self.shoot_timer = 0
         self.magazine = 0
+        self.orientation = orientation
     
     def setFirerate(self, rpm):
         self.shoot_delay = round(100 * 60 / rpm)
 
 class WeaponSingle(WeaponBase):
-    def __init__(self, ammo):
-        WeaponBase.__init__(self, ammo)
+    def __init__(self, ammo, orientation):
+        WeaponBase.__init__(self, ammo, orientation)
         self.setFirerate(500)
 
     def launch(self, x, y):
         if self.shoot_timer >= self.shoot_delay:
-            AmmoBasic(x, y, self.ammo)
+            AmmoBasic(x, y, self.orientation, self.ammo)
             self.shoot_timer = 0 
             self.magazine -= 1
 
 class WeaponDouble(WeaponBase):
-    def __init__(self, ammo):
-        WeaponBase.__init__(self, ammo)
+    def __init__(self, ammo, orientation):
+        WeaponBase.__init__(self, ammo, orientation)
         self.setFirerate(500)
 
     def launch(self, x, y):
         if self.shoot_timer >= self.shoot_delay:
-            AmmoBasic(x - 16, y, self.ammo)
-            AmmoBasic(x + 16, y, self.ammo)
+            AmmoBasic(x - 16, y, self.orientation, self.ammo)
+            AmmoBasic(x + 16, y, self.orientation, self.ammo)
             self.shoot_timer = 0 
             self.magazine -= 1
 
 class WeaponMinigun(WeaponBase):
-    def __init__(self, ammo):
-        WeaponBase.__init__(self, ammo)
+    def __init__(self, ammo, orientation):
+        WeaponBase.__init__(self, ammo, orientation)
         self.setFirerate(1000)
 
     def launch(self, x, y):
         if self.shoot_timer >= self.shoot_delay:
-            AmmoBasic(x, y, self.ammo)
+            AmmoBasic(x, y, self.orientation, self.ammo)
             self.shoot_timer = 0 
             self.magazine -= 1
 
 class WeaponLauncher(WeaponBase):
-    def __init__(self, ammo):
-        WeaponBase.__init__(self, ammo)
+    def __init__(self, ammo, orientation):
+        WeaponBase.__init__(self, ammo, orientation)
         self.setFirerate(500)
         self.side = 1
 
     def launch(self, x, y):
         if self.shoot_timer >= self.shoot_delay:
             if self.side == 1:
-                AmmoRocket(x - 16, y, self.ammo)
+                AmmoRocket(x - 16, y, self.orientation, self.ammo)
                 self.side = 2
             else:
-                AmmoRocket(x + 16, y, self.ammo)
+                AmmoRocket(x + 16, y, self.orientation, self.ammo)
                 self.side = 1
             self.shoot_timer = 0 
             self.magazine -= 1
 
 class WeaponThrower(WeaponBase):
-    def __init__(self, ammo):
-        WeaponBase.__init__(self, ammo)
+    def __init__(self, ammo, orientation):
+        WeaponBase.__init__(self, ammo, orientation)
         self.setFirerate(2000)
 
     def launch(self, x, y):
         if self.shoot_timer >= self.shoot_delay:
-            AmmoFlame(x, y, self.ammo)
+            AmmoFlame(x, y, self.orientation, self.ammo)
             self.shoot_timer = 0 
             self.magazine -= 1
 
@@ -166,7 +168,7 @@ feat_player_beam_default = {
     "imageset_explosion": GR_AMMO_BLUE_EXPLOSION,
     "sound_launch": snd_laser,
     "sound_explosion": snd_small_explo,
-    "speedy": -10.0,
+    "speed": 10.0,
     "energy": 8,  
 }
 
@@ -177,7 +179,7 @@ feat_player_beam_minigun = {
     "imageset_explosion": GR_AMMO_BLUE_EXPLOSION,
     "sound_launch": snd_laser,
     "sound_explosion": snd_small_explo,
-    "speedy": -10.0,
+    "speed": 10.0,
     "energy": 3,  
 }
 
@@ -188,7 +190,7 @@ feat_player_flame = {
     "imageset_explosion": GR_AMMO_FLAME_EXPLOSION,
     "sound_launch": snd_laser_enemy,
     "sound_explosion": snd_small_explo,
-    "speedy": -10.0,
+    "speed": 10.0,
     "energy": 3,  
 }
 
@@ -199,7 +201,7 @@ feat_player_rocket = {
     "imageset_explosion": GR_AMMO_ROCKET_EXPLOSION,
     "sound_launch": snd_laser_enemy,
     "sound_explosion": snd_small_explo,
-    "speedy": -0.01,
+    "speed": 0.01,
     "energy": 9,  
 }
 
@@ -210,7 +212,7 @@ feat_enemy_beam_default = {
     "imageset_explosion": GR_AMMO_PINK_EXPLOSION,
     "sound_launch": snd_laser_enemy,
     "sound_explosion": snd_laser_enemy,
-    "speedy": 5.0,
+    "speed": 5.0,
     "energy": 1,  
 }
 
@@ -221,6 +223,6 @@ feat_enemy_missile = {
     "imageset_explosion": GR_AMMO_PINK_EXPLOSION,
     "sound_launch": snd_laser_enemy,
     "sound_explosion": snd_small_explo,
-    "speedy": 8.0,
+    "speed": 8.0,
     "energy": 1,  
 }

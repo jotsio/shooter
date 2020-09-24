@@ -44,6 +44,7 @@ class Base():
         self.max_speedx = 32.0
         self.max_speedy = 32.0
         self.speed = (0.0, 0.0)
+        self.orientation = (0.0, 0.0)
         self.hit_energy = 0
         self.killed = False
         self.score = 1
