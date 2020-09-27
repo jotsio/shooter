@@ -10,6 +10,7 @@ class NewEnemy(pygame.sprite.Sprite, Base):
     def __init__(self, x, y, features):
         pygame.sprite.Sprite.__init__(self)
         Base.__init__(self, x, y, features["image_default"], enemy_group)
+        self.id = random.randint(1,1000)
         self.hostile_group = player_ammo_group
         self.hor_margin = -24
         self.ver_margin = -24
@@ -60,12 +61,18 @@ class NewEnemy(pygame.sprite.Sprite, Base):
 
         # Bounces form walls
         self.bounceFromRect(level.locateCollision(self.hitbox, offset))
-
         self.bounceFromSides(level, offset)
 
-        # Check shooting delay
-        if abs(player.rect.centerx - self.rect.centerx) < self.accuracy:
-            self.weapon.launch(self.rect.centerx, self.rect.bottom)
+        # Shoot if player on shooting line
+        distance_x = self.rect.centerx - player.rect.centerx + player.speed[0]
+        distance_y = self.rect.centery - player.rect.centery + player.speed[1]
+        offset_x = self.orientation[0] * self.rect.width / 3
+        offset_y = self.orientation[1] * self.rect.height / 3       
+        if self.orientation[0] * distance_x <= 0 and self.orientation[1] * distance_y <= 0:
+            if (self.orientation[0] == 0 and abs(distance_x) <= self.accuracy) or (self.orientation[1] == 0 and abs(distance_y) <= self.accuracy):
+                self.weapon.launch(self.rect.centerx + offset_x, self.rect.centery + offset_y)
+            if (self.orientation[0] != 0 and self.orientation[1] != 0) and (abs(abs(distance_x) - abs(distance_y)) <= self.accuracy):
+                self.weapon.launch(self.rect.centerx + offset_x, self.rect.centery + offset_y)
 
         # Update shooting delay
         self.weapon.shoot_timer += 1
@@ -86,10 +93,12 @@ def selectEnemy(x, y, character):
         return NewEnemy(x, y, feat_enemy_spike)
     elif character == "Z":    
         return NewEnemy(x, y, feat_enemy_boss)
+    elif character == "Y":    
+        return NewEnemy(x, y, feat_enemy_turret_left)
     elif character == "U":    
-        return NewEnemy(x, y, feat_enemy_turret)
+        return NewEnemy(x, y, feat_enemy_turret_right)
 
-feat_enemy_turret = {
+feat_enemy_turret_left = {
     "type": "Turret",
     "level": 0,
     "image_default": GR_ENEMY_TURRET_DEFAULT,
@@ -100,7 +109,21 @@ feat_enemy_turret = {
     "shoot_delay": 20,
     "initial_speed": (0.0, 0.0),
     "score": 5,
-    "orientation": (0.0, 1.0)
+    "orientation": (-1.0, 1.0)
+}
+
+feat_enemy_turret_right = {
+    "type": "Turret",
+    "level": 0,
+    "image_default": GR_ENEMY_TURRET_DEFAULT,
+    "animation_blink": GR_ENEMY_TURRET_BLINK,
+    "weapon": WeaponSingle,
+    "ammo": feat_enemy_beam_default,
+    "hitpoints": 8,
+    "shoot_delay": 20,
+    "initial_speed": (0.0, 0.0),
+    "score": 5,
+    "orientation": (1.0, 1.0)
 }
 
 feat_enemy_fighter = {
