@@ -122,6 +122,7 @@ TILES_LIST = [
 # Load level image sets
 GR_WALLSET_STONE = loadTileset("stone/")
 GR_WALLSET_TECH = loadTileset("tech/")
+GR_WALLSET_TOR = loadTileset("tor/")
 
 #graphics
 GR_APPICON = loadImages([

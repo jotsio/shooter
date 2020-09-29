@@ -284,16 +284,16 @@ level5_map = [
 
 test_map = [
 ".....................",
-"....#....Z....#......",
+"....#....Z....#....##",
 "....##..###..##.....#",
-".....................",
-"..####.X......X.##...",
-"..####...........Y....",
-".....#.......#....#..",
-"....##............#..",
-"######.........######",
+"..##................#",
+"..##..X.....#X......#",
+"............#...Y...#",
+".###.#......#.....###",
+".###............#####",
+".###.........########",
 ".....U..........O..O.",
-".....................",
+"..............#.#....",
 "....................."
 ]
 
@@ -496,8 +496,8 @@ class StarField:
 
 # Level parameters
 levels = [
-    (level1_map, GR_WALLSET_STONE, music_planet, width, height), 
-    (level2_map, GR_WALLSET_TECH, music_star, width, height),  
+    (test_map, GR_WALLSET_TOR, music_planet, width, height), 
+    (level2_map, GR_WALLSET_TOR, music_star, width, height),  
     (level3_map, GR_WALLSET_STONE, music_solar, width, height),
     (level4_map, GR_WALLSET_TECH, music_planet, width, height),
     (level5_map, GR_WALLSET_STONE, music_star, width, height) 
