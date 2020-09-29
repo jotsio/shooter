@@ -10,6 +10,7 @@ class NewEnemy(pygame.sprite.Sprite, Base):
     def __init__(self, x, y, features):
         pygame.sprite.Sprite.__init__(self)
         Base.__init__(self, x, y, features["image_default"], enemy_group)
+        self.features = features
         self.id = random.randint(1,1000)
         self.hostile_group = player_ammo_group
         self.hor_margin = -24
@@ -37,7 +38,7 @@ class NewEnemy(pygame.sprite.Sprite, Base):
         Collectable(self.rect.centerx, self.rect.centery, table[value])
 
     # Passive movement & collision detection
-    def update(self, level, offset, player):
+    def update(self, level, offset, player, scroll_speed):
         # Check if dead
         if self.destroyed() == True:
             self.explode(GR_EFFECT_EXPLOSION_BIG, snd_enemy_death)
@@ -64,8 +65,10 @@ class NewEnemy(pygame.sprite.Sprite, Base):
         self.bounceFromSides(level, offset)
 
         # Shoot if player on shooting line
-        distance_x = self.rect.centerx - player.rect.centerx + player.speed[0]
-        distance_y = self.rect.centery - player.rect.centery + player.speed[1]
+        distance_x = self.rect.centerx - player.rect.centerx
+        distance_y = self.rect.centery - player.rect.centery 
+        distance_y = distance_y + scroll_speed * distance_x / self.features["ammo"]["speed"]
+
         offset_x = self.orientation[0] * self.rect.width / 3
         offset_y = self.orientation[1] * self.rect.height / 3       
         if self.orientation[0] * distance_x <= 0 and self.orientation[1] * distance_y <= 0:
@@ -151,7 +154,7 @@ feat_enemy_spike = {
     "shoot_delay": 1000,
     "initial_speed": (-1.0, 0.0),
     "score": 5,
-    "orientation": (0.0, 1.0)
+    "orientation": (-1.0, 0.0)
 } 
 
 feat_enemy_boss = {

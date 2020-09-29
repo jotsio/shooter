@@ -85,7 +85,7 @@ while True:
 
         # Objects update
         player_group.update(this_level, offset)
-        enemy_group.update(this_level, offset, player)
+        enemy_group.update(this_level, offset, player, scroll_speed)
         player_ammo_group.update(this_level, offset)
         enemy_ammo_group.update(this_level, offset)
         effects_group.update(this_level, offset)
