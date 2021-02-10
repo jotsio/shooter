@@ -1,8 +1,7 @@
 from inits import *
 
 # Show game titles
-def showText(message, place, size):
-    font = pygame.font.Font('freesansbold.ttf', size) 
+def showText(message, place, font):
     text = font.render(message, True, color_text)
     textRect = text.get_rect()
     textRect.center = place

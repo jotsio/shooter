@@ -60,7 +60,7 @@ class NewEnemy(pygame.sprite.Sprite, Base):
         if pygame.sprite.spritecollideany(self, player_group, self.collided):
             self.hitpoints = 0
 
-        # Bounces form walls
+        # Bounces from walls
         self.bounceFromRect(level.locateCollision(self.hitbox, offset))
         self.bounceFromSides(level, offset)
 

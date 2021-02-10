@@ -13,14 +13,15 @@ player_start_y = round(height-100)
 update_offset_up = -2560
 update_offset_down = 256
 
+# Font
+font_small = pygame.font.Font(None, 24)
+font_medium = pygame.font.Font(None,32)
+font_large = pygame.font.Font(None,48)
+
 # Text positions
 textplace_center = (width // 2, height // 2)
 textplace_rightdown_first = (width - 64, height - 64)
 textplace_rightdown_second = (width - 128, height - 64)
-
-# Text size
-textsize_medium = 32
-textsize_large = 48
 
 #pygame.FULLSCREEN
 SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  

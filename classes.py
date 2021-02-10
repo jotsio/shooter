@@ -184,6 +184,3 @@ class NewEffect(pygame.sprite.Sprite, Base):
         # Update animation
         self.changeFrame()
 
-
-
-

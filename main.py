@@ -41,11 +41,16 @@ while True:
     while clock.tick(framerate):
         # Keyevents listener
         pressed = pygame.key.get_pressed()
-
+ 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or pressed[pygame.K_ESCAPE]: 
+            if event.type == pygame.QUIT  or pressed[pygame.K_ESCAPE]:  
                 pygame.quit()
                 sys.exit()
+  
+        # Debug keys
+        nextlevel = pressed[pygame.K_l]
+        if nextlevel == True:
+            break
 
        # Is player alive?
         if player.alive == False:
@@ -152,10 +157,9 @@ while True:
         showHearts(player.hitpoints)
 
         # Show score and money
-        showText(str(money), textplace_rightdown_second, textsize_medium)
-        showText(str(score), textplace_rightdown_first, textsize_medium)
+        showText(str(money), textplace_rightdown_second, font_medium)
+        showText(str(score), textplace_rightdown_first, font_medium)
         
-
         # Update screen
         pygame.display.flip()
         
@@ -164,24 +168,23 @@ while True:
 
     # Show level ending text
     if player.alive == False:
-        showText("Kuolit!", textplace_center, textsize_large)
+        showText("Kuolit!", textplace_center, font_large)
         # Reset player
         player = PlayerShip(player_start_x, player_start_y)
         this_level.reset(levels[current_level])
 
     elif current_level == (len(levels)-1):
-        showText("HIENOA, PELI LÄPÄISTY!", textplace_center, textsize_large)
+        showText("HIENOA, PELI LÄPÄISTY!", textplace_center, font_large)
         player.setStartPosition()
         current_level = 0
     
     else:
-        showText("Kenttä läpäisty!", textplace_center, textsize_large)
+        showText("Kenttä läpäisty!", textplace_center, font_large)
         player.setStartPosition()
         current_level += 1
     
     # Update screen
     pygame.display.flip()
-
     enemy_group.empty()
     player_ammo_group.empty()
     enemy_ammo_group.empty()
