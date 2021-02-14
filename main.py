@@ -51,7 +51,7 @@ while True:
         nextlevel = pressed[pygame.K_l]
         if nextlevel == True:
             break
-        
+
        # Is player alive?
         if player.alive == False:
             player.speedx = 0.0

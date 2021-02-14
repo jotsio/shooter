@@ -24,7 +24,7 @@ class AmmoBasic(pygame.sprite.Sprite, Base):
         # Explode if collided to level walls
         hitted_block = level.checkCollision(self.hitbox, offset)
         if hitted_block:
-            if self.hit_energy > 10: 
+            if self.hit_energy > 100: 
                 level.removeBlock(hitted_block[0], hitted_block[1])
             self.hitpoints = 0
         # Explode if collided to collision group

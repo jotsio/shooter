@@ -47,8 +47,8 @@ class PlayerShip(pygame.sprite.Sprite, Base):
                 player_group.remove(self)
             
             # Dies if touches walls
-            #if level.checkCollision(self.hitbox, offset):
-            #    self.hitpoints = 0
+            if level.checkCollision(self.hitbox, offset):
+                self.hitpoints -= 1
 
             # Check collision to ammo
             damage = self.getCollisionDamage(self.hostile_group)

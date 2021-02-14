@@ -105,7 +105,7 @@ def selectEnemy(x, y, character):
     elif character == "L":    
         return NewEnemy(x, y, feat_enemy_turret_right)
     elif character == "J":    
-        return NewEnemy(x, y, feat_enemy_turret_right)
+        return NewEnemy(x, y, feat_enemy_turret_left)
     elif character == "Z":    
         return NewEnemy(x, y, feat_enemy_boss)
     elif character == "S":    
