@@ -143,6 +143,18 @@ GR_ENEMY_TURRET_BLINK = loadImages([
     "enemy_turret_hilight.png",
     "enemy_turret_hilight.png",
     "enemy_turret_hilight.png"])
+GR_ENEMY_TURRETLEFT_DEFAULT = loadImages([
+    "enemy_turret_left.png"])
+GR_ENEMY_TURRETLEFT_BLINK = loadImages([
+    "enemy_turret_left_hilight.png",
+    "enemy_turret_left_hilight.png",
+    "enemy_turret_left_hilight.png"])
+GR_ENEMY_TURRETRIGHT_DEFAULT = loadImages([
+    "enemy_turret_right.png"])
+GR_ENEMY_TURRETRIGHT_BLINK = loadImages([
+    "enemy_turret_right_hilight.png",
+    "enemy_turret_right_hilight.png",
+    "enemy_turret_right_hilight.png"])
 GR_ENEMY_FIGHTER_DEFAULT = loadImages([
     "enemy_default.png",
     "enemy_default2.png",
@@ -166,6 +178,11 @@ GR_ENEMY_BIG_BLINK = loadImages([
     "enemy_big_hilight.png", 
     "enemy_big_hilight.png", 
     "enemy_big_hilight.png"])
+GR_ENEMY_BIGFLAME_DEFAULT = loadImages(["enemy_big_flame.png"])
+GR_ENEMY_BIGFLAME_BLINK = loadImages([
+    "enemy_big_flame_hilight.png", 
+    "enemy_big_flame_hilight.png", 
+    "enemy_big_flame_hilight.png"])
 GR_AMMO_BLUE_DEFAULT = loadImages(["ammo_blue.png"])
 GR_AMMO_BLUE_ROUND = loadImages(["ammo_blue_round.png"])
 GR_AMMO_BLUE_EXPLOSION = loadImages([

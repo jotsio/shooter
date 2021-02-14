@@ -159,6 +159,18 @@ class WeaponThrower(WeaponBase):
             self.shoot_timer = 0 
             self.magazine -= 1
 
+class WeaponBossThrower(WeaponBase):
+    def __init__(self, ammo, orientation):
+        WeaponBase.__init__(self, ammo, orientation)
+        self.setFirerate(2000)
+
+    def launch(self, x, y):
+        if self.shoot_timer >= self.shoot_delay:
+            AmmoFlame(x - 58, y, self.orientation, self.ammo)
+            AmmoFlame(x + 58, y, self.orientation, self.ammo)
+            self.shoot_timer = 0 
+            self.magazine -= 1
+
 
 # Ammo types
 feat_player_beam_default = {
@@ -194,6 +206,17 @@ feat_player_flame = {
     "energy": 3,  
 }
 
+feat_enemy_flame = {
+    "own_group": enemy_ammo_group,
+    "enemy_group": player_group,
+    "imageset_default": GR_AMMO_FLAME,
+    "imageset_explosion": GR_AMMO_FLAME_EXPLOSION,
+    "sound_launch": snd_laser_enemy,
+    "sound_explosion": snd_small_explo,
+    "speed": 10.0,
+    "energy": 1,  
+}
+
 feat_player_rocket = {
     "own_group": player_ammo_group,
     "enemy_group": enemy_group,
@@ -202,7 +225,7 @@ feat_player_rocket = {
     "sound_launch": snd_laser_enemy,
     "sound_explosion": snd_small_explo,
     "speed": 0.01,
-    "energy": 9,  
+    "energy": 11,  
 }
 
 feat_enemy_beam_default = {

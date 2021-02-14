@@ -91,25 +91,35 @@ class NewEnemy(pygame.sprite.Sprite, Base):
 
 def selectEnemy(x, y, character):
     if character == "X": 
-        return NewEnemy(x, y, feat_enemy_fighter)
+        return NewEnemy(x, y, feat_enemy_fighter_double)
+    if character == "V": 
+        return NewEnemy(x, y, feat_enemy_fighter_single)
     elif character == "O":
-        return NewEnemy(x, y, feat_enemy_spike)
+        return NewEnemy(x, y, feat_enemy_spike_down)
+    elif character == ">":
+        return NewEnemy(x, y, feat_enemy_spike_right)      
+    elif character == "<":
+        return NewEnemy(x, y, feat_enemy_spike_left)    
+    elif character == "Y":    
+        return NewEnemy(x, y, feat_enemy_turret_down)
+    elif character == "L":    
+        return NewEnemy(x, y, feat_enemy_turret_right)
+    elif character == "J":    
+        return NewEnemy(x, y, feat_enemy_turret_right)
     elif character == "Z":    
         return NewEnemy(x, y, feat_enemy_boss)
-    elif character == "Y":    
-        return NewEnemy(x, y, feat_enemy_turret_left)
-    elif character == "U":    
-        return NewEnemy(x, y, feat_enemy_turret_right)
+    elif character == "S":    
+        return NewEnemy(x, y, feat_enemy_boss_flame)
 
 feat_enemy_turret_left = {
     "type": "Turret",
     "level": 0,
-    "image_default": GR_ENEMY_TURRET_DEFAULT,
-    "animation_blink": GR_ENEMY_TURRET_BLINK,
+    "image_default": GR_ENEMY_TURRETLEFT_DEFAULT,
+    "animation_blink": GR_ENEMY_TURRETLEFT_BLINK,
     "weapon": WeaponSingle,
     "ammo": feat_enemy_beam_default,
     "hitpoints": 8,
-    "shoot_delay": 20,
+    "shoot_delay": 16,
     "initial_speed": (0.0, 0.0),
     "score": 5,
     "orientation": (-1.0, 1.0)
@@ -118,20 +128,48 @@ feat_enemy_turret_left = {
 feat_enemy_turret_right = {
     "type": "Turret",
     "level": 0,
-    "image_default": GR_ENEMY_TURRET_DEFAULT,
-    "animation_blink": GR_ENEMY_TURRET_BLINK,
+    "image_default": GR_ENEMY_TURRETRIGHT_DEFAULT,
+    "animation_blink": GR_ENEMY_TURRETRIGHT_BLINK,
     "weapon": WeaponSingle,
     "ammo": feat_enemy_beam_default,
     "hitpoints": 8,
-    "shoot_delay": 20,
+    "shoot_delay": 16,
     "initial_speed": (0.0, 0.0),
     "score": 5,
     "orientation": (1.0, 1.0)
 }
 
-feat_enemy_fighter = {
+feat_enemy_turret_down = {
+    "type": "Turret",
+    "level": 0,
+    "image_default": GR_ENEMY_TURRET_DEFAULT,
+    "animation_blink": GR_ENEMY_TURRET_BLINK,
+    "weapon": WeaponSingle,
+    "ammo": feat_enemy_beam_default,
+    "hitpoints": 8,
+    "shoot_delay": 16,
+    "initial_speed": (0.0, 0.0),
+    "score": 5,
+    "orientation": (0.0, 1.0)
+}
+
+feat_enemy_fighter_single = {
     "type": "Ship",
     "level": 10,
+    "image_default": GR_ENEMY_FIGHTER_DEFAULT,
+    "animation_blink": GR_ENEMY_FIGHTER_BLINK,
+    "weapon": WeaponSingle,
+    "ammo": feat_enemy_beam_default,
+    "hitpoints": 10,
+    "shoot_delay": 30,
+    "initial_speed": (1.0, 0.0),
+    "score": 10,
+    "orientation": (0.0, 1.0)
+}
+
+feat_enemy_fighter_double = {
+    "type": "Ship",
+    "level": 15,
     "image_default": GR_ENEMY_FIGHTER_DEFAULT,
     "animation_blink": GR_ENEMY_FIGHTER_BLINK,
     "weapon": WeaponDouble,
@@ -143,7 +181,7 @@ feat_enemy_fighter = {
     "orientation": (0.0, 1.0)
 }
 
-feat_enemy_spike = {
+feat_enemy_spike_down = {
     "type": "Spike",
     "level": 5,
     "image_default": GR_ENEMY_SPIKE_DEFAULT,
@@ -151,10 +189,38 @@ feat_enemy_spike = {
     "weapon": WeaponSingle,
     "ammo": feat_enemy_beam_default,
     "hitpoints": 10,
-    "shoot_delay": 1000,
+    "shoot_delay": 60,
+    "initial_speed": (-1.0, 0.0),
+    "score": 5,
+    "orientation": (0.0, 1.0)
+} 
+
+feat_enemy_spike_left = {
+    "type": "Spike",
+    "level": 5,
+    "image_default": GR_ENEMY_SPIKE_DEFAULT,
+    "animation_blink": GR_ENEMY_SPIKE_BLINK,
+    "weapon": WeaponSingle,
+    "ammo": feat_enemy_beam_default,
+    "hitpoints": 10,
+    "shoot_delay": 60,
     "initial_speed": (-1.0, 0.0),
     "score": 5,
     "orientation": (-1.0, 0.0)
+} 
+
+feat_enemy_spike_right = {
+    "type": "Spike",
+    "level": 5,
+    "image_default": GR_ENEMY_SPIKE_DEFAULT,
+    "animation_blink": GR_ENEMY_SPIKE_BLINK,
+    "weapon": WeaponSingle,
+    "ammo": feat_enemy_beam_default,
+    "hitpoints": 10,
+    "shoot_delay": 60,
+    "initial_speed": (-1.0, 0.0),
+    "score": 5,
+    "orientation": (1.0, 0.0)
 } 
 
 feat_enemy_boss = {
@@ -171,3 +237,16 @@ feat_enemy_boss = {
     "orientation": (0.0, 1.0)
 }
 
+feat_enemy_boss_flame = {
+    "type": "Boss",
+    "level": 20,
+    "image_default": GR_ENEMY_BIGFLAME_DEFAULT,
+    "animation_blink": GR_ENEMY_BIGFLAME_BLINK,
+    "weapon": WeaponBossThrower,
+    "ammo": feat_enemy_flame,
+    "hitpoints": 120,
+    "shoot_delay": 2,
+    "initial_speed": (-1.0, 0.0),
+    "score": 50,
+    "orientation": (0.0, 1.0)
+}

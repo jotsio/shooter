@@ -1,5 +1,6 @@
 import random
 from inits import *
+from level_test import *
 from level1 import *
 from level2 import *
 from level3 import *
