@@ -23,7 +23,7 @@ class NewEnemy(pygame.sprite.Sprite, Base):
         self.score = features["score"]
         self.hitpoints = features["hitpoints"]
         self.weapon = features["weapon"](features["ammo"], self.orientation)
-        self.accuracy = 16
+        self.accuracy = features["accuracy"]
         self.rect = self.rect.move(x, y)
         self.alignHitBox(self.rect)
         self.speed = features["initial_speed"]
@@ -108,8 +108,14 @@ def selectEnemy(x, y, character):
         return NewEnemy(x, y, feat_enemy_turret_left)
     elif character == "Z":    
         return NewEnemy(x, y, feat_enemy_boss)
-    elif character == "S":    
+    elif character == "F":    
         return NewEnemy(x, y, feat_enemy_boss_flame)
+    elif character == "M":    
+        return NewEnemy(x, y, feat_enemy_boss_missile)
+    elif character == "R":    
+        return NewEnemy(x, y, feat_enemy_boss_rocket)
+    elif character == "D":    
+        return NewEnemy(x, y, feat_enemy_boss_distributor)
 
 feat_enemy_turret_left = {
     "type": "Turret",
@@ -122,7 +128,8 @@ feat_enemy_turret_left = {
     "shoot_delay": 16,
     "initial_speed": (0.0, 0.0),
     "score": 5,
-    "orientation": (-1.0, 1.0)
+    "orientation": (-1.0, 1.0),
+    "accuracy": 16
 }
 
 feat_enemy_turret_right = {
@@ -136,7 +143,8 @@ feat_enemy_turret_right = {
     "shoot_delay": 16,
     "initial_speed": (0.0, 0.0),
     "score": 5,
-    "orientation": (1.0, 1.0)
+    "orientation": (1.0, 1.0),
+    "accuracy": 16
 }
 
 feat_enemy_turret_down = {
@@ -150,7 +158,8 @@ feat_enemy_turret_down = {
     "shoot_delay": 16,
     "initial_speed": (0.0, 0.0),
     "score": 5,
-    "orientation": (0.0, 1.0)
+    "orientation": (0.0, 1.0),
+    "accuracy": 16
 }
 
 feat_enemy_fighter_single = {
@@ -164,7 +173,8 @@ feat_enemy_fighter_single = {
     "shoot_delay": 30,
     "initial_speed": (1.0, 0.0),
     "score": 10,
-    "orientation": (0.0, 1.0)
+    "orientation": (0.0, 1.0),
+    "accuracy": 16
 }
 
 feat_enemy_fighter_double = {
@@ -178,7 +188,8 @@ feat_enemy_fighter_double = {
     "shoot_delay": 40,
     "initial_speed": (1.0, 0.0),
     "score": 10,
-    "orientation": (0.0, 1.0)
+    "orientation": (0.0, 1.0),
+    "accuracy": 24
 }
 
 feat_enemy_spike_down = {
@@ -192,7 +203,8 @@ feat_enemy_spike_down = {
     "shoot_delay": 60,
     "initial_speed": (-1.0, 0.0),
     "score": 5,
-    "orientation": (0.0, 1.0)
+    "orientation": (0.0, 1.0),
+    "accuracy": 16
 } 
 
 feat_enemy_spike_left = {
@@ -206,7 +218,8 @@ feat_enemy_spike_left = {
     "shoot_delay": 60,
     "initial_speed": (-1.0, 0.0),
     "score": 5,
-    "orientation": (-1.0, 0.0)
+    "orientation": (-1.0, 0.0),
+    "accuracy": 16
 } 
 
 feat_enemy_spike_right = {
@@ -220,7 +233,8 @@ feat_enemy_spike_right = {
     "shoot_delay": 60,
     "initial_speed": (-1.0, 0.0),
     "score": 5,
-    "orientation": (1.0, 0.0)
+    "orientation": (1.0, 0.0),
+    "accuracy": 16
 } 
 
 feat_enemy_boss = {
@@ -229,12 +243,13 @@ feat_enemy_boss = {
     "image_default": GR_ENEMY_BIG_DEFAULT,
     "animation_blink": GR_ENEMY_BIG_BLINK,
     "weapon": WeaponMinigun,
-    "ammo": feat_enemy_missile,
+    "ammo": feat_enemy_beam_large,
     "hitpoints": 120,
-    "shoot_delay": 4,
+    "shoot_delay": 30,
     "initial_speed": (-1.0, 0.0),
     "score": 50,
-    "orientation": (0.0, 1.0)
+    "orientation": (0.0, 1.0),
+    "accuracy": 16
 }
 
 feat_enemy_boss_flame = {
@@ -248,5 +263,51 @@ feat_enemy_boss_flame = {
     "shoot_delay": 2,
     "initial_speed": (-1.0, 0.0),
     "score": 50,
-    "orientation": (0.0, 1.0)
+    "orientation": (0.0, 1.0),
+    "accuracy": 64
+}
+
+feat_enemy_boss_missile = {
+    "type": "Boss",
+    "level": 20,
+    "image_default": GR_ENEMY_BIG_DEFAULT,
+    "animation_blink": GR_ENEMY_BIG_BLINK,
+    "weapon": WeaponMissileLauncher,
+    "ammo": feat_enemy_missile,
+    "hitpoints": 120,
+    "shoot_delay": 2,
+    "initial_speed": (-1.0, 0.0),
+    "score": 50,
+    "orientation": (0.0, 1.0),
+    "accuracy": 256
+}
+
+feat_enemy_boss_rocket = {
+    "type": "Boss",
+    "level": 20,
+    "image_default": GR_ENEMY_BIG_DEFAULT,
+    "animation_blink": GR_ENEMY_BIG_BLINK,
+    "weapon": WeaponEnemyRocketLauncher,
+    "ammo": feat_enemy_rocket,
+    "hitpoints": 120,
+    "shoot_delay": 2,
+    "initial_speed": (-1.0, 0.0),
+    "score": 50,
+    "orientation": (0.0, 1.0),
+    "accuracy": 32
+}
+
+feat_enemy_boss_distributor = {
+    "type": "Boss",
+    "level": 20,
+    "image_default": GR_ENEMY_BIG_DEFAULT,
+    "animation_blink": GR_ENEMY_BIG_BLINK,
+    "weapon": WeaponDistributor,
+    "ammo": feat_enemy_beam_default,
+    "hitpoints": 120,
+    "shoot_delay": 1,
+    "initial_speed": (2.0, 0.0),
+    "score": 50,
+    "orientation": (0.0, 1.0),
+    "accuracy": 512
 }

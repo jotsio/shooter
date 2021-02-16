@@ -19,12 +19,12 @@ class AmmoBasic(pygame.sprite.Sprite, Base):
         self.hit_energy = features["energy"]
         features["sound_launch"].play()
 
-    def update(self, level, offset):
+    def update(self, level, offset, player):
 
         # Explode if collided to level walls
         hitted_block = level.checkCollision(self.hitbox, offset)
         if hitted_block:
-            if self.hit_energy > 100: 
+            if self.hit_energy > 100:
                 level.removeBlock(hitted_block[0], hitted_block[1])
             self.hitpoints = 0
         # Explode if collided to collision group
@@ -45,6 +45,45 @@ class AmmoBasic(pygame.sprite.Sprite, Base):
         NewEffect(self.rect.centerx, self.rect.centery, animation)
         sound.play()
 
+class AmmoMissile(AmmoBasic):
+    def update(self, level, offset, player):
+
+        # Explode if collided to level walls
+        hitted_block = level.checkCollision(self.hitbox, offset)
+        if hitted_block:
+            if self.hit_energy > 100:
+                level.removeBlock(hitted_block[0], hitted_block[1])
+            self.hitpoints = 0
+        # Explode if collided to collision group
+        elif self.collisionToEnemy():
+            self.hitpoints = 0
+        # Updates possible animation
+
+        if self.destroyed() == True:
+            self.explode(self.features["imageset_explosion"], self.features["sound_explosion"])
+            self.kill()
+        # Disappear if outside the area
+        if self.outsideArea(level):
+            self.kill()
+        # Guides itself towards player
+        if self.rect.centerx > player.rect.centerx:
+            self.speed = (self.speed[0] - 0.1, self.speed[1])
+        if self.rect.centerx < player.rect.centerx:
+            self.speed = (self.speed[0] + 0.1, self.speed[1])
+
+        self.changeFrame()
+
+    def move(self, scroll_speed):
+        self.rect = self.rect.move(self.speed)
+        self.rect = self.rect.move(0, scroll_speed)
+        self.alignHitBox(self.rect)
+        sy = self.speed[1]
+        if sy < 10.0:    
+            sy += 0.1
+        else:
+            sy = 10.0
+        self.speed = (self.speed[0], sy) 
+
 class AmmoRocket(AmmoBasic):
     def move(self, scroll_speed):
         self.rect = self.rect.move(self.speed)
@@ -58,7 +97,7 @@ class AmmoRocket(AmmoBasic):
         self.speed = (self.speed[0], sy) 
 
 class AmmoFlame(AmmoBasic):
-    def update(self, level, offset):
+    def update(self, level, offset, player):
 
         # Explode if collided to level walls
         hitted_block = level.checkCollision(self.hitbox, offset)
@@ -171,6 +210,40 @@ class WeaponBossThrower(WeaponBase):
             self.shoot_timer = 0 
             self.magazine -= 1
 
+class WeaponMissileLauncher(WeaponBase):
+    def __init__(self, ammo, orientation):
+        WeaponBase.__init__(self, ammo, orientation)
+        self.setFirerate(100)
+
+    def launch(self, x, y):
+        if self.shoot_timer >= self.shoot_delay:
+            AmmoMissile(x, y, self.orientation, self.ammo)
+            self.shoot_timer = 0 
+            self.magazine -= 1
+
+class WeaponEnemyRocketLauncher(WeaponBase):
+    def __init__(self, ammo, orientation):
+        WeaponBase.__init__(self, ammo, orientation)
+        self.setFirerate(100)
+
+    def launch(self, x, y):
+        if self.shoot_timer >= self.shoot_delay:
+            AmmoBasic(x, y, self.orientation, self.ammo)
+            self.shoot_timer = 0 
+            self.magazine -= 1
+
+class WeaponDistributor(WeaponBase):
+    def __init__(self, ammo, orientation):
+        WeaponBase.__init__(self, ammo, orientation)
+        self.setFirerate(300)
+
+    def launch(self, x, y):
+        if self.shoot_timer >= self.shoot_delay:
+            AmmoBasic(x, y, (0, 1), self.ammo)
+            AmmoBasic(x, y, (0.5,1), self.ammo)
+            AmmoBasic(x, y, (-0.5,1), self.ammo)
+            self.shoot_timer = 0 
+            self.magazine -= 1
 
 # Ammo types
 feat_player_beam_default = {
@@ -239,7 +312,7 @@ feat_enemy_beam_default = {
     "energy": 1,  
 }
 
-feat_enemy_missile = {
+feat_enemy_beam_large = {
     "own_group": enemy_ammo_group,
     "enemy_group": player_group,
     "imageset_default": GR_AMMO_PINKBIG_DEFAULT,
@@ -248,4 +321,26 @@ feat_enemy_missile = {
     "sound_explosion": snd_small_explo,
     "speed": 8.0,
     "energy": 1,  
+}
+
+feat_enemy_missile = {
+    "own_group": enemy_ammo_group,
+    "enemy_group": player_group,
+    "imageset_default": GR_AMMO_MISSILE_DEFAULT,
+    "imageset_explosion": GR_EFFECT_EXPLOSION_BIG,
+    "sound_launch": snd_laser_enemy,
+    "sound_explosion": snd_small_explo,
+    "speed": 2.0,
+    "energy": 101,  
+}
+
+feat_enemy_rocket = {
+    "own_group": enemy_ammo_group,
+    "enemy_group": player_group,
+    "imageset_default": GR_AMMO_ROCKET_PINK,
+    "imageset_explosion": GR_EFFECT_EXPLOSION_BIG,
+    "sound_launch": snd_laser_enemy,
+    "sound_explosion": snd_small_explo,
+    "speed": 2.0,
+    "energy": 101,  
 }
