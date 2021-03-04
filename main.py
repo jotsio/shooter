@@ -124,13 +124,17 @@ while True:
                 score += i.score
                 i.kill()
 
-        # Count collected money
+        # Process collectables
         for i in effects_group:
             if i.killed == True:
-                if i.boost == 0:
+                if i.type == "coin":
                     money += i.score
-                elif i.boost > 0:
+                elif i.type == "weapon":
                     player.getWeapon(i.boost)
+                elif i.type == "powerup":
+                    player.getHealth()
+                elif i.type == "shield":
+                    player.getShield()
                 i.kill()
 
         # Create new enemies

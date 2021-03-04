@@ -34,6 +34,7 @@ class Base():
         self.animation_frame = 0 
         self.image = self.animation[0]
         self.rect = self.image.get_rect()
+        self.rect = self.rect.move(x, y)
         self.hor_margin = 0
         self.ver_margin = 0
         self.alignHitBox(self.rect) 
@@ -173,7 +174,7 @@ class NewEffect(pygame.sprite.Sprite, Base):
     def __init__(self, x, y, imageset):
         pygame.sprite.Sprite.__init__(self)
         Base.__init__(self, x, y, imageset, effects_group)
-        self.rect = self.rect.move(round(x - self.rect.w / 2), y - round(self.rect.h / 2))
+        self.rect = self.rect.move(round(-self.rect.w / 2), -round(self.rect.h / 2))
         self.lifetime = len(self.animation) * self.ticks_in_frame
     
     def update(self, level, offset):
@@ -183,4 +184,5 @@ class NewEffect(pygame.sprite.Sprite, Base):
         
         # Update animation
         self.changeFrame()
+
 

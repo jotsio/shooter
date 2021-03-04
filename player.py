@@ -18,6 +18,7 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         self.start_x = x
         self.start_y = y
         self.alive = True
+        self.invincible = 0
         self.hitpoints = 10
         self.hitpoints_max = 12
         self.max_speedx = 4.0
@@ -45,24 +46,21 @@ class PlayerShip(pygame.sprite.Sprite, Base):
                 self.alive = False
                 self.explode(GR_EFFECT_EXPLOSION_BIG, snd_player_death)
                 player_group.remove(self)
-            
-            # Dies if touches walls
-            if level.checkCollision(self.hitbox, offset):
-                self.hitpoints -= 1
 
-            # Check collision to ammo
-            damage = self.getCollisionDamage(self.hostile_group)
-            if damage:
-                self.hitpoints -= damage
-                self.setAnimation(self.imageset_hilight, 12)
-            
-            #if self.collisionToEnemy():
-            #    self.hitpoints -= 1
-            #    self.setAnimation(self.imageset_hilight, 12)
-            
-            # Check collision to enemy
-            if pygame.sprite.spritecollideany(self, enemy_group, self.collided):
-                self.hitpoints = 0
+            if self.invincible <= 0:
+                # Dies if touches walls
+                if level.checkCollision(self.hitbox, offset):
+                    self.hitpoints -= 1
+
+                # Check collision to ammo
+                damage = self.getCollisionDamage(self.hostile_group)
+                if damage:
+                    self.hitpoints -= damage
+                    self.setAnimation(self.imageset_hilight, 12)
+                
+                # Check collision to enemy
+                if pygame.sprite.spritecollideany(self, enemy_group, self.collided):
+                    self.hitpoints = 0
 
             # Update shooting delay
             self.weapon.shoot_timer += 1
@@ -95,6 +93,10 @@ class PlayerShip(pygame.sprite.Sprite, Base):
 
             # Change animation frame
             self.changeFrame()
+
+            # Counts invincibility
+            if self.invincible > 0:
+                self.invincible -= 1
 
             # Ensures that hitbox is following
             self.alignHitBox(self.rect)
@@ -155,7 +157,40 @@ class PlayerShip(pygame.sprite.Sprite, Base):
             self.weapon = WeaponThrower(feat_player_flame, self.orientation)
             self.weapon.magazine = 60
 
+    def getHealth(self):
+        if self.hitpoints < self.hitpoints_max:
+            self.hitpoints += 1
+            self.setAnimation(self.imageset_hilight, 12)
+
+    def getShield(self):
+        PlayerEffect(self, GR_PLAYER_SHIELD, 300)
+        self.invincible = 300
+
     # Shooting
     def shoot(self, key):
         if self.alive == True and key == True:
             self.weapon.launch(self.rect.centerx, self.rect.y)
+
+
+
+class PlayerEffect(pygame.sprite.Sprite, Base):
+    def __init__(self, player, imageset, duration):
+        pygame.sprite.Sprite.__init__(self)
+        Base.__init__(self, player.rect.centerx, player.rect.centery, imageset, effects_group)
+        self.rect = self.rect.move(round(-self.rect.w / 2), round(-self.rect.h / 2))
+        self.host = player
+        self.lifetime = duration
+        self.animation_duration = 0
+    
+    def update(self, level, offset):
+        # Erase if lifetime spent
+        if self.counter >= self.lifetime or self.host.alive == False:
+            self.kill()
+
+        # Update animation
+        self.changeFrame()
+        
+    def move(self, scroll_speed):
+        self.rect.centerx = self.host.rect.centerx
+        self.rect.centery = self.host.rect.centery
+        self.alignHitBox(self.rect)

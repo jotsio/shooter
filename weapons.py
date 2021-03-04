@@ -11,7 +11,7 @@ class AmmoBasic(pygame.sprite.Sprite, Base):
         self.hostile_group = features["enemy_group"]
         self.features = features
         # Centrify position
-        self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
+        self.rect = self.rect.move(round(-self.rect.w / 2), round(-self.rect.h / 2))
         self.alignHitBox(self.rect)
         # Vertical speed
         self.speed = direction

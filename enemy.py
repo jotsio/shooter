@@ -24,7 +24,6 @@ class NewEnemy(pygame.sprite.Sprite, Base):
         self.hitpoints = features["hitpoints"]
         self.weapon = features["weapon"](features["ammo"], self.orientation)
         self.accuracy = features["accuracy"]
-        self.rect = self.rect.move(x, y)
         self.alignHitBox(self.rect)
         self.speed = features["initial_speed"]
         self.level = features["level"]

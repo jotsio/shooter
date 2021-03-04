@@ -137,6 +137,11 @@ GR_PLAYER_BODY_BLINK = loadImages([
 GR_PLAYER_BODY_UP = loadImages([
     "ship_thrust1.png",
     "ship_thrust2.png"])
+GR_PLAYER_SHIELD = loadImages([
+    "ship_shield_1.png",
+    "ship_shield_2.png",
+    "ship_shield_3.png",
+    "ship_shield_4.png"])
 GR_ENEMY_TURRET_DEFAULT = loadImages([
     "enemy_turret_default.png"])
 GR_ENEMY_TURRET_BLINK = loadImages([
@@ -238,11 +243,6 @@ GR_EFFECT_EXPLOSION_BIG = loadImages([
     "exp_round5.png", 
     "exp_round6.png"])
 GR_UI_HEART_DEFAULT = loadImages(["heart.png"])
-GR_ACCESSORIES_COIN = loadImages([
-    "coin_1.png", 
-    "coin_2.png",
-    "coin_3.png",
-    "coin_4.png",])
 GR_ACCESSORIES_WEAPON_SINGLE = loadImages([
     "accessory_weapon_single.png"])
 GR_ACCESSORIES_WEAPON_DOUBLE = loadImages([
@@ -253,6 +253,22 @@ GR_ACCESSORIES_WEAPON_LAUNCHER = loadImages([
     "accessory_weapon_launcher.png"])
 GR_ACCESSORIES_WEAPON_THROWER = loadImages([
     "accessory_weapon_thrower.png"])
+GR_ACCESSORIES_COIN = loadImages([
+    "coin_1.png", 
+    "coin_2.png",
+    "coin_3.png",
+    "coin_4.png"])
+GR_ACCESSORIES_POWERUP = loadImages([
+    "powerup_1.png",
+    "powerup_2.png",
+    "powerup_3.png",
+    "powerup_4.png"])
+GR_ACCESSORIES_SHIELD = loadImages([
+    "shield_1.png",
+    "shield_2.png",
+    "shield_3.png",
+    "shield_4.png"])
+
 
 
 # Load sounds

@@ -9,9 +9,10 @@ class Collectable(pygame.sprite.Sprite, Base):
         pygame.sprite.Sprite.__init__(self)
         Base.__init__(self, x, y, features["imageset"], effects_group)
         self.hostile_group = player_group
+        self.type = features["type"]
         self.boost = features["boost"]
         # Centrify position
-        self.rect = self.rect.move(round(x - self.rect.w / 2), round(y - self.rect.h / 2))
+        self.rect = self.rect.move(round(-self.rect.w / 2), round(-self.rect.h / 2))
         self.alignHitBox(self.rect)
         self.frequency = 80
         self.amplitude = 2
@@ -50,58 +51,79 @@ class Collectable(pygame.sprite.Sprite, Base):
 
 
 c_coin = {
+    "type": "money",
     "imageset": GR_ACCESSORIES_COIN,
     "boost": 0
     }
 
 c_weapon_single = {
+    "type": "weapon",
     "imageset": GR_ACCESSORIES_WEAPON_SINGLE,
     "boost": 1
     }
 
 c_weapon_double = {
+    "type": "weapon",
     "imageset": GR_ACCESSORIES_WEAPON_DOUBLE,
     "boost": 2
     }
 
 c_weapon_minigun = {
+    "type": "weapon",
     "imageset": GR_ACCESSORIES_WEAPON_MINIGUN,
     "boost": 3
     }
 
 c_weapon_launcher = {
+    "type": "weapon",
     "imageset": GR_ACCESSORIES_WEAPON_LAUNCHER,
     "boost": 4
     }
 
 c_weapon_thrower = {
+    "type": "weapon",
     "imageset": GR_ACCESSORIES_WEAPON_THROWER,
     "boost": 5
     }
 
+c_powerup = {
+    "type": "powerup",
+    "imageset": GR_ACCESSORIES_POWERUP,
+    "boost": 0
+    }
+
+c_shield = {
+    "type": "shield",
+    "imageset": GR_ACCESSORIES_SHIELD,
+    "boost": 0
+    }
+
+test_list = [
+    c_shield
+]
 
 collectables_list = [
     c_coin,
     c_coin,
     c_coin,
     c_coin,
+    c_shield,
     c_coin,
     c_coin,
     c_coin,
     c_coin,
-    c_coin,
-    c_coin,
+    c_powerup,
     # +10
     c_coin,
     c_weapon_double,
     c_coin,
     c_coin,
     c_weapon_minigun,
-    c_coin,
+    c_shield,
     c_coin,
     c_weapon_launcher,
     c_coin,
-    c_coin,
+    c_powerup,
     # + 20
     c_weapon_thrower,
     c_weapon_double,
@@ -109,8 +131,8 @@ collectables_list = [
     c_weapon_launcher,
     c_weapon_thrower,
     c_weapon_double,
-    c_weapon_minigun,
+    c_shield,
     c_weapon_minigun,
     c_weapon_launcher,
-    c_weapon_thrower
+    c_powerup
 ]
