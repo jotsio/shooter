@@ -142,6 +142,23 @@ GR_PLAYER_SHIELD = loadImages([
     "ship_shield_2.png",
     "ship_shield_3.png",
     "ship_shield_4.png"])
+GR_PLAYER_SHIELD_BLINK = loadImages([
+    "ship_shield_1.png",
+    "ship_shield_2.png",
+    "ship_shield_3.png",
+    "ship_shield_4.png",
+    "ship_shield_1.png",
+    "ship_shield_2.png",
+    "ship_shield_3.png",
+    "ship_shield_4.png",
+    "transparent.png",
+    "transparent.png",
+    "transparent.png",
+    "transparent.png",
+    "transparent.png",
+    "transparent.png",
+    "transparent.png",
+    "transparent.png"])
 GR_ENEMY_TURRET_DEFAULT = loadImages([
     "enemy_turret_default.png"])
 GR_ENEMY_TURRET_BLINK = loadImages([
@@ -263,12 +280,12 @@ GR_ACCESSORIES_POWERUP = loadImages([
     "powerup_2.png",
     "powerup_3.png",
     "powerup_4.png"])
+
 GR_ACCESSORIES_SHIELD = loadImages([
     "shield_1.png",
     "shield_2.png",
     "shield_3.png",
     "shield_4.png"])
-
 
 
 # Load sounds

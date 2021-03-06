@@ -31,7 +31,7 @@ class NewEnemy(pygame.sprite.Sprite, Base):
 
     def createCollectables(self, bonus):
         value = random.randint(0, 3) + random.randint(0, 4) + random.randint(0, 3) + bonus
-        table = collectables_list
+        table = test_list
         if value >= len(table) - 1:
             value = len(table) -1
         Collectable(self.rect.centerx, self.rect.centery, table[value])
@@ -57,7 +57,8 @@ class NewEnemy(pygame.sprite.Sprite, Base):
 
         # Check collision to player
         if pygame.sprite.spritecollideany(self, player_group, self.collided):
-            self.hitpoints = 0
+            if self.type != "Boss":
+                self.hitpoints = 0
 
         # Bounces from walls
         self.bounceFromRect(level.locateCollision(self.hitbox, offset))

@@ -19,8 +19,8 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         self.start_y = y
         self.alive = True
         self.invincible = 0
-        self.hitpoints = 10
-        self.hitpoints_max = 12
+        self.hitpoints = 5
+        self.hitpoints_max = 10
         self.max_speedx = 4.0
         self.max_speedy = 3.0
         self.frictionX = 0.2 
@@ -47,11 +47,15 @@ class PlayerShip(pygame.sprite.Sprite, Base):
                 self.explode(GR_EFFECT_EXPLOSION_BIG, snd_player_death)
                 player_group.remove(self)
 
-            if self.invincible <= 0:
-                # Dies if touches walls
-                if level.checkCollision(self.hitbox, offset):
+            # Dies if collided to level walls but destroys them when invincible
+            hitted_block = level.checkCollision(self.hitbox, offset)
+            if hitted_block:
+                if self.invincible > 0:
+                    level.removeBlock(hitted_block[0], hitted_block[1])
+                else:
                     self.hitpoints -= 1
 
+            if self.invincible <= 0:
                 # Check collision to ammo
                 damage = self.getCollisionDamage(self.hostile_group)
                 if damage:
@@ -163,8 +167,8 @@ class PlayerShip(pygame.sprite.Sprite, Base):
             self.setAnimation(self.imageset_hilight, 12)
 
     def getShield(self):
-        PlayerEffect(self, GR_PLAYER_SHIELD, 300)
-        self.invincible = 300
+        PlayerEffect(self, GR_PLAYER_SHIELD, 1000)
+        self.invincible = 1000
 
     # Shooting
     def shoot(self, key):
@@ -180,13 +184,22 @@ class PlayerEffect(pygame.sprite.Sprite, Base):
         self.rect = self.rect.move(round(-self.rect.w / 2), round(-self.rect.h / 2))
         self.host = player
         self.lifetime = duration
+        self.lifetime_counter = 0
         self.animation_duration = 0
+        self.transparent = GR_PLAYER_SHIELD_BLINK
+        self.disable_warning_time = 64
+
     
     def update(self, level, offset):
         # Erase if lifetime spent
-        if self.counter >= self.lifetime or self.host.alive == False:
+        if self.lifetime_counter >= self.lifetime or self.host.alive == False:
             self.kill()
 
+        # Blink if lifetime about to end
+        if self.lifetime - self.lifetime_counter < self.disable_warning_time:
+            self.setAnimation(self.transparent, 0)
+
+        self.lifetime_counter += 1
         # Update animation
         self.changeFrame()
         
