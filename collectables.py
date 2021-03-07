@@ -98,41 +98,48 @@ c_shield = {
     "boost": 0
     }
 
-test_list = [
-    c_shield
-]
-
-collectables_list = [
+collectables_list_small = [
+    c_coin,
+    c_coin,
+    c_coin,
+    c_coin,
+    c_coin,
+    c_coin,
+    c_coin,
+    c_coin,
+    c_coin,
     c_coin,
     c_coin,
     c_coin,
     c_coin,
     c_shield,
-    c_coin,
-    c_coin,
-    c_coin,
-    c_coin,
-    c_powerup,
-    # +10
-    c_coin,
-    c_weapon_double,
-    c_coin,
-    c_coin,
-    c_weapon_minigun,
-    c_shield,
-    c_coin,
-    c_weapon_launcher,
-    c_coin,
-    c_powerup,
-    # + 20
-    c_weapon_thrower,
-    c_weapon_double,
-    c_weapon_minigun,
-    c_weapon_launcher,
-    c_weapon_thrower,
-    c_weapon_double,
-    c_shield,
-    c_weapon_minigun,
-    c_weapon_launcher,
     c_powerup
 ]
+
+collectables_list_medium = [
+    c_coin,
+    c_coin,
+    c_coin,
+    c_coin,
+    c_coin,
+    c_coin,
+    c_coin,
+    c_coin,
+    c_coin,
+    c_coin,
+    c_coin,
+    c_coin,
+    c_weapon_double,
+    c_weapon_minigun,
+    c_shield,
+    c_powerup
+]
+
+collectables_list_boss = [
+    c_weapon_minigun,
+    c_weapon_launcher,
+    c_weapon_thrower,
+    c_powerup,
+    c_powerup,
+]
+

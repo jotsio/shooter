@@ -17,6 +17,7 @@ class NewEnemy(pygame.sprite.Sprite, Base):
         self.ver_margin = -24
         self.orientation = features["orientation"]
         self.features = features
+        self.collectables_list = features["collectables"]
         self.setAnimation(self.imageset_default, 0)
         self.imageset_hilight = features["animation_blink"]
         self.type = features["type"]
@@ -28,13 +29,9 @@ class NewEnemy(pygame.sprite.Sprite, Base):
         self.speed = features["initial_speed"]
         self.level = features["level"]
         
-
-    def createCollectables(self, bonus):
-        value = random.randint(0, 3) + random.randint(0, 4) + random.randint(0, 3) + bonus
-        table = test_list
-        if value >= len(table) - 1:
-            value = len(table) -1
-        Collectable(self.rect.centerx, self.rect.centery, table[value])
+    def createCollectables(self, c_list):
+        value = random.randint(0, (len(c_list) - 1))
+        Collectable(self.rect.centerx, self.rect.centery, c_list[value])
 
     # Passive movement & collision detection
     def update(self, level, offset, player, scroll_speed):
@@ -43,7 +40,7 @@ class NewEnemy(pygame.sprite.Sprite, Base):
             self.explode(GR_EFFECT_EXPLOSION_BIG, snd_enemy_death)
             self.killed = True
             # Create collectables
-            self.createCollectables(self.level)
+            self.createCollectables(self.collectables_list)
 
         # Check if outside area
         if self.outsideArea(level):
@@ -120,6 +117,7 @@ def selectEnemy(x, y, character):
 feat_enemy_turret_left = {
     "type": "Turret",
     "level": 0,
+    "collectables": collectables_list_small,
     "image_default": GR_ENEMY_TURRETLEFT_DEFAULT,
     "animation_blink": GR_ENEMY_TURRETLEFT_BLINK,
     "weapon": WeaponSingle,
@@ -135,6 +133,7 @@ feat_enemy_turret_left = {
 feat_enemy_turret_right = {
     "type": "Turret",
     "level": 0,
+    "collectables": collectables_list_small,
     "image_default": GR_ENEMY_TURRETRIGHT_DEFAULT,
     "animation_blink": GR_ENEMY_TURRETRIGHT_BLINK,
     "weapon": WeaponSingle,
@@ -150,6 +149,7 @@ feat_enemy_turret_right = {
 feat_enemy_turret_down = {
     "type": "Turret",
     "level": 0,
+    "collectables": collectables_list_small,
     "image_default": GR_ENEMY_TURRET_DEFAULT,
     "animation_blink": GR_ENEMY_TURRET_BLINK,
     "weapon": WeaponSingle,
@@ -165,6 +165,7 @@ feat_enemy_turret_down = {
 feat_enemy_fighter_single = {
     "type": "Ship",
     "level": 10,
+    "collectables": collectables_list_medium,
     "image_default": GR_ENEMY_FIGHTER_DEFAULT,
     "animation_blink": GR_ENEMY_FIGHTER_BLINK,
     "weapon": WeaponSingle,
@@ -180,6 +181,7 @@ feat_enemy_fighter_single = {
 feat_enemy_fighter_double = {
     "type": "Ship",
     "level": 15,
+    "collectables": collectables_list_medium,
     "image_default": GR_ENEMY_FIGHTER_DEFAULT,
     "animation_blink": GR_ENEMY_FIGHTER_BLINK,
     "weapon": WeaponDouble,
@@ -195,6 +197,7 @@ feat_enemy_fighter_double = {
 feat_enemy_spike_down = {
     "type": "Spike",
     "level": 5,
+    "collectables": collectables_list_small,
     "image_default": GR_ENEMY_SPIKE_DEFAULT,
     "animation_blink": GR_ENEMY_SPIKE_BLINK,
     "weapon": WeaponSingle,
@@ -210,6 +213,7 @@ feat_enemy_spike_down = {
 feat_enemy_spike_left = {
     "type": "Spike",
     "level": 5,
+    "collectables": collectables_list_small,
     "image_default": GR_ENEMY_SPIKE_DEFAULT,
     "animation_blink": GR_ENEMY_SPIKE_BLINK,
     "weapon": WeaponSingle,
@@ -225,6 +229,7 @@ feat_enemy_spike_left = {
 feat_enemy_spike_right = {
     "type": "Spike",
     "level": 5,
+    "collectables": collectables_list_small,
     "image_default": GR_ENEMY_SPIKE_DEFAULT,
     "animation_blink": GR_ENEMY_SPIKE_BLINK,
     "weapon": WeaponSingle,
@@ -240,6 +245,7 @@ feat_enemy_spike_right = {
 feat_enemy_boss = {
     "type": "Boss",
     "level": 20,
+    "collectables": collectables_list_boss,
     "image_default": GR_ENEMY_BIG_DEFAULT,
     "animation_blink": GR_ENEMY_BIG_BLINK,
     "weapon": WeaponMinigun,
@@ -255,6 +261,7 @@ feat_enemy_boss = {
 feat_enemy_boss_flame = {
     "type": "Boss",
     "level": 20,
+    "collectables": collectables_list_boss,
     "image_default": GR_ENEMY_BIGFLAME_DEFAULT,
     "animation_blink": GR_ENEMY_BIGFLAME_BLINK,
     "weapon": WeaponBossThrower,
@@ -270,6 +277,7 @@ feat_enemy_boss_flame = {
 feat_enemy_boss_missile = {
     "type": "Boss",
     "level": 20,
+    "collectables": collectables_list_boss,
     "image_default": GR_ENEMY_BIG_DEFAULT,
     "animation_blink": GR_ENEMY_BIG_BLINK,
     "weapon": WeaponMissileLauncher,
@@ -285,6 +293,7 @@ feat_enemy_boss_missile = {
 feat_enemy_boss_rocket = {
     "type": "Boss",
     "level": 20,
+    "collectables": collectables_list_boss,
     "image_default": GR_ENEMY_BIG_DEFAULT,
     "animation_blink": GR_ENEMY_BIG_BLINK,
     "weapon": WeaponEnemyRocketLauncher,
@@ -300,6 +309,7 @@ feat_enemy_boss_rocket = {
 feat_enemy_boss_distributor = {
     "type": "Boss",
     "level": 20,
+    "collectables": collectables_list_boss,
     "image_default": GR_ENEMY_BIG_DEFAULT,
     "animation_blink": GR_ENEMY_BIG_BLINK,
     "weapon": WeaponDistributor,
