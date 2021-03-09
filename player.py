@@ -54,6 +54,7 @@ class PlayerShip(pygame.sprite.Sprite, Base):
                     level.removeBlock(hitted_block[0], hitted_block[1])
                 else:
                     self.hitpoints -= 1
+                    level.flashBg()
 
             if self.invincible <= 0:
                 # Check collision to ammo
@@ -61,7 +62,8 @@ class PlayerShip(pygame.sprite.Sprite, Base):
                 if damage:
                     self.hitpoints -= damage
                     self.setAnimation(self.imageset_hilight, 12)
-                
+                    level.flashBg()
+
                 # Check collision to enemy
                 if pygame.sprite.spritecollideany(self, enemy_group, self.collided):
                     self.hitpoints = 0

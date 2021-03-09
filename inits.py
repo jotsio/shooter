@@ -45,7 +45,11 @@ for x in range(100):
 BLACK = 0, 0, 0
 WHITE = 255, 255, 255
 RED = 255, 0, 0
+DARK_RED = 64, 0, 0
+DARK_GRAY = 32, 32, 32
+
 color_bg_default = BLACK
+color_bg_hilight = DARK_GRAY
 color_text = WHITE
 
 def loadImages(image_list):

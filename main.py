@@ -23,7 +23,6 @@ pygame.display.set_icon(icon[0])
 # Create player
 player = PlayerShip(player_start_x, player_start_y)
 
-
 # Main loop
 while True: 
     # Play the level
@@ -33,7 +32,6 @@ while True:
     counter_backwards = 0
     end_counter = 0
     boss_music = False
-    stars = StarField(250)
     this_level = Walls(levels[current_level])
     loadMusic(this_level.music[0])
     pygame.mixer.music.play(-1)
@@ -144,8 +142,6 @@ while True:
                 enemy = selectEnemy(i[0], i[1], i[2])
 
         # Background update
-        SCREEN.fill(color_bg_default)
-        stars.draw(SCREEN, 2)
         this_level.draw(offset, SCREEN)        
 
         # Draw all the objects

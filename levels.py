@@ -25,6 +25,9 @@ class Walls:
         self.start_point = -len(self.map) * gridsize
         self.rect = pygame.Rect(0, self.start_point, gridsize, gridsize) 
         self.level_finished = False
+        self.stars = StarField(250)
+        self.bg = color_bg_default
+        self.hilight = 0
     
     # Convert levels to lists
     def levelToList(self, map):
@@ -96,6 +99,16 @@ class Walls:
 
     # Parses the level map and draws graphics if wall exists
     def draw(self, offset, screen):
+        # Background
+        if self.hilight > 0:
+            self.bg = color_bg_hilight
+            self.hilight -= 1
+        else:
+            self.bg = color_bg_default
+
+        screen.fill(self.bg)
+        self.stars.draw(screen)
+        # Blocks
         rect = pygame.Rect(0, self.start_point, gridsize, gridsize)
         rect.y += offset
         k = 0
@@ -115,7 +128,8 @@ class Walls:
                 rect.x = 0
             k += 1
             rect.y += gridsize
-    
+
+        
     # Parses the level map and returns block position if wall is found
 
     def checkCollision(self, obj_rect, offset):
@@ -181,7 +195,9 @@ class Walls:
             y += gridsize
         return enemy_list 
 
-            
+    def flashBg(self):
+        self.bg = color_bg_hilight
+        self.hilight = 8
 
 # Animated star background
 class StarField:
@@ -193,6 +209,7 @@ class StarField:
         self.z = [0.0] * amount
         self.color = [0,0,0] * amount
         self.speed = [0.0] * amount
+        self.speed_multiplier = 1
 
         #Create star a random.rect and speed
         i = 0
@@ -206,8 +223,7 @@ class StarField:
             self.speed[i] = c / 255.0 * self.spd
             i += 1
 
-    def draw(self, screen, speed): 
-        self.speed_multiplier = speed / 2
+    def draw(self, screen): 
         i = 0
         while i < self.n:
             self.y[i] += self.speed[i] * self.speed_multiplier
