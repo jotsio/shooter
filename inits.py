@@ -252,6 +252,12 @@ GR_AMMO_PINK_EXPLOSION = loadImages([
     "exp_pink2.png", 
     "exp_pink3.png", 
     "exp_pink4.png"])
+GR_EFFECT_EXPLOSION_PINK_LARGE = loadImages([
+    "exp_pink_large_1.png", 
+    "exp_pink_large_2.png", 
+    "exp_pink_large_3.png",
+    "exp_pink_large_4.png",
+    "exp_pink_large_5.png"])
 GR_EFFECT_EXPLOSION_BIG = loadImages([
     "exp_round1.png", 
     "exp_round2.png", 
