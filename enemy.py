@@ -64,7 +64,7 @@ class NewEnemy(pygame.sprite.Sprite, Base):
         # Shoot if player on shooting line
         distance_x = self.rect.centerx - player.rect.centerx
         distance_y = self.rect.centery - player.rect.centery 
-        distance_y = distance_y + scroll_speed * distance_x / self.features["ammo"]["speed"]
+        distance_y = distance_y + scroll_speed * abs(distance_x) / self.features["ammo"]["speed"]
 
         offset_x = self.orientation[0] * self.rect.width / 3
         offset_y = self.orientation[1] * self.rect.height / 3       

@@ -19,7 +19,7 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         self.start_y = y
         self.alive = True
         self.invincible = 0
-        self.hitpoints = 5
+        self.hitpoints = 10
         self.hitpoints_max = 10
         self.max_speedx = 4.0
         self.max_speedy = 3.0
