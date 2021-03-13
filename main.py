@@ -142,7 +142,7 @@ while True:
                 enemy = selectEnemy(i[0], i[1], i[2])
 
         # Background update
-        this_level.draw(offset, SCREEN)        
+        this_level.draw(offset, SCREEN, scroll_speed)        
 
         # Draw all the objects
         player_ammo_group.draw(SCREEN)

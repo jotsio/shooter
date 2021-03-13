@@ -17,15 +17,15 @@ class Walls:
         self.reset(features)
 
     def reset(self, features):
-        self.map = self.levelToList(features[0])
-        self.img = features[1]  
-        self.music = features[2]
-        self.width = features[3]
-        self.height = features[4]-32
+        self.map = self.levelToList(features["map"])
+        self.img = features["imageset"]  
+        self.music = features["music"]
+        self.width = width
+        self.height = height - 32
         self.start_point = -len(self.map) * gridsize
         self.rect = pygame.Rect(0, self.start_point, gridsize, gridsize) 
         self.level_finished = False
-        self.stars = StarField(250)
+        self.background = features["background"]()
         self.bg = color_bg_default
         self.hilight = 0
     
@@ -98,7 +98,7 @@ class Walls:
         return block
 
     # Parses the level map and draws graphics if wall exists
-    def draw(self, offset, screen):
+    def draw(self, offset, screen, scroll_speed):
         # Background
         if self.hilight > 0:
             self.bg = color_bg_hilight
@@ -107,7 +107,7 @@ class Walls:
             self.bg = color_bg_default
 
         screen.fill(self.bg)
-        self.stars.draw(screen)
+        self.background.draw(scroll_speed, screen)
         # Blocks
         rect = pygame.Rect(0, self.start_point, gridsize, gridsize)
         rect.y += offset
@@ -200,16 +200,15 @@ class Walls:
         self.hilight = 8
 
 # Animated star background
-class StarField:
-    def __init__(self, amount):
-        self.n = amount
+class BgStarField:
+    def __init__(self):
+        self.n = 250
         self.spd = 0.5
-        self.y = [0.0] * amount
-        self.x = [0.0] * amount
-        self.z = [0.0] * amount
-        self.color = [0,0,0] * amount
-        self.speed = [0.0] * amount
-        self.speed_multiplier = 1
+        self.y = [0.0] * self.n
+        self.x = [0.0] * self.n
+        self.z = [0.0] * self.n
+        self.color = [0,0,0] * self.n
+        self.speed = [0.0] * self.n
 
         #Create star a random.rect and speed
         i = 0
@@ -223,20 +222,49 @@ class StarField:
             self.speed[i] = c / 255.0 * self.spd
             i += 1
 
-    def draw(self, screen): 
+    def draw(self, scroll_speed, screen): 
         i = 0
         while i < self.n:
-            self.y[i] += self.speed[i] * self.speed_multiplier
+            self.y[i] += self.speed[i] * scroll_speed
             if self.y[i] > height: self.y[i] = 0
             pygame.gfxdraw.pixel(screen, self.x[i], int(self.y[i]), self.color[i])
             i += 1
 
 # Level parameters
 levels = [
-    (level1_map, GR_WALLSET_TOR, music_planet, width, height), 
-    (level2_map, GR_WALLSET_STONE, music_star, width, height),  
-    (level3_map, GR_WALLSET_TOR, music_solar, width, height),
-    (level4_map, GR_WALLSET_STONE, music_planet, width, height),
-    (level5_map, GR_WALLSET_TECH, music_star, width, height),
-    (level6_map, GR_WALLSET_TECH, music_solar, width, height) 
-    ]
+    {
+    "map":level1_map, 
+    "imageset": GR_WALLSET_TOR, 
+    "background": BgStarField, 
+    "music": music_planet
+    },
+    {
+    "map":level2_map, 
+    "imageset": GR_WALLSET_STONE, 
+    "background": BgStarField, 
+    "music": music_star
+    },
+    {
+    "map":level3_map, 
+    "imageset": GR_WALLSET_TOR, 
+    "background": BgStarField, 
+    "music": music_solar
+    },
+    {
+    "map":level4_map, 
+    "imageset": GR_WALLSET_STONE, 
+    "background": BgStarField, 
+    "music": music_planet
+    },
+    {
+    "map":level5_map, 
+    "imageset": GR_WALLSET_TECH, 
+    "background": BgStarField, 
+    "music": music_star
+    },
+    {
+    "map":level6_map, 
+    "imageset": GR_WALLSET_TECH, 
+    "background": BgStarField, 
+    "music": music_solar
+    }]
