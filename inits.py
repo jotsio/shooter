@@ -46,10 +46,15 @@ BLACK = 0, 0, 0
 WHITE = 255, 255, 255
 RED = 255, 0, 0
 DARK_RED = 64, 0, 0
-DARK_GRAY = 32, 32, 32
+GRAY_800 = 32, 32, 32
+VIOLET_800 = 26, 0, 62
+VIOLET_700 = 40, 20, 80
 
-color_bg_default = BLACK
-color_bg_hilight = DARK_GRAY
+color_bg_stars_default = BLACK
+color_bg_stars_hilight = GRAY_800
+color_bg_clouds_default = VIOLET_800
+color_bg_clouds_hilight = VIOLET_700
+
 color_text = WHITE
 
 def loadImages(image_list):
@@ -291,6 +296,12 @@ GR_ACCESSORIES_SHIELD = loadImages([
     "shield_3.png",
     "shield_4.png"])
 
+# Parallax backgrounds
+GR_BACKGROUND_CLOUDS_TOP = loadImages([
+    "cloud_parallax_1.png"])
+
+GR_BACKGROUND_CLOUDS_BOTTOM = loadImages([
+    "cloud_parallax_2.png"])
 
 # Load sounds
 snd_laser = loadSound("laser1.ogg", 0.15)

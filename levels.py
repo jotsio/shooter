@@ -26,7 +26,6 @@ class Walls:
         self.rect = pygame.Rect(0, self.start_point, gridsize, gridsize) 
         self.level_finished = False
         self.background = features["background"]()
-        self.bg = color_bg_default
         self.hilight = 0
     
     # Convert levels to lists
@@ -101,12 +100,11 @@ class Walls:
     def draw(self, offset, screen, scroll_speed):
         # Background
         if self.hilight > 0:
-            self.bg = color_bg_hilight
+            self.background.hilightOn()
             self.hilight -= 1
         else:
-            self.bg = color_bg_default
+            self.background.hilightOff()
 
-        screen.fill(self.bg)
         self.background.draw(scroll_speed, screen)
         # Blocks
         rect = pygame.Rect(0, self.start_point, gridsize, gridsize)
@@ -196,10 +194,10 @@ class Walls:
         return enemy_list 
 
     def flashBg(self):
-        self.bg = color_bg_hilight
+        self.background.hilightOn()
         self.hilight = 8
 
-# Animated star background
+# Background, starfield
 class BgStarField:
     def __init__(self):
         self.n = 250
@@ -209,6 +207,7 @@ class BgStarField:
         self.z = [0.0] * self.n
         self.color = [0,0,0] * self.n
         self.speed = [0.0] * self.n
+        self.bg_color = color_bg_stars_default
 
         #Create star a random.rect and speed
         i = 0
@@ -222,7 +221,14 @@ class BgStarField:
             self.speed[i] = c / 255.0 * self.spd
             i += 1
 
+    def hilightOn(self):
+        self.bg_color = color_bg_stars_hilight
+
+    def hilightOff(self):
+        self.bg_color = color_bg_stars_default
+
     def draw(self, scroll_speed, screen): 
+        screen.fill(self.bg_color)
         i = 0
         while i < self.n:
             self.y[i] += self.speed[i] * scroll_speed
@@ -230,18 +236,53 @@ class BgStarField:
             pygame.gfxdraw.pixel(screen, self.x[i], int(self.y[i]), self.color[i])
             i += 1
 
+# Background, clouds
+class BgClouds:
+    def __init__(self):
+        self.layer_1 = BgLayer(GR_BACKGROUND_CLOUDS_TOP[0], 0.5)
+        self.layer_2 = BgLayer(GR_BACKGROUND_CLOUDS_BOTTOM[0], 0.25)
+        self.bg_color = color_bg_clouds_default
+
+    def hilightOn(self):
+        self.bg_color = color_bg_clouds_hilight
+
+    def hilightOff(self):
+        self.bg_color = color_bg_clouds_default
+
+    def draw(self, scroll_speed, screen): 
+        screen.fill(self.bg_color)
+        self.layer_2.draw(screen, scroll_speed)
+        self.layer_1.draw(screen, scroll_speed)
+
+class BgLayer:
+    def __init__(self, img, speed):
+        self.image = img
+        self.height = self.image.get_height()
+        self.speed = speed
+        self.offset = 0
+
+    def draw(self, screen, scroll_speed):
+        self.offset += scroll_speed * self.speed 
+        if self.offset < 0:
+            self.offset += heigth
+        if self.offset > self.height:
+            self.offset = 0
+        screen.blit(self.image, (0, round(self.offset)))
+        screen.blit(self.image, (0, round(self.offset-height)))
+
+
 # Level parameters
 levels = [
     {
     "map":level1_map, 
     "imageset": GR_WALLSET_TOR, 
-    "background": BgStarField, 
+    "background": BgClouds, 
     "music": music_planet
     },
     {
     "map":level2_map, 
     "imageset": GR_WALLSET_STONE, 
-    "background": BgStarField, 
+    "background": BgClouds, 
     "music": music_star
     },
     {
@@ -259,7 +300,7 @@ levels = [
     {
     "map":level5_map, 
     "imageset": GR_WALLSET_TECH, 
-    "background": BgStarField, 
+    "background": BgClouds, 
     "music": music_star
     },
     {
