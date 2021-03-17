@@ -24,11 +24,11 @@ textplace_rightdown_first = (width - 64, height - 64)
 textplace_rightdown_second = (width - 128, height - 64)
 
 #pygame.FULLSCREEN
-SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
-#SCREEN = pygame.display.set_mode(size)
+#SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
+SCREEN = pygame.display.set_mode(size)
 
 # Global variables
-framerate = 100
+framerate = 50
 basic_scroll_speed = 2
 offset = 0
 current_level = 0 
@@ -296,12 +296,18 @@ GR_ACCESSORIES_SHIELD = loadImages([
     "shield_3.png",
     "shield_4.png"])
 
-# Parallax backgrounds
-GR_BACKGROUND_CLOUDS_TOP = loadImages([
-    "cloud_parallax_1.png"])
+# Backgrounds and parallaxes
+GR_BACKGROUND_STARS = loadImages(["stars_background.png"])
 
-GR_BACKGROUND_CLOUDS_BOTTOM = loadImages([
-    "cloud_parallax_2.png"])
+GR_PARALLAX_TOR = loadImages(["tor_parallax.png"])
+GR_BACKGROUND_TOR = loadImages(["tor_background.png"])
+
+GR_PARALLAX_STONE = loadImages(["stone_parallax.png"])
+GR_BACKGROUND_STONE = loadImages(["stone_background.png"])
+
+
+
+
 
 # Load sounds
 snd_laser = loadSound("laser1.ogg", 0.15)
