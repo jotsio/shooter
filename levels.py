@@ -25,8 +25,7 @@ class Walls:
         self.start_point = -len(self.map) * gridsize
         self.rect = pygame.Rect(0, self.start_point, gridsize, gridsize) 
         self.level_finished = False
-        self.background = features["background"]()
-        self.hilight = 0
+        self.background = LevelBackground(features["background"], features["parallax"])
     
     # Convert levels to lists
     def levelToList(self, map):
@@ -99,13 +98,8 @@ class Walls:
     # Parses the level map and draws graphics if wall exists
     def draw(self, offset, screen, scroll_speed):
         # Background
-        if self.hilight > 0:
-            self.background.hilightOn()
-            self.hilight -= 1
-        else:
-            self.background.hilightOff()
+        self.background.draw(screen, scroll_speed)
 
-        self.background.draw(scroll_speed, screen)
         # Blocks
         rect = pygame.Rect(0, self.start_point, gridsize, gridsize)
         rect.y += offset
@@ -193,86 +187,23 @@ class Walls:
             y += gridsize
         return enemy_list 
 
-    def flashBg(self):
-        self.background.hilightOn()
-        self.hilight = 8
-
-# Background, starfield
-class BgStarField:
-    def __init__(self):
-        self.n = 250
-        self.spd = 0.5
-        self.y = [0.0] * self.n
-        self.x = [0.0] * self.n
-        self.z = [0.0] * self.n
-        self.color = [0,0,0] * self.n
-        self.speed = [0.0] * self.n
-        self.background = BgLayer(GR_BACKGROUND_STARS[0], 0.0)
-
-        #Create star a random.rect and speed
-        i = 0
-        while i < self.n:
-            self.y[i] = random.randrange(0, height)
-            self.x[i] = random.randrange(0, width)
-            rnd = random.random()
-            self.z[i] = rnd * rnd * 192 + 63
-            c = self.z[i]
-            self.color[i] = c, c, c
-            self.speed[i] = c / 255.0 * self.spd
-            i += 1
-
-    def hilightOn(self):
-        self.bg_color = color_bg_stars_hilight
-
-    def hilightOff(self):
-        self.bg_color = color_bg_stars_default
-
-    def draw(self, scroll_speed, screen): 
-        self.background.draw(screen, scroll_speed)
-        i = 0
-        while i < self.n:
-            self.y[i] += self.speed[i] * scroll_speed
-            if self.y[i] > height: self.y[i] = 0
-            pygame.gfxdraw.pixel(screen, self.x[i], int(self.y[i]), self.color[i])
-            i += 1
-
-# Background, clouds
-class BgTor:
-    def __init__(self):
-        self.parallax = BgLayer(GR_PARALLAX_TOR [0], 0.5)
-        self.background = BgLayer(GR_BACKGROUND_TOR[0], 0.0)
-
-    def hilightOn(self):
-        pass
-
-    def hilightOff(self):
-        pass
-
-    def draw(self, scroll_speed, screen): 
+# Background classes
+class LevelBackground:
+    def __init__(self, bg_image, parallax):
+        self.background = BgLayer(bg_image)
+        self.parallax = parallax
+        self.background.speed = 0.0
+        self.parallax.speed = 0.5
+    
+    def draw(self, screen, scroll_speed): 
         self.background.draw(screen, scroll_speed)
         self.parallax.draw(screen, scroll_speed)
-
-class BgCave:
-    def __init__(self):
-        self.parallax = BgLayer(GR_PARALLAX_STONE [0], 0.5)
-        self.background = BgLayer(GR_BACKGROUND_STONE[0], 0.0)
-
-    def hilightOn(self):
-        pass
-
-    def hilightOff(self):
-        pass
-
-    def draw(self, scroll_speed, screen): 
-        self.background.draw(screen, scroll_speed)
-        self.parallax.draw(screen, scroll_speed)
-
 
 class BgLayer:
-    def __init__(self, img, speed):
-        self.image = pygame.transform.scale(img, (width, height))
+    def __init__(self, img):
+        self.image = pygame.transform.scale(img[0], (width, height))
         self.height = self.image.get_height()
-        self.speed = speed
+        self.speed = 0.0
         self.offset = 0
 
     def draw(self, screen, scroll_speed):
@@ -287,43 +218,75 @@ class BgLayer:
             screen.blit(self.image, (0, round(drawpoint + self.height * rows)))
             rows +=1
 
-
+class StarLayer:
+    def __init__(self):
+        self.n = 250
+        self.speed = 0.5
+        self.y = [0.0] * self.n
+        self.x = [0.0] * self.n
+        self.z = [0.0] * self.n
+        self.color = [0,0,0] * self.n
+        self.star_spd = [0.0] * self.n
+        i = 0
+        while i < self.n:
+            self.y[i] = random.randrange(0, height)
+            self.x[i] = random.randrange(0, width)
+            rnd = random.random()
+            self.z[i] = rnd * rnd * 192 + 63
+            c = self.z[i]
+            self.color[i] = c, c, c
+            self.star_spd[i] = c / 255.0
+            i += 1
+    
+    def draw(self, screen, scroll_speed):
+        i = 0
+        while i < self.n:
+            self.y[i] += self.star_spd[i] * self.speed * scroll_speed
+            if self.y[i] > height: self.y[i] = 0
+            pygame.gfxdraw.pixel(screen, self.x[i], int(self.y[i]), self.color[i])
+            i += 1
 
 # Level parameters
 levels = [
     {
     "map":level1_map, 
     "imageset": GR_WALLSET_TOR, 
-    "background": BgTor, 
+    "background": GR_BACKGROUND_TOR,
+    "parallax": BgLayer(GR_PARALLAX_TOR),
     "music": music_planet
     },
     {
     "map":level2_map, 
     "imageset": GR_WALLSET_STONE, 
-    "background": BgCave, 
+    "background": GR_BACKGROUND_STONE,
+    "parallax": BgLayer(GR_PARALLAX_STONE),
     "music": music_star
     },
     {
     "map":level3_map, 
     "imageset": GR_WALLSET_TOR, 
-    "background": BgTor, 
+    "background": GR_BACKGROUND_TOR,
+    "parallax": BgLayer(GR_PARALLAX_TOR),
     "music": music_solar
     },
     {
     "map":level4_map, 
     "imageset": GR_WALLSET_STONE, 
-    "background": BgCave, 
+    "background": GR_BACKGROUND_STONE,
+    "parallax": BgLayer(GR_PARALLAX_STONE),
     "music": music_planet
     },
     {
     "map":level5_map, 
     "imageset": GR_WALLSET_TECH, 
-    "background": BgStarField, 
+    "background": GR_BACKGROUND_STARS,
+    "parallax": StarLayer(),
     "music": music_star
     },
     {
     "map":level6_map, 
     "imageset": GR_WALLSET_TECH, 
-    "background": BgStarField, 
+    "background": GR_BACKGROUND_STARS,
+    "parallax": StarLayer(),
     "music": music_solar
     }]
