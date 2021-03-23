@@ -107,6 +107,9 @@ class PlayerShip(pygame.sprite.Sprite, Base):
             # Ensures that hitbox is following
             self.alignHitBox(self.rect)
 
+            # Give coordinates for shadow casting
+            #level.background.getPlayerPosition(self.rect)
+
 
     def move(self, scroll_speed): 
         # Move the player

@@ -44,6 +44,7 @@ for x in range(100):
 # Colors
 BLACK = 0, 0, 0
 WHITE = 255, 255, 255
+YELLOW = 255, 255, 0
 RED = 255, 0, 0
 DARK_RED = 64, 0, 0
 GRAY_800 = 32, 32, 32
@@ -168,6 +169,8 @@ GR_PLAYER_SHIELD_BLINK = loadImages([
     "transparent.png",
     "transparent.png",
     "transparent.png"])
+GR_PLAYER_SHADOW = loadImages([
+    "ship_shadow.png"])
 GR_ENEMY_TURRET_DEFAULT = loadImages([
     "enemy_turret_default.png"])
 GR_ENEMY_TURRET_BLINK = loadImages([
