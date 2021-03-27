@@ -25,7 +25,7 @@ textplace_rightdown_second = (width - 128, height - 64)
 
 #pygame.FULLSCREEN
 #SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
-SCREEN = pygame.display.set_mode(size)
+SCREEN = pygame.display.set_mode(size, FULLSCREEN)
 
 # Global variables
 framerate = 50
@@ -264,6 +264,12 @@ GR_AMMO_PINK_EXPLOSION = loadImages([
     "exp_pink2.png", 
     "exp_pink3.png", 
     "exp_pink4.png"])
+GR_AMMO_PINK_EXPLOSION_BIG = loadImages([
+    "exp_pink_huge_1.png", 
+    "exp_pink_huge_2.png", 
+    "exp_pink_huge_3.png",
+    "exp_pink_huge_4.png", 
+    "exp_pink_huge_5.png"])
 GR_EFFECT_EXPLOSION_BIG = loadImages([
     "exp_round1.png", 
     "exp_round2.png", 
@@ -314,11 +320,15 @@ GR_BACKGROUND_STONE = loadImages(["stone_background.png"])
 
 # Load sounds
 snd_laser = loadSound("laser1.ogg", 0.15)
+snd_laser_minigun = loadSound("laser3.ogg", 0.20)
 snd_laser_enemy = loadSound("laser2.ogg", 0.3)
 snd_player_death = loadSound("defeated.ogg", 0.8)
 snd_enemy_death = loadSound("hit1.ogg", 0.8)
 snd_small_explo = loadSound("hit3.ogg", 0.3)
+snd_medium_explo = loadSound("hit4.ogg", 0.5)
 snd_coin = loadSound("coin.ogg", 0.3)
+snd_wall_hit = loadSound("wallbump.ogg", 0.5)
+snd_wall_destroy = loadSound("wall_explode.ogg", 0.8)
 
 # Load music
 music_star = [

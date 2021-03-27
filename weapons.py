@@ -262,7 +262,7 @@ feat_player_beam_minigun = {
     "enemy_group": enemy_group,
     "imageset_default": GR_AMMO_BLUE_DEFAULT,
     "imageset_explosion": GR_AMMO_BLUE_EXPLOSION,
-    "sound_launch": snd_laser,
+    "sound_launch": snd_laser_minigun,
     "sound_explosion": snd_small_explo,
     "speed": 10.0,
     "energy": 3,  
@@ -274,7 +274,7 @@ feat_player_flame = {
     "imageset_default": GR_AMMO_FLAME,
     "imageset_explosion": GR_AMMO_FLAME_EXPLOSION,
     "sound_launch": snd_laser_enemy,
-    "sound_explosion": snd_small_explo,
+    "sound_explosion": snd_medium_explo,
     "speed": 10.0,
     "energy": 3,  
 }
@@ -285,7 +285,7 @@ feat_enemy_flame = {
     "imageset_default": GR_AMMO_FLAME,
     "imageset_explosion": GR_AMMO_FLAME_EXPLOSION,
     "sound_launch": snd_laser_enemy,
-    "sound_explosion": snd_small_explo,
+    "sound_explosion": snd_medium_explo,
     "speed": 10.0,
     "energy": 1,  
 }
@@ -296,7 +296,7 @@ feat_player_rocket = {
     "imageset_default": GR_AMMO_ROCKET_DEFAULT,
     "imageset_explosion": GR_AMMO_ROCKET_EXPLOSION,
     "sound_launch": snd_laser_enemy,
-    "sound_explosion": snd_small_explo,
+    "sound_explosion": snd_medium_explo,
     "speed": 0.01,
     "energy": 11,  
 }
@@ -307,7 +307,7 @@ feat_enemy_beam_default = {
     "imageset_default": GR_AMMO_PINK_DEFAULT,
     "imageset_explosion": GR_AMMO_PINK_EXPLOSION,
     "sound_launch": snd_laser_enemy,
-    "sound_explosion": snd_laser_enemy,
+    "sound_explosion": snd_medium_explo,
     "speed": 5.0,
     "energy": 1,  
 }
@@ -318,7 +318,7 @@ feat_enemy_beam_large = {
     "imageset_default": GR_AMMO_PINKBIG_DEFAULT,
     "imageset_explosion": GR_AMMO_PINK_EXPLOSION,
     "sound_launch": snd_laser_enemy,
-    "sound_explosion": snd_small_explo,
+    "sound_explosion": snd_medium_explo,
     "speed": 8.0,
     "energy": 1,  
 }
@@ -327,9 +327,9 @@ feat_enemy_missile = {
     "own_group": enemy_ammo_group,
     "enemy_group": player_group,
     "imageset_default": GR_AMMO_MISSILE_DEFAULT,
-    "imageset_explosion": GR_EFFECT_EXPLOSION_BIG,
+    "imageset_explosion": GR_AMMO_PINK_EXPLOSION_BIG,
     "sound_launch": snd_laser_enemy,
-    "sound_explosion": snd_small_explo,
+    "sound_explosion": snd_wall_destroy,
     "speed": 2.0,
     "energy": 101,  
 }
@@ -338,9 +338,9 @@ feat_enemy_rocket = {
     "own_group": enemy_ammo_group,
     "enemy_group": player_group,
     "imageset_default": GR_AMMO_ROCKET_PINK,
-    "imageset_explosion": GR_EFFECT_EXPLOSION_BIG,
+    "imageset_explosion": GR_AMMO_PINK_EXPLOSION_BIG,
     "sound_launch": snd_laser_enemy,
-    "sound_explosion": snd_small_explo,
+    "sound_explosion": snd_wall_destroy,
     "speed": 2.0,
     "energy": 101,  
 }

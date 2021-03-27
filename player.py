@@ -46,14 +46,18 @@ class PlayerShip(pygame.sprite.Sprite, Base):
                 self.alive = False
                 self.explode(GR_EFFECT_EXPLOSION_BIG, snd_player_death)
                 player_group.remove(self)
+                
 
             # Dies if collided to level walls but destroys them when invincible
             hitted_block = level.checkCollision(self.hitbox, offset)
             if hitted_block:
                 if self.invincible > 0:
                     level.removeBlock(hitted_block[0], hitted_block[1])
+                    snd_wall_destroy.play()
                 else:
                     self.hitpoints -= 1
+                    self.setAnimation(self.imageset_hilight, 12)
+                    snd_wall_hit.play()
     
 
             if self.invincible <= 0:
