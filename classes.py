@@ -1,7 +1,6 @@
 import pygame
 import math
 import random
-from levels import *
 from pygame.locals import *
 from inits import *
 
@@ -40,7 +39,6 @@ class Base():
         self.alignHitBox(self.rect) 
         self.ticks_in_frame = 4
         self.counter = 0
-        self.alignHitBox(self.rect)
         self.hitpoints = 1
         self.max_speedx = 32.0
         self.max_speedy = 32.0
@@ -185,4 +183,19 @@ class NewEffect(pygame.sprite.Sprite, Base):
         # Update animation
         self.changeFrame()
 
+class NewParticleEffect(pygame.sprite.Sprite, Base):
+    def __init__(self, x, y, imageset):
+        pygame.sprite.Sprite.__init__(self)
+        Base.__init__(self, x, y, imageset, effects_group)
+        self.lifetime = random.randrange(10, 50)
+        self.sprinkle(10)
+    
+    def update(self, level, offset):
+        # Erase if lifetime spent
+        if self.counter >= self.lifetime:
+            self.kill()
+        self.counter += 1
+        
+    
 
+    

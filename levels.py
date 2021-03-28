@@ -1,5 +1,6 @@
 import random
 from inits import *
+from classes import *
 from level_test import *
 from level1 import *
 from level2 import *
@@ -26,7 +27,8 @@ class Walls:
         self.rect = pygame.Rect(0, self.start_point, gridsize, gridsize) 
         self.level_finished = False
         self.background = LevelBackground(features["background"], features["parallax"], features["shadow"])
-    
+        self.splinter = features["splinter"]
+
     # Convert levels to lists
     def levelToList(self, map):
         i = 0
@@ -161,6 +163,12 @@ class Walls:
     # Removes defined wallblock from level
     def removeBlock(self, col, row):
         self.map[row][col] = "."
+        
+    def createPieces(self, x, y, amount):
+        i = 0
+        while amount > i:
+            NewParticleEffect(x, y, self.splinter)
+            i += 1
 
     # Gives a list of enemy characters from current row
     def getEnemies(self, offset):
@@ -261,6 +269,7 @@ levels = [
     "background": BgLayer(GR_BACKGROUND_TOR, 0.0),
     "parallax": BgLayer(GR_PARALLAX_TOR, 0.25),
     "shadow": False,
+    "splinter": GR_EFFECT_SPLINTER_TOR,
     "music": music_planet
     },
     {
@@ -269,6 +278,7 @@ levels = [
     "background": BgLayer(GR_BACKGROUND_STONE, 0.4),
     "parallax": BgLayer(GR_PARALLAX_STONE, 0.5),
     "shadow": True,
+    "splinter": GR_EFFECT_SPLINTER_STONE,
     "music": music_star
     },
     {
@@ -277,6 +287,7 @@ levels = [
     "background": BgLayer(GR_BACKGROUND_TOR, 0.0),
     "parallax": BgLayer(GR_PARALLAX_TOR, 0.25),
     "shadow": False,
+    "splinter": GR_EFFECT_SPLINTER_TOR,
     "music": music_solar
     },
     {
@@ -285,6 +296,7 @@ levels = [
     "background": BgLayer(GR_BACKGROUND_STONE, 0.4),
     "parallax": BgLayer(GR_PARALLAX_STONE, 0.5),
     "shadow": True,
+    "splinter": GR_EFFECT_SPLINTER_STONE,
     "music": music_planet
     },
     {
@@ -293,6 +305,7 @@ levels = [
     "background": BgLayer(GR_BACKGROUND_STARS, 0.0),
     "parallax": StarLayer(WHITE, 0.4),
     "shadow": False,
+    "splinter": GR_EFFECT_SPLINTER_TECH,
     "music": music_star
     },
     {
@@ -301,5 +314,6 @@ levels = [
     "background": BgLayer(GR_BACKGROUND_STARS, 0.0),
     "parallax": StarLayer(WHITE, 0.4),
     "shadow": False,
+    "splinter": GR_EFFECT_SPLINTER_TECH,
     "music": music_solar
     }]

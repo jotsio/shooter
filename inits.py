@@ -322,8 +322,9 @@ GR_BACKGROUND_TOR = loadImages(["tor_background.png"])
 
 GR_PARALLAX_STONE = loadImages(["stone_parallax.png"])
 GR_BACKGROUND_STONE = loadImages(["stone_background.png"])
-
-
+GR_EFFECT_SPLINTER_TOR = loadImages(["splinter_tor.png"])
+GR_EFFECT_SPLINTER_STONE = loadImages(["splinter_stone.png"])
+GR_EFFECT_SPLINTER_TECH = loadImages(["splinter_tech.png"])
 
 
 

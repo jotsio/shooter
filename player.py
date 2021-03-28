@@ -51,13 +51,18 @@ class PlayerShip(pygame.sprite.Sprite, Base):
             # Dies if collided to level walls but destroys them when invincible
             hitted_block = level.checkCollision(self.hitbox, offset)
             if hitted_block:
+                block_position = level.locateCollision(self.hitbox, offset)
                 if self.invincible > 0:
                     level.removeBlock(hitted_block[0], hitted_block[1])
                     snd_wall_destroy.play()
+                    level.createPieces(block_position[0], block_position[1], 10)
                 else:
+                    self.bounceFromRect(block_position)
                     self.hitpoints -= 1
                     self.setAnimation(self.imageset_hilight, 12)
                     snd_wall_hit.play()
+                    # Bounces form walls
+                 
     
 
             if self.invincible <= 0:
@@ -95,9 +100,6 @@ class PlayerShip(pygame.sprite.Sprite, Base):
             # Bounces from sides of level
             self.bounceFromSides(level, offset)
 
-            # Bounces form walls
-            self.bounceFromRect(level.locateCollision(self.hitbox, offset))
-
             # Apply Friction
             self.applyFriction(self.frictionX, self.frictionY)
 
@@ -113,7 +115,6 @@ class PlayerShip(pygame.sprite.Sprite, Base):
 
             # Give coordinates for shadow casting
             #level.background.getPlayerPosition(self.rect)
-
 
     def move(self, scroll_speed): 
         # Move the player
@@ -151,6 +152,8 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         if key[pygame.K_5] == True:
             self.weapon = WeaponThrower(feat_player_flame, self.orientation)
             self.weapon.magazine = -1
+        if key[pygame.K_6] == True:
+            self.getShield()
 
     # Change a weapon
     def getWeapon(self, key):
@@ -176,7 +179,8 @@ class PlayerShip(pygame.sprite.Sprite, Base):
             self.setAnimation(self.imageset_hilight, 12)
 
     def getShield(self):
-        PlayerEffect(self, GR_PLAYER_SHIELD, 1000)
+        if self.invincible <= 0:
+            PlayerEffect(self, GR_PLAYER_SHIELD, 1000)
         self.invincible = 1000
 
     # Shooting
