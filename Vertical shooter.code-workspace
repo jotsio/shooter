@@ -1,11 +1,7 @@
 {
-	"folders": [
-		{
-			"path": "..\\Spacefleet"
-		},
-		{
-			"path": "."
-		}
-	],
-	"settings": {}
+    "folders": [
+        {
+            "path": "."
+        }
+    ]
 }
