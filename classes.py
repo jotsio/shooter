@@ -45,6 +45,7 @@ class Base():
         self.speed = (0.0, 0.0)
         self.orientation = (0.0, 0.0)
         self.hit_energy = 0
+        self.destroys_walls = False
         self.killed = False
         self.score = 1
         
@@ -99,6 +100,11 @@ class Base():
         for subject in group:
             if self.collided(self, subject):
                 return subject.hit_energy
+
+    def destroyWall(self, level, row, col, wall_rect):
+        level.removeBlock(row, col)
+        snd_wall_destroy.play()
+        level.createPieces(wall_rect.centerx, wall_rect.centery, 10)
 
     def bounceFromWalls(self, level, offset):
         # Check collision to walls
@@ -188,6 +194,7 @@ class NewParticleEffect(pygame.sprite.Sprite, Base):
         pygame.sprite.Sprite.__init__(self)
         Base.__init__(self, x, y, imageset, effects_group)
         self.lifetime = random.randrange(10, 50)
+        self.rect = self.rect.move(random.randrange(-16, 16), random.randrange(-16, 16))
         self.sprinkle(10)
     
     def update(self, level, offset):

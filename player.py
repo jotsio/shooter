@@ -50,12 +50,10 @@ class PlayerShip(pygame.sprite.Sprite, Base):
 
             # Dies if collided to level walls but destroys them when invincible
             hitted_block = level.checkCollision(self.hitbox, offset)
-            if hitted_block:
-                block_position = level.locateCollision(self.hitbox, offset)
-                if self.invincible > 0:
-                    level.removeBlock(hitted_block[0], hitted_block[1])
-                    snd_wall_destroy.play()
-                    level.createPieces(block_position[0], block_position[1], 10)
+            if hitted_block != None:
+                block_position = hitted_block[2]
+                if self.destroys_walls:
+                    self.destroyWall(level, hitted_block[0], hitted_block[1], hitted_block[2])
                 else:
                     self.bounceFromRect(block_position)
                     self.hitpoints -= 1
@@ -109,6 +107,8 @@ class PlayerShip(pygame.sprite.Sprite, Base):
             # Counts invincibility
             if self.invincible > 0:
                 self.invincible -= 1
+            if self.invincible <= 0:
+                self.removeShield()
 
             # Ensures that hitbox is following
             self.alignHitBox(self.rect)
@@ -178,10 +178,15 @@ class PlayerShip(pygame.sprite.Sprite, Base):
             self.hitpoints += 1
             self.setAnimation(self.imageset_hilight, 12)
 
+    def removeShield(self):
+        self.destroys_walls = False
+        self.invincible = 0
+
     def getShield(self):
         if self.invincible <= 0:
             PlayerEffect(self, GR_PLAYER_SHIELD, 1000)
-        self.invincible = 1000
+            self.invincible = 1000
+            self.destroys_walls = True
 
     # Shooting
     def shoot(self, key):

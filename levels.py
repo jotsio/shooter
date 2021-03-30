@@ -136,7 +136,7 @@ class Walls:
                 while i < len(self.map[k]):
                     if self.map[k][i] == "#":
                         if rect.colliderect(obj_rect):
-                            return (i, k)
+                            return (i, k, rect)
                     rect.x += gridsize
                     i += 1            
                 rect.x = 0
@@ -144,26 +144,15 @@ class Walls:
             rect.y += gridsize
 
     def locateCollision(self, obj_rect, offset):
-        rect = pygame.Rect(0, self.start_point, gridsize, gridsize)
-        rect.y += offset
-        k = 0
-        while k < len(self.map):
-            if rect.y >= -gridsize and rect.y <= height:
-                i = 0 
-                while i < len(self.map[k]):
-                    if self.map[k][i] == "#":
-                        if rect.colliderect(obj_rect):
-                            return rect
-                    rect.x += gridsize
-                    i += 1            
-                rect.x = 0
-            k += 1
-            rect.y += gridsize
+        result = self.checkCollision(obj_rect, offset)
+        if result != None:
+            return result[2]
 
     # Removes defined wallblock from level
     def removeBlock(self, col, row):
         self.map[row][col] = "."
-        
+    
+
     def createPieces(self, x, y, amount):
         i = 0
         while amount > i:
@@ -264,7 +253,7 @@ class StarLayer:
 # Level parameters
 levels = [
     {
-    "map":level1_map, 
+    "map":level0_map,
     "imageset": GR_WALLSET_TOR, 
     "background": BgLayer(GR_BACKGROUND_TOR, 0.0),
     "parallax": BgLayer(GR_PARALLAX_TOR, 0.25),

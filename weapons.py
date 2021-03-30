@@ -17,15 +17,16 @@ class AmmoBasic(pygame.sprite.Sprite, Base):
         self.speed = direction
         self.speed = (self.speed[0] * features["speed"], self.speed[1] * features["speed"])
         self.hit_energy = features["energy"]
+        if self.hit_energy > 100:
+            self.destroys_walls = True
         features["sound_launch"].play()
 
-    def update(self, level, offset, player):
-
+    def basicAmmoChecks(self, level, offset, player):
         # Explode if collided to level walls
         hitted_block = level.checkCollision(self.hitbox, offset)
-        if hitted_block:
-            if self.hit_energy > 100:
-                level.removeBlock(hitted_block[0], hitted_block[1])
+        if hitted_block != None:
+            if self.destroys_walls:
+                self.destroyWall(level, hitted_block[0], hitted_block[1], hitted_block[2])
             self.hitpoints = 0
         # Explode if collided to collision group
         elif self.collisionToEnemy():
@@ -35,11 +36,15 @@ class AmmoBasic(pygame.sprite.Sprite, Base):
         if self.destroyed() == True:
             self.explode(self.features["imageset_explosion"], self.features["sound_explosion"])
             self.kill()
+
         # Disappear if outside the area
         if self.outsideArea(level):
             self.kill()
 
         self.changeFrame()
+
+    def update(self, level, offset, player):
+        self.basicAmmoChecks(level, offset, player)
 
     def explode(self, animation, sound):
         NewEffect(self.rect.centerx, self.rect.centery, animation)
@@ -47,31 +52,13 @@ class AmmoBasic(pygame.sprite.Sprite, Base):
 
 class AmmoMissile(AmmoBasic):
     def update(self, level, offset, player):
+        self.basicAmmoChecks(level, offset, player)
 
-        # Explode if collided to level walls
-        hitted_block = level.checkCollision(self.hitbox, offset)
-        if hitted_block:
-            if self.hit_energy > 100:
-                level.removeBlock(hitted_block[0], hitted_block[1])
-            self.hitpoints = 0
-        # Explode if collided to collision group
-        elif self.collisionToEnemy():
-            self.hitpoints = 0
-        # Updates possible animation
-
-        if self.destroyed() == True:
-            self.explode(self.features["imageset_explosion"], self.features["sound_explosion"])
-            self.kill()
-        # Disappear if outside the area
-        if self.outsideArea(level):
-            self.kill()
         # Guides itself towards player
         if self.rect.centerx > player.rect.centerx:
             self.speed = (self.speed[0] - 0.1, self.speed[1])
         if self.rect.centerx < player.rect.centerx:
             self.speed = (self.speed[0] + 0.1, self.speed[1])
-
-        self.changeFrame()
 
     def move(self, scroll_speed):
         self.rect = self.rect.move(self.speed)
@@ -98,30 +85,12 @@ class AmmoRocket(AmmoBasic):
 
 class AmmoFlame(AmmoBasic):
     def update(self, level, offset, player):
-
-        # Explode if collided to level walls
-        hitted_block = level.checkCollision(self.hitbox, offset)
-        if hitted_block:
-            if self.hit_energy > 10: 
-                level.removeBlock(hitted_block[0], hitted_block[1])
-            self.hitpoints = 0
-        # Explode if collided to collision group
-        elif self.collisionToEnemy():
-            self.hitpoints = 0
-        # Updates possible animation
-
-        if self.destroyed() == True:
-            self.explode(self.features["imageset_explosion"], self.features["sound_explosion"])
-            self.kill()
-        # Disappear if outside the area
-        if self.outsideArea(level):
-            self.kill()
+        self.basicAmmoChecks(level, offset, player)
         
         if self.counter >= len(self.animation) * self.ticks_in_frame:
             self.kill()
 
         self.applyFriction(0.0, 0.2)
-        self.changeFrame()
 
 # Weapons
 class WeaponBase():
