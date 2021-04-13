@@ -23,7 +23,7 @@ class NewEnemy(pygame.sprite.Sprite, Base):
         self.type = features["type"]
         self.score = features["score"]
         self.hitpoints = features["hitpoints"]
-        self.weapon = features["weapon"](features["ammo"], self.orientation)
+        self.weapon = features["weapon"](self, features["ammo"], self.orientation)
         self.accuracy = features["accuracy"]
         self.alignHitBox(self.rect)
         self.speed = features["initial_speed"]
@@ -70,9 +70,9 @@ class NewEnemy(pygame.sprite.Sprite, Base):
         offset_y = self.orientation[1] * self.rect.height / 3       
         if self.orientation[0] * distance_x <= 0 and self.orientation[1] * distance_y <= 0:
             if (self.orientation[0] == 0 and abs(distance_x) <= self.accuracy) or (self.orientation[1] == 0 and abs(distance_y) <= self.accuracy):
-                self.weapon.launch(self.rect.centerx + offset_x, self.rect.centery + offset_y)
+                self.weapon.launch(self.rect.centerx + offset_x, self.rect.centery + offset_y, level, offset)
             if (self.orientation[0] != 0 and self.orientation[1] != 0) and (abs(abs(distance_x) - abs(distance_y)) <= self.accuracy):
-                self.weapon.launch(self.rect.centerx + offset_x, self.rect.centery + offset_y)
+                self.weapon.launch(self.rect.centerx + offset_x, self.rect.centery + offset_y, level, offset)
 
         # Update shooting delay
         self.weapon.shoot_timer += 1

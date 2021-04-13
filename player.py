@@ -28,6 +28,7 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         self.setStartPosition()
         self.getWeapon(1)
         self.tryout = 0
+        self.fire = False
         
     
     # Set player to starting position on screen and initialize hitbox
@@ -60,8 +61,6 @@ class PlayerShip(pygame.sprite.Sprite, Base):
                     self.setAnimation(self.imageset_hilight, 12)
                     snd_wall_hit.play()
                     # Bounces form walls
-                 
-    
 
             if self.invincible <= 0:
                 # Check collision to ammo
@@ -70,12 +69,15 @@ class PlayerShip(pygame.sprite.Sprite, Base):
                     self.hitpoints -= damage
                     self.setAnimation(self.imageset_hilight, 12)
                     
-
                 # Check collision to enemy
                 if pygame.sprite.spritecollideany(self, enemy_group, self.collided):
                     self.hitpoints = 0
 
-            # Update shooting delay
+            # Shooting
+            if self.fire == True and self.alive == True:
+                self.weapon.launch(self.rect.centerx, self.rect.y, level, offset)
+                self.fire = False
+            
             self.weapon.shoot_timer += 1
 
             # Check special weapon ammo left and go back to default weapon
@@ -138,39 +140,42 @@ class PlayerShip(pygame.sprite.Sprite, Base):
     # Change a weapon
     def changeWeapon(self, key):
         if key[pygame.K_1] == True:
-            self.weapon = WeaponSingle(feat_player_beam_default, self.orientation)
+            self.weapon = WeaponSingle(self, feat_player_beam_default, self.orientation)
             self.weapon.magazine = -1
         if key[pygame.K_2] == True:
-            self.weapon = WeaponDouble(feat_player_beam_default, self.orientation)
+            self.weapon = WeaponDouble(self, feat_player_beam_default, self.orientation)
             self.weapon.magazine = -1
         if key[pygame.K_3] == True:
-            self.weapon = WeaponMinigun(feat_player_beam_minigun, self.orientation)
+            self.weapon = WeaponMinigun(self, feat_player_beam_minigun, self.orientation)
             self.weapon.magazine = -1
         if key[pygame.K_4] == True:
-            self.weapon = WeaponLauncher(feat_player_rocket, self.orientation)
+            self.weapon = WeaponLauncher(self, feat_player_rocket, self.orientation)
             self.weapon.magazine = -1
         if key[pygame.K_5] == True:
-            self.weapon = WeaponThrower(feat_player_flame, self.orientation)
+            self.weapon = WeaponThrower(self, feat_player_flame, self.orientation)
             self.weapon.magazine = -1
         if key[pygame.K_6] == True:
+            self.weapon = WeaponLaser(self, feat_player_laser, self.orientation)
+            self.weapon.magazine = -1
+        if key[pygame.K_7] == True:
             self.getShield()
 
     # Change a weapon
     def getWeapon(self, key):
         if key == 1:
-            self.weapon = WeaponSingle(feat_player_beam_default, self.orientation)
+            self.weapon = WeaponSingle(self, feat_player_beam_default, self.orientation)
             self.weapon.magazine = -1
         if key == 2:
-            self.weapon = WeaponDouble(feat_player_beam_default, self.orientation)
+            self.weapon = WeaponDouble(self, feat_player_beam_default, self.orientation)
             self.weapon.magazine = 15
         if key == 3:
-            self.weapon = WeaponMinigun(feat_player_beam_default, self.orientation)
+            self.weapon = WeaponMinigun(self, feat_player_beam_default, self.orientation)
             self.weapon.magazine = 30
         if key == 4:
-            self.weapon = WeaponLauncher(feat_player_rocket, self.orientation)
+            self.weapon = WeaponLauncher(self, feat_player_rocket, self.orientation)
             self.weapon.magazine = 15
         if key == 5:
-            self.weapon = WeaponThrower(feat_player_flame, self.orientation)
+            self.weapon = WeaponThrower(self, feat_player_flame, self.orientation)
             self.weapon.magazine = 60
 
     def getHealth(self):
@@ -189,11 +194,10 @@ class PlayerShip(pygame.sprite.Sprite, Base):
             self.destroys_walls = True
 
     # Shooting
-    def shoot(self, key):
-        if self.alive == True and key == True:
-            self.weapon.launch(self.rect.centerx, self.rect.y)
-
-
+    def shoot(self, key, level):
+        if key == True:
+            self.fire = True
+             
 
 class PlayerEffect(pygame.sprite.Sprite, Base):
     def __init__(self, player, imageset, duration):

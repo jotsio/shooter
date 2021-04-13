@@ -97,7 +97,7 @@ while True:
         acc_x = pressed[pygame.K_RIGHT]-pressed[pygame.K_LEFT]
         acc_y = pressed[pygame.K_DOWN]-pressed[pygame.K_UP]
         player.setSpeed(acc_x, acc_y)
-        player.shoot(pressed[pygame.K_LCTRL] + pressed[pygame.K_SPACE])
+        player.shoot(pressed[pygame.K_LCTRL] + pressed[pygame.K_SPACE], this_level)
         player.changeWeapon(pressed)
 
         # Objects movement

@@ -219,6 +219,7 @@ GR_ENEMY_BIGFLAME_BLINK = loadImages([
     "enemy_big_flame_hilight.png"])
 GR_AMMO_BLUE_DEFAULT = loadImages(["ammo_blue.png"])
 GR_AMMO_BLUE_ROUND = loadImages(["ammo_blue_round.png"])
+GR_AMMO_BLUE_LASER = loadImages(["ammo_blue_laser.png"])
 GR_AMMO_BLUE_EXPLOSION = loadImages([
     "exp_blue1.png", 
     "exp_blue2.png", 

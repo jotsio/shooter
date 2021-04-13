@@ -3,6 +3,7 @@ import random
 from inits import *
 from classes import *
 
+
 # Basic Ammunition
 class AmmoBasic(pygame.sprite.Sprite, Base):
     def __init__(self, x, y, direction, features):
@@ -20,6 +21,7 @@ class AmmoBasic(pygame.sprite.Sprite, Base):
         if self.hit_energy > 100:
             self.destroys_walls = True
         features["sound_launch"].play()
+
 
     def basicAmmoChecks(self, level, offset, player):
         # Explode if collided to level walls
@@ -48,6 +50,42 @@ class AmmoBasic(pygame.sprite.Sprite, Base):
 
     def explode(self, animation, sound):
         NewEffect(self.rect.centerx, self.rect.centery, animation)
+        sound.play()
+
+# Beam
+class AmmoLaser(AmmoBasic):
+    def __init__(self, x, y, direction, features, level, offset):
+        AmmoBasic.__init__(self, x, y, direction, features)
+        y_hit = self.defineBeamTop(level, offset)
+        beam_height = y - y_hit
+        self.image = pygame.transform.scale(self.animation[0], (self.rect.width, beam_height))
+        self.rect = pygame.Rect(x - self.rect.w / 2, y_hit, self.rect.width, beam_height)
+
+
+    def defineBeamTop(self, level, offset):
+        y_result = 0
+        while self.rect.y > -64:
+            hitted_block = level.checkCollision(self.rect, offset)
+            hitted_enemy = self.collisionToEnemy()
+            print(hitted_block, hitted_enemy)
+            if hitted_block != None or hitted_enemy == True:
+                y_result = self.rect[1]
+                break
+            self.rect = self.rect.move(0, -8)
+            self.alignHitBox
+        return y_result
+
+
+    def update(self, level, offset, player):
+        #self.basicAmmoChecks(level, offset, player)
+        if self.counter > 1:
+            self.explode(self.features["imageset_explosion"], self.features["sound_explosion"])
+            self.kill()
+        self.counter += 1
+
+
+    def explode(self, animation, sound):
+        NewEffect(self.rect.centerx, self.rect.y, animation)
         sound.play()
 
 class AmmoMissile(AmmoBasic):
@@ -106,22 +144,22 @@ class WeaponBase():
         self.shoot_delay = round(100 * 60 / rpm)
 
 class WeaponSingle(WeaponBase):
-    def __init__(self, ammo, orientation):
+    def __init__(self, host, ammo, orientation):
         WeaponBase.__init__(self, ammo, orientation)
         self.setFirerate(500)
 
-    def launch(self, x, y):
+    def launch(self, x, y, level, offset):
         if self.shoot_timer >= self.shoot_delay:
             AmmoBasic(x, y, self.orientation, self.ammo)
             self.shoot_timer = 0 
             self.magazine -= 1
 
 class WeaponDouble(WeaponBase):
-    def __init__(self, ammo, orientation):
+    def __init__(self, host, ammo, orientation):
         WeaponBase.__init__(self, ammo, orientation)
         self.setFirerate(500)
 
-    def launch(self, x, y):
+    def launch(self, x, y, level, offset):
         if self.shoot_timer >= self.shoot_delay:
             AmmoBasic(x - 16, y, self.orientation, self.ammo)
             AmmoBasic(x + 16, y, self.orientation, self.ammo)
@@ -129,23 +167,34 @@ class WeaponDouble(WeaponBase):
             self.magazine -= 1
 
 class WeaponMinigun(WeaponBase):
-    def __init__(self, ammo, orientation):
+    def __init__(self, host, ammo, orientation):
         WeaponBase.__init__(self, ammo, orientation)
         self.setFirerate(1000)
 
-    def launch(self, x, y):
+    def launch(self, x, y, level, offset):
         if self.shoot_timer >= self.shoot_delay:
             AmmoBasic(x, y, self.orientation, self.ammo)
             self.shoot_timer = 0 
             self.magazine -= 1
 
+class WeaponLaser(WeaponBase):
+    def __init__(self, host, ammo, orientation):
+        WeaponBase.__init__(self, ammo, orientation)
+        self.shoot_delay = 1
+
+    def launch(self, x, y, level, offset):
+        if self.shoot_timer >= self.shoot_delay:
+            AmmoLaser(x, y, self.orientation, self.ammo, level, offset)
+            self.shoot_timer = 0 
+            self.magazine -= 1
+        
 class WeaponLauncher(WeaponBase):
-    def __init__(self, ammo, orientation):
+    def __init__(self, host, ammo, orientation):
         WeaponBase.__init__(self, ammo, orientation)
         self.setFirerate(500)
         self.side = 1
 
-    def launch(self, x, y):
+    def launch(self, x, y, level, offset):
         if self.shoot_timer >= self.shoot_delay:
             if self.side == 1:
                 AmmoRocket(x - 16, y, self.orientation, self.ammo)
@@ -157,22 +206,22 @@ class WeaponLauncher(WeaponBase):
             self.magazine -= 1
 
 class WeaponThrower(WeaponBase):
-    def __init__(self, ammo, orientation):
+    def __init__(self, host, ammo, orientation):
         WeaponBase.__init__(self, ammo, orientation)
         self.setFirerate(2000)
 
-    def launch(self, x, y):
+    def launch(self, x, y, level, offset):
         if self.shoot_timer >= self.shoot_delay:
             AmmoFlame(x, y, self.orientation, self.ammo)
             self.shoot_timer = 0 
             self.magazine -= 1
 
 class WeaponBossThrower(WeaponBase):
-    def __init__(self, ammo, orientation):
+    def __init__(self, host, ammo, orientation):
         WeaponBase.__init__(self, ammo, orientation)
         self.setFirerate(2000)
 
-    def launch(self, x, y):
+    def launch(self, x, y, level, offset):
         if self.shoot_timer >= self.shoot_delay:
             AmmoFlame(x - 58, y, self.orientation, self.ammo)
             AmmoFlame(x + 58, y, self.orientation, self.ammo)
@@ -180,33 +229,33 @@ class WeaponBossThrower(WeaponBase):
             self.magazine -= 1
 
 class WeaponMissileLauncher(WeaponBase):
-    def __init__(self, ammo, orientation):
+    def __init__(self, host, ammo, orientation):
         WeaponBase.__init__(self, ammo, orientation)
         self.setFirerate(100)
 
-    def launch(self, x, y):
+    def launch(self, x, y, level, offset):
         if self.shoot_timer >= self.shoot_delay:
             AmmoMissile(x, y, self.orientation, self.ammo)
             self.shoot_timer = 0 
             self.magazine -= 1
 
 class WeaponEnemyRocketLauncher(WeaponBase):
-    def __init__(self, ammo, orientation):
+    def __init__(self, host, ammo, orientation):
         WeaponBase.__init__(self, ammo, orientation)
         self.setFirerate(100)
 
-    def launch(self, x, y):
+    def launch(self, x, y, level, offset):
         if self.shoot_timer >= self.shoot_delay:
             AmmoBasic(x, y, self.orientation, self.ammo)
             self.shoot_timer = 0 
             self.magazine -= 1
 
 class WeaponDistributor(WeaponBase):
-    def __init__(self, ammo, orientation):
+    def __init__(self, host, ammo, orientation):
         WeaponBase.__init__(self, ammo, orientation)
         self.setFirerate(300)
 
-    def launch(self, x, y):
+    def launch(self, x, y, level, offset):
         if self.shoot_timer >= self.shoot_delay:
             AmmoBasic(x, y, (0, 1), self.ammo)
             AmmoBasic(x, y, (0.5,1), self.ammo)
@@ -246,6 +295,17 @@ feat_player_flame = {
     "sound_explosion": snd_medium_explo,
     "speed": 10.0,
     "energy": 3,  
+}
+
+feat_player_laser = {
+    "own_group": player_ammo_group,
+    "enemy_group": enemy_group,
+    "imageset_default": GR_AMMO_BLUE_LASER,
+    "imageset_explosion": GR_AMMO_BLUE_EXPLOSION,
+    "sound_launch": snd_laser,
+    "sound_explosion": snd_small_explo,
+    "speed": 0.0,
+    "energy": 4,  
 }
 
 feat_enemy_flame = {
