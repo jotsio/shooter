@@ -220,6 +220,11 @@ GR_ENEMY_BIGFLAME_BLINK = loadImages([
 GR_AMMO_BLUE_DEFAULT = loadImages(["ammo_blue.png"])
 GR_AMMO_BLUE_ROUND = loadImages(["ammo_blue_round.png"])
 GR_AMMO_BLUE_LASER = loadImages(["ammo_blue_laser.png"])
+GR_AMMO_BLUE_LASER_HIT = loadImages([
+    "exp_blue_laser.png", 
+    "exp_blue2.png", 
+    "exp_blue3.png", 
+    "exp_blue4.png"])
 GR_AMMO_BLUE_EXPLOSION = loadImages([
     "exp_blue1.png", 
     "exp_blue2.png", 
@@ -252,6 +257,13 @@ GR_AMMO_FLAME_EXPLOSION = loadImages([
     "exp_flame_1.png", 
     "exp_flame_2.png",
     "exp_flame_3.png"
+    ])
+GR_EFFECT_FLAME = loadImages([
+    "ammo_flame_6.png",
+    "ammo_flame_7.png",
+    "ammo_flame_8.png",
+    "ammo_flame_9.png",
+    "ammo_flame_10.png"
     ])
 GR_AMMO_PINK_DEFAULT = loadImages(["ammo_pink.png"])
 GR_AMMO_PINK_ROUND = loadImages(["ammo_pink_round.png"])
@@ -323,9 +335,21 @@ GR_BACKGROUND_TOR = loadImages(["tor_background.png"])
 
 GR_PARALLAX_STONE = loadImages(["stone_parallax.png"])
 GR_BACKGROUND_STONE = loadImages(["stone_background.png"])
-GR_EFFECT_SPLINTER_TOR = loadImages(["splinter_tor.png"])
-GR_EFFECT_SPLINTER_STONE = loadImages(["splinter_stone.png"])
-GR_EFFECT_SPLINTER_TECH = loadImages(["splinter_tech.png"])
+GR_EFFECT_SPLINTER_TOR = loadImages([
+    "splinter_tor_1.png",
+    "splinter_tor_2.png",
+    "splinter_tor_3.png",
+    "splinter_tor_4.png"])
+GR_EFFECT_SPLINTER_STONE = loadImages([
+    "splinter_stone_1.png",
+    "splinter_stone_2.png",
+    "splinter_stone_3.png",
+    "splinter_stone_4.png"])
+GR_EFFECT_SPLINTER_TECH = loadImages([
+    "splinter_tech_1.png",
+    "splinter_tech_2.png",
+    "splinter_tech_3.png",
+    "splinter_tech_4.png"])
 
 
 

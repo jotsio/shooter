@@ -305,7 +305,7 @@ feat_player_laser = {
     "own_group": player_ammo_group,
     "enemy_group": enemy_group,
     "imageset_default": GR_AMMO_BLUE_LASER,
-    "imageset_explosion": GR_AMMO_BLUE_EXPLOSION,
+    "imageset_explosion": GR_AMMO_BLUE_LASER_HIT,
     "sound_launch": snd_laser,
     "sound_explosion": snd_small_explo,
     "speed": 0.0,

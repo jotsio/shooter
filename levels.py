@@ -36,7 +36,9 @@ class Walls:
         while i < len(map):
             list_map.append(list(map[i]))
             i += 1
+        print(list_map)
         return list_map
+       
 
     def checkSolid(self, character):
         result = False
@@ -154,6 +156,7 @@ class Walls:
     
 
     def createPieces(self, x, y, amount):
+        NewEffect(x, y, GR_EFFECT_FLAME)
         i = 0
         while amount > i:
             NewParticleEffect(x, y, self.splinter)

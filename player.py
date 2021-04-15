@@ -28,8 +28,6 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         self.setStartPosition()
         self.getWeapon(1)
         self.tryout = 0
-        self.fire = False
-        self.beam = False
         
     
     # Set player to starting position on screen and initialize hitbox
@@ -38,6 +36,8 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         self.rect.y = 0
         self.rect = self.rect.move(self.start_x, self.start_y)
         self.alignHitBox(self.rect)
+        self.fire = False
+        self.beam = False
         
     # Passive movement & collision detection
     def update(self, level, offset):

@@ -193,6 +193,8 @@ class NewParticleEffect(pygame.sprite.Sprite, Base):
     def __init__(self, x, y, imageset):
         pygame.sprite.Sprite.__init__(self)
         Base.__init__(self, x, y, imageset, effects_group)
+        random_image = random.randrange(1, len(self.animation))-1
+        self.image = self.animation[random_image]
         self.lifetime = random.randrange(10, 50)
         self.rect = self.rect.move(random.randrange(-16, 16), random.randrange(-16, 16))
         self.sprinkle(10)
