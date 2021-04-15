@@ -56,33 +56,34 @@ class AmmoBasic(pygame.sprite.Sprite, Base):
 class AmmoLaser(AmmoBasic):
     def __init__(self, x, y, direction, features, level, offset):
         AmmoBasic.__init__(self, x, y, direction, features)
-        y_hit = self.defineBeamTop(level, offset)
+        self.scaleBeamByHit(level, offset, x, y)
+        
+
+    def scaleBeamByHit(self, level, offset, x, y):
+        y_hit = 0
+        while self.rect.y > -64:
+            hitted_block = level.checkCollision(self.rect, offset)
+            hitted_enemy = self.collisionToEnemy()
+            if hitted_block != None or hitted_enemy != None:
+                y_hit = self.rect[1]
+                self.explode(self.features["imageset_explosion"], self.features["sound_explosion"])
+                if hitted_block:
+                    self.destroyWall(level, hitted_block[0], hitted_block[1], hitted_block[2])
+                break
+            self.rect = self.rect.move(0, -8)
+            self.alignHitBox(self.rect)
         beam_height = y - y_hit
         self.image = pygame.transform.scale(self.animation[0], (self.rect.width, beam_height))
         self.rect = pygame.Rect(x - self.rect.w / 2, y_hit, self.rect.width, beam_height)
 
 
-    def defineBeamTop(self, level, offset):
-        y_result = 0
-        while self.rect.y > -64:
-            hitted_block = level.checkCollision(self.rect, offset)
-            hitted_enemy = self.collisionToEnemy()
-            print(hitted_block, hitted_enemy)
-            if hitted_block != None or hitted_enemy == True:
-                y_result = self.rect[1]
-                break
-            self.rect = self.rect.move(0, -8)
-            self.alignHitBox
-        return y_result
-
-
     def update(self, level, offset, player):
-        #self.basicAmmoChecks(level, offset, player)
-        if self.counter > 1:
-            self.explode(self.features["imageset_explosion"], self.features["sound_explosion"])
+        player.beam = True
+        self.scaleBeamByHit(level, offset, player.rect.centerx, player.rect.centery)
+        if player.fire == False:    
             self.kill()
+            player.beam = False
         self.counter += 1
-
 
     def explode(self, animation, sound):
         NewEffect(self.rect.centerx, self.rect.y, animation)
@@ -143,6 +144,9 @@ class WeaponBase():
     def setFirerate(self, rpm):
         self.shoot_delay = round(100 * 60 / rpm)
 
+    def releaseTrigger(self):
+        self.shoot_timer = 0
+
 class WeaponSingle(WeaponBase):
     def __init__(self, host, ammo, orientation):
         WeaponBase.__init__(self, ammo, orientation)
@@ -180,7 +184,7 @@ class WeaponMinigun(WeaponBase):
 class WeaponLaser(WeaponBase):
     def __init__(self, host, ammo, orientation):
         WeaponBase.__init__(self, ammo, orientation)
-        self.shoot_delay = 1
+        self.setFirerate(500)
 
     def launch(self, x, y, level, offset):
         if self.shoot_timer >= self.shoot_delay:

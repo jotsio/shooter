@@ -29,6 +29,7 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         self.getWeapon(1)
         self.tryout = 0
         self.fire = False
+        self.beam = False
         
     
     # Set player to starting position on screen and initialize hitbox
@@ -74,10 +75,9 @@ class PlayerShip(pygame.sprite.Sprite, Base):
                     self.hitpoints = 0
 
             # Shooting
-            if self.fire == True and self.alive == True:
+            if self.fire == True and self.alive == True and self.beam == False:
                 self.weapon.launch(self.rect.centerx, self.rect.y, level, offset)
-                self.fire = False
-            
+
             self.weapon.shoot_timer += 1
 
             # Check special weapon ammo left and go back to default weapon
@@ -197,6 +197,8 @@ class PlayerShip(pygame.sprite.Sprite, Base):
     def shoot(self, key, level):
         if key == True:
             self.fire = True
+        else:
+            self.fire = False
              
 
 class PlayerEffect(pygame.sprite.Sprite, Base):
