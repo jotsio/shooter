@@ -86,6 +86,12 @@ c_weapon_thrower = {
     "boost": 5
     }
 
+c_weapon_laser = {
+    "type": "weapon",
+    "imageset": GR_ACCESSORIES_WEAPON_LASER,
+    "boost": 6
+    }
+
 c_powerup = {
     "type": "powerup",
     "imageset": GR_ACCESSORIES_POWERUP,
@@ -139,6 +145,7 @@ collectables_list_boss = [
     c_weapon_minigun,
     c_weapon_launcher,
     c_weapon_thrower,
+    c_weapon_laser,
     c_powerup,
     c_powerup,
 ]

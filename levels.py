@@ -36,7 +36,6 @@ class Walls:
         while i < len(map):
             list_map.append(list(map[i]))
             i += 1
-        print(list_map)
         return list_map
        
 
@@ -256,7 +255,7 @@ class StarLayer:
 # Level parameters
 levels = [
     {
-    "map":level0_map,
+    "map":level1_map,
     "imageset": GR_WALLSET_TOR, 
     "background": BgLayer(GR_BACKGROUND_TOR, 0.0),
     "parallax": BgLayer(GR_PARALLAX_TOR, 0.25),

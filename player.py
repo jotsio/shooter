@@ -177,6 +177,9 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         if key == 5:
             self.weapon = WeaponThrower(self, feat_player_flame, self.orientation)
             self.weapon.magazine = 60
+        if key == 6:
+            self.weapon = WeaponThrower(self, feat_player_laser, self.orientation)
+            self.weapon.magazine = 60
 
     def getHealth(self):
         if self.hitpoints < self.hitpoints_max:

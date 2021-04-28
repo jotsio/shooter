@@ -25,10 +25,11 @@ textplace_rightdown_second = (width - 128, height - 64)
 
 #pygame.FULLSCREEN
 #SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
-SCREEN = pygame.display.set_mode(size, FULLSCREEN)
+pygame.display.Info()
+SCREEN = pygame.display.set_mode(size, FULLSCREEN, SCALED)
 
 # Global variables
-framerate = 50
+framerate = 75
 basic_scroll_speed = 2
 offset = 0
 current_level = 0 
@@ -309,6 +310,8 @@ GR_ACCESSORIES_WEAPON_MINIGUN = loadImages([
 GR_ACCESSORIES_WEAPON_LAUNCHER = loadImages([
     "accessory_weapon_launcher.png"])
 GR_ACCESSORIES_WEAPON_THROWER = loadImages([
+    "accessory_weapon_thrower.png"])
+GR_ACCESSORIES_WEAPON_LASER = loadImages([
     "accessory_weapon_thrower.png"])
 GR_ACCESSORIES_COIN = loadImages([
     "coin_1.png", 
