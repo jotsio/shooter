@@ -13,20 +13,15 @@ player_start_y = round(height-100)
 update_offset_up = -2560
 update_offset_down = 256
 
-# Font
-font_small = pygame.font.Font(None, 24)
-font_medium = pygame.font.Font(None,32)
-font_large = pygame.font.Font(None,48)
-
 # Text positions
 textplace_center = (width // 2, height // 2)
 textplace_rightdown_first = (width - 64, height - 64)
 textplace_rightdown_second = (width - 128, height - 64)
 
 #pygame.FULLSCREEN
-#SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
+SCREEN = pygame.display.set_mode(size, FULLSCREEN | HWACCEL)  
 pygame.display.Info()
-SCREEN = pygame.display.set_mode(size, FULLSCREEN, SCALED)
+#SCREEN = pygame.display.set_mode(size, FULLSCREEN, SCALED)
 
 # Global variables
 framerate = 75
@@ -59,6 +54,13 @@ color_bg_clouds_hilight = VIOLET_700
 
 color_text = WHITE
 
+# Asset folders for images and sounds
+IMG_FOLDER = "assets/"
+TILES_FOLDER = "tilesets/"
+SND_FOLDER = "sounds/"
+MUS_FOLDER = "music/"
+FONT_FOLDER = "fonts/"
+
 def loadImages(image_list):
     folder = IMG_FOLDER
     i = 0
@@ -90,11 +92,19 @@ def loadMusic(filename):
     sound = pygame.mixer.music.load(filename)
     return sound
 
-# Asset folders for images and sounds
-IMG_FOLDER = "assets/"
-TILES_FOLDER = "tilesets/"
-SND_FOLDER = "sounds/"
-MUS_FOLDER = "music/"
+def loadFont(filename, size):
+    folder = FONT_FOLDER
+    filename = folder + filename
+    font = pygame.font.Font(filename, size)
+    return font
+
+# Text Styles
+
+BODY_FONT = "TitilliumWeb-Regular.ttf"
+
+font_small = loadFont(BODY_FONT, 24)
+font_medium = loadFont(BODY_FONT, 32)
+font_large = loadFont(BODY_FONT, 48)
 
 # Tileset file names in right order
 TILES_LIST = [
