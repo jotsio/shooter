@@ -24,7 +24,7 @@ pygame.display.Info()
 #SCREEN = pygame.display.set_mode(size, FULLSCREEN, SCALED)
 
 # Global variables
-framerate = 75
+framerate = 60
 basic_scroll_speed = 2
 offset = 0
 current_level = 0 
