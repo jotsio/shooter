@@ -68,7 +68,7 @@ while True:
                 boss_music = True
             # Check if boss is dead         
             if checkBosses() == False:
-                if end_counter > framerate * 2:
+                if end_counter > framerate * 4:
                     break
                 end_counter += 1
 
