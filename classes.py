@@ -142,6 +142,43 @@ class Base():
                 self.speed = (self.speed[0], -self.speed[1])   
             self.alignRect(self.hitbox)
 
+    def bounceFromTopandBottom(self, level):
+            sx, sy = self.speed
+            if self.rect.top < 0:
+                self.rect.top = 0
+                sy = -sy
+            if self.rect.bottom > level.height:
+                self.rect.bottom = level.height
+                sy = -sy
+            self.speed = (sx, sy)
+
+    def bounceStronglyFromRect(self, obj_rect):
+        if obj_rect != None:
+            power = 6.0
+            sx, sy = self.speed
+            print("first", self.speed)
+            dx = obj_rect.centerx - self.hitbox.centerx
+            dy = obj_rect.centery - self.hitbox.centery
+            if abs(dx) >= abs(dy):
+                if dx <= 0:
+                    self.hitbox.left = obj_rect.right
+                    sx += power
+                else:
+                    self.hitbox.right = obj_rect.left
+                    sx -= power
+
+            else:
+                if dy <= 0:
+                    self.hitbox.top = obj_rect.bottom
+                    sy += power
+                else:
+                    self.hitbox.bottom = obj_rect.top
+                    sy -= power
+
+            self.speed = (sx, sy)  
+            print("then", self.speed)
+            self.alignRect(self.hitbox)
+
     def collisionToEnemy(self):
         return pygame.sprite.spritecollideany(self, self.hostile_group, self.collided)
 

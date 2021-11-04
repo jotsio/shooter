@@ -21,6 +21,7 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         self.invincible = 0
         self.hitpoints = 10
         self.hitpoints_max = 10
+        self.justhittedwall = 0
         self.max_speedx = 4.0
         self.max_speedy = 3.0
         self.frictionX = 0.2 
@@ -41,7 +42,6 @@ class PlayerShip(pygame.sprite.Sprite, Base):
         
     # Passive movement & collision detection
     def update(self, level, offset):
-        sx, sy = self.speed
         # Check if dead        
         if self.alive == True:
             if self.destroyed() == True:
@@ -57,11 +57,16 @@ class PlayerShip(pygame.sprite.Sprite, Base):
                 if self.destroys_walls:
                     self.destroyWall(level, hitted_block[0], hitted_block[1], hitted_block[2])
                 else:
-                    self.bounceFromRect(block_position)
-                    self.hitpoints -= 1
-                    self.setAnimation(self.imageset_hilight, 12)
-                    snd_wall_hit.play()
-                    # Bounces form walls
+                    # Bounces form walls and get some damage
+                    self.bounceStronglyFromRect(block_position)
+                    if self.justhittedwall == 0:
+                        self.hitpoints -= 1
+                        self.justhittedwall = 8
+                        self.setAnimation(self.imageset_hilight, 12)
+                        snd_wall_hit.play()
+                    
+            if self.justhittedwall > 0:
+                self.justhittedwall -= 1
 
             if self.invincible <= 0:
                 # Check collision to ammo
@@ -89,13 +94,7 @@ class PlayerShip(pygame.sprite.Sprite, Base):
                 self.setAnimation(self.imageset_up, 4)
 
             # bounces from top and bottom of the area
-            if self.rect.top < 0:
-                self.rect.top = 0
-                sy = -sy
-            if self.rect.bottom > level.height:
-                self.rect.bottom = level.height
-                sy = -sy
-            self.speed = (sx, sy)
+            self.bounceFromTopandBottom(level)
 
             # Bounces from sides of level
             self.bounceFromSides(level, offset)
@@ -125,16 +124,10 @@ class PlayerShip(pygame.sprite.Sprite, Base):
 
     def setSpeed(self, acc_x, acc_y):
         sx, sy = self.speed
-        sx += acc_x
-        sy += acc_y
-        if sx > self.max_speedx :
-            sx = self.max_speedx
-        if sx < -self.max_speedx :
-            sx = -self.max_speedx
-        if sy > self.max_speedy :
-            sy = self.max_speedy
-        if sy < -self.max_speedy :
-            sy = -self.max_speedy
+        if abs(sx) < self.max_speedx:
+            sx += acc_x
+        if abs(sy) < self.max_speedy:
+            sy += acc_y
         self.speed = (sx, sy)
 
     # Change a weapon
