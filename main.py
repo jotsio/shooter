@@ -10,6 +10,7 @@ from classes import *
 from enemy import *
 from player import *
 from interface import *
+from text import *
 
 # Main program
 #------------- 
@@ -19,6 +20,9 @@ from interface import *
 pygame.display.set_caption("Luolalentely")
 icon = GR_PLAYER_BODY_DEFAULT
 pygame.display.set_icon(icon[0])
+
+# Create game texts
+text = TextContent("Finnish", game_dictionary)
 
 # Create player
 player = PlayerShip(player_start_x, player_start_y)
@@ -157,8 +161,8 @@ while True:
         showHearts(player.hitpoints)
 
         # Show score and money
-        showText(str(money), textplace_rightdown_second, font_medium)
-        showText(str(score), textplace_rightdown_first, font_medium)
+        text.showValue(str(money), textplace_rightdown_second, font_medium)
+        text.showValue(str(score), textplace_rightdown_first, font_medium)
         
         # Update screen
         pygame.display.flip()
@@ -168,18 +172,18 @@ while True:
 
     # Show level ending text
     if player.alive == False:
-        showText("Kuolit!", textplace_center, font_large)
+        text.showTitle("t_player_dead", textplace_center, font_large)
         # Reset player
         player = PlayerShip(player_start_x, player_start_y)
         this_level.reset(levels[current_level])
 
     elif current_level == (len(levels)-1):
-        showText("HIENOA, PELI LÄPÄISTY!", textplace_center, font_large)
+        text.showTitle("t_game_finished", textplace_center, font_large)
         player.setStartPosition()
         current_level = 0
     
     else:
-        showText("Kenttä läpäisty!", textplace_center, font_large)
+        text.showTitle("t_level_finished", textplace_center, font_large)
         player.setStartPosition()
         current_level += 1
     

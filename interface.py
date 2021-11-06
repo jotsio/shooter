@@ -1,13 +1,6 @@
 from inits import *
 
-# Show game titles
-def showText(message, place, font):
-    text = font.render(message, True, color_text)
-    textRect = text.get_rect()
-    textRect.center = place
-    SCREEN.blit(text, textRect)
-  
-
+# Show health
 def showHearts(amount):
     image = GR_UI_HEART_DEFAULT
     Rect = image[0].get_rect()
