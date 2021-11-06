@@ -156,7 +156,6 @@ class Base():
         if obj_rect != None:
             power = 6.0
             sx, sy = self.speed
-            print("first", self.speed)
             dx = obj_rect.centerx - self.hitbox.centerx
             dy = obj_rect.centery - self.hitbox.centery
             if abs(dx) >= abs(dy):
@@ -176,7 +175,6 @@ class Base():
                     sy -= power
 
             self.speed = (sx, sy)  
-            print("then", self.speed)
             self.alignRect(self.hitbox)
 
     def collisionToEnemy(self):
