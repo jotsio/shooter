@@ -1,14 +1,23 @@
 from inits import *
+from assets import *
+
+# Text positions
+textplace_center = (width // 2, height // 2)
+textplace_rightdown_first = (width - 64, height - 64)
+textplace_rightdown_second = (width - 128, height - 64)
+
+# Language handling
 class TextContent():
-    def __init__(self, language, dict):
+    def __init__(self, dict):
         self.dict = dict
+        self.lang = 0
+
+    def setLanguage(self, language):
         if language == "English":
             self.lang = 0
         if language == "Finnish":
             self.lang = 1
-        else:
-            self.lang = 0
-    
+
     def showTitle(self, key, place, font):
         value = self.dict[key][self.lang]
         self.showValue(value, place, font)
@@ -33,3 +42,11 @@ game_dictionary = {
         "Kuolit!"
         ] 
 }
+
+# Create text object
+text = TextContent(game_dictionary)
+
+properties = open("properties.txt", "r")
+language = properties.read()
+properties.close()
+text.setLanguage(language)

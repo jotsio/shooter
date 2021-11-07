@@ -1,28 +1,27 @@
 import pygame
-#import sys, pygame
 import pygame.gfxdraw
 from pygame.locals import *
 import random
 import time
 from inits import *
+from assets import *
+from text import *
+from interface import *
 from levels import *
 from classes import *
 from enemy import *
 from player import *
-from interface import *
-from text import *
 
 # Main program
-#------------- 
-# Pygame initials
-
+#-------------
 # Title
 pygame.display.set_caption("Luolalentely")
-icon = GR_PLAYER_BODY_DEFAULT
-pygame.display.set_icon(icon[0])
+pygame.display.set_icon(GR_PLAYER_BODY_DEFAULT[0])
 
-# Create game texts
-text = TextContent("Finnish", game_dictionary)
+offset = 0
+current_level = 0 
+score = 0
+money = 0
 
 # Create player
 player = PlayerShip(player_start_x, player_start_y)

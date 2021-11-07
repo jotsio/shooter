@@ -1,5 +1,6 @@
 import random
 from inits import *
+from assets import *
 from classes import *
 from level_test import *
 from level1 import *

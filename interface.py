@@ -1,4 +1,5 @@
 from inits import *
+from assets import *
 
 # Show health
 def showHearts(amount):

@@ -1,6 +1,7 @@
 import math
 import random
 from inits import *
+from assets import *
 from classes import *
 
 

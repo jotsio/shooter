@@ -3,6 +3,7 @@ import math
 import random
 from pygame.locals import *
 from inits import *
+from assets import *
 
 score = 0
 
